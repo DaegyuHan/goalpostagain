@@ -19,18 +19,19 @@
   <div class="notice-title">공지사항</div>
 
     <div class="white-main">
-      <div class="white-bg">
+      
         <% for (let i=글목록.length -1; i>=0; i--){ %>
           <div class="list-box">
-            <h4 style="font-size: 18px;">   
-              <a href="/detailnotice/<%=글목록[i]._id%>"><%=글목록[i].title%></a>
+            <h4 style="font-size: 19px;">   
+              <a href="notice-detail/<%=글목록[i]._id%>"><%=글목록[i].title%></a>
             </h4>
             <span>한대규</span>
             <span style="padding-left: 15px ;"><%=글목록[i].today%></span>
           </div>
           <%}%>
-      </div>
+      
     </div>
+
 </body>
 
 </html>

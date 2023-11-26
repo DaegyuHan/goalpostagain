@@ -1,0 +1,46 @@
+
+
+.detail-bg {
+  padding: 15px;
+  margin: 5px;
+}
+
+.detail-title {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.detail-img {
+  align-items: center;
+
+}
+
+.detail-content {
+  padding-top: 30px;
+  font-size: 18px;
+}
+
+.comment-input {
+  width: 85%;
+  height: 60px;
+}
+
+.comment-button {
+  width: 10%;
+  height: 50px;
+  font-size: 14px;
+  background-color: #002832;
+  color: white;
+  border: #002832;
+  border-radius: 5px;
+}
+
+.detail-bt {
+  width: 10%;
+  height: 50px;
+  font-size: 14px;
+  background-color: #002832;
+  color: white;
+  border: #002832;
+  border-radius: 5px;
+}

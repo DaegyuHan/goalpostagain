@@ -1,22 +1,24 @@
 .notice-title {
-  color: white;
-  margin-top: 80px;
-  font-size: 30px;
-  text-align: center;
+    color: white;
+    margin-top: 80px;
+    margin-bottom: 20px;
+    font-size: 30px;
+    text-align: center;
 }
 
 .grey-bg {
     background: #eee;
   }
   
-  .white-bg {
+  /* .white-bg {
     background: white;
     margin: 20px;
-    padding: 20px;
+    padding: 3px;
     border-radius: 5px;
-  }
+  } */
   
   .list-box {
+    margin-left: 10px;
     padding: 5px;
     border-bottom: 1px solid#eee;
   }

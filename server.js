@@ -79,55 +79,83 @@ connectDB.then((client) => {
 
 
 
-app.get('/', (요청, 응답) => {      //간단한 서버 기능, 누가 메인페이지 접속 시 응답함
-  응답.sendFile(__dirname + '/index.html')
+app.get('/', (req, res) => {      //간단한 서버 기능, 누가 메인페이지 접속 시 응답함
+  res.sendFile(__dirname + '/index.html')
 })
 
-app.get('/notice', async (요청, 응답) => {
+app.get('/notice', async (req, res) => {
       let result = await db.collection('notice').find().toArray();
       let Today = new Date().toLocaleString()
-      응답.render('notice.ejs', { 글목록: result, 날짜: Today});
+      console.log(Today)
+      res.render('notice.ejs', { 글목록: result, 날짜: Today});
   });
 
-  app.get('/management', async (요청, 응답) => {
+  app.get('/management', async (req, res) => {
     let result = await db.collection('notice').find().toArray();
-    응답.render('management.ejs', { 글목록: result});
+    res.render('management.ejs', { 글목록: result});
 });
 
-app.get('/management/postnotice', async (요청, 응답) => {
-  응답.render('postnotice.ejs');
+app.get('/management/notice-post', async (req, res) => {
+  res.render('notice-post.ejs');
 });
 
-app.post('/postnotice', async (요청, 응답) => {
+app.post('/notice-post', async (req, res) => {
   let Today = new Date().toLocaleString()
-  upload.single('img1')(요청, 응답, async (err) => {
-    if (err) return 응답.send('업로드에러')
+  upload.single('img1')(req, res, async (err) => {
+    if (err) return res.send('업로드에러')
     try {
-      if (요청.body.title == '') {
-        응답.send('제목입력안했음')
+      if (req.body.title == '') {
+        res.send('제목입력안했음')
       } else {
         await db.collection('notice').insertOne(
           {
             today: Today,
-            title: 요청.body.title,
-            content: 요청.body.content,
-            img: 요청.file ? 요청.file.location : '',
+            title: req.body.title,
+            content: req.body.content,
+            img: req.file ? req.file.location : '',
           }
         )
-        응답.redirect('/notice')
+        res.redirect('/notice')
       }
     } catch (e) {
       console.log(e)
-      응답.status(500).send('서버에러남')
+      res.status(500).send('서버에러남')
     }
   })
 
 })
 
-app.get('/detailnotice/:id', async (요청, 응답) => {
+app.get('/notice-detail/:id', async (req, res) => {
   let notice = await db.collection('notice').find().toArray()
-  let postID = await db.collection('notice').findOne({ _id: new ObjectId(요청.params.id) })
-  console.log(postID)
-  응답.render('detailnotice.ejs', {글: postID,  글목록: notice})
+  let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
+  res.render('notice-detail.ejs', {글: postID,  글목록: notice})
 
+})
+
+app.get('/notice-edit/:id', async (req, res) => {
+  let postID = await db.collection('notice').findOne({ _id : new ObjectId(req.params.id)})
+  res.render('notice-edit.ejs', {글: postID})
+})
+
+app.put('/notice-edit', async (req, res) => {
+  
+  let result = await db.collection('notice').updateOne({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        title: req.body.title,
+        content: req.body.content
+      }
+    })
+
+
+  res.redirect('/notice')
+
+})
+
+app.get('/notice-delete/:id', async (req, res) => {
+  let result = await db.collection('notice').deleteOne({
+    _id: new ObjectId(req.params.id)  
+  })  
+
+  res.redirect('/notice')
 })

@@ -3,6 +3,10 @@ body {
     background-color: #002832;
 
 }
+button:hover {
+    background-color: #ff3ca0;
+}
+
 
 a:hover {
     color: #ff3ca0;
@@ -10,6 +14,7 @@ a:hover {
 
 a {
     color: black;
+    text-decoration: none;
 }
 
 .flex-row {
@@ -36,6 +41,7 @@ a {
     width: 200px;
     height: 160px;
     align-items: center;
+    cursor: pointer;
 }
 
 .menu-bar {
@@ -85,12 +91,12 @@ a {
 
 .home-main {
     width: 800px;
-    height: 1500px;
+    height: 90%;
     background-color: #002832;
-    margin: 140px auto 0px auto
+    margin: 10% auto 0px auto
 }
 .white-main {
-    width: 80%;
+    width: 800px;
     height: 90%;
     background-color: white;
     margin: 0px auto 0px auto;
@@ -112,15 +118,31 @@ img {
 @media only screen and (max-width: 1000px) {
     /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
     .home-main,
-    .notice-main
+    .white-main
     {
-        width: 100%;
-        margin: 0;
+        width: 98%;
+        margin: 0 1%;
     }
-
+    .notice-title
+    {
+        height: 70px;
+    }
+    .white-bg
+    {
+        padding: 3px;
+        margin: 3px;
+    }
     /* 이미지 스타일을 조정합니다. */
     img {
         max-width: 100%;
         height: auto;
     }
+    .detail-bg {
+        padding: 5px;
+        margin: 6px;
+        border-radius: 2px;
+      }
+      .detail-bt {
+        background-color: white;
+      }
 }
