@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    background-color: #002832;
+
+}
+
+a:hover {
+    color: #ff3ca0;
+}
+
+a {
+    color: black;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-area {
+    background-color: #ff3ca0;
+    width: 100%;
+    height: 100px;
+}
+
+.top-area-logo {
+    width: 200px;
+    height: 160px;
+    align-items: center;
+}
+
+.menu-bar {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    /* 메뉴 영역을 왼쪽으로 숨김 */
+    width: 300px;
+    height: 100%;
+    background-color: #ff3ca0;
+    transition: left 0.3s ease;
+    /* left 속성에 트랜지션 적용 */
+}
+
+.side-menu ul {
+    list-style: none;
+    padding-top: 70px;
+    padding-left: 0px;
+}
+
+.side-menu ul li {
+    width: 250px;
+    margin: 20px;
+    border-bottom: 1px solid white;
+}
+
+.side-menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    display: block;
+    padding-bottom: 20px;
+    /* 흰색 선과 글씨 사이 여백 추가 */
+    border-bottom: 0px solid white;
+    /* 흰색 선 추가 */
+    box-sizing: border-box;
+    /* padding 포함하도록 box-sizing 설정 */
+}
+
+.home-main {
+    width: 800px;
+    height: 1500px;
+    background-color: #002832;
+    margin: 140px auto 0px auto
+}
+.white-main {
+    width: 80%;
+    height: 90%;
+    background-color: white;
+    margin: 0px auto 0px auto;
+    border-radius: 8px;
+}
+
+/* 이미지 스타일 */
+img {
+    max-width: 500px;
+    /* 최대 너비 */
+    max-height: 400px;
+    /* 최대 높이 */
+    width: auto;
+    /* 자동으로 너비 조절 */
+    height: auto;
+    /* 자동으로 높이 조절 */
+}
+
+@media only screen and (max-width: 1000px) {
+    /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
+    .home-main,
+    .notice-main
+    {
+        width: 100%;
+        margin: 0;
+    }
+
+    /* 이미지 스타일을 조정합니다. */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}

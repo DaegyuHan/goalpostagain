@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoalpostAgain</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+            background-color: #002832;
+
+        }
+
+        a:hover {
+            color: #ff3ca0;
+        }
+
+        a {
+            color: black;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .top-area {
+            background-color: #ff3ca0;
+            max-width: 100%;
+            height: 100px;
+        }
+
+        .top-area-logo {
+            width: 200px;
+            height: 160px;
+            align-items: center;
+        }
+
+        .menu-bar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            /* 메뉴 영역을 왼쪽으로 숨김 */
+            width: 300px;
+            height: 100%;
+            background-color: #ff3ca0;
+            transition: left 0.3s ease;
+            /* left 속성에 트랜지션 적용 */
+        }
+
+        .side-menu ul {
+            list-style: none;
+            padding-top: 70px;
+            padding-left: 0px;
+        }
+
+        .side-menu ul li {
+            width: 250px;
+            margin: 20px;
+            border-bottom: 1px solid white;
+        }
+
+        .side-menu ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            display: block;
+            padding-bottom: 20px;
+            /* 흰색 선과 글씨 사이 여백 추가 */
+            border-bottom: 0px solid white;
+            /* 흰색 선 추가 */
+            box-sizing: border-box;
+            /* padding 포함하도록 box-sizing 설정 */
+        }
+
+        .home-main {
+            width: 800px;
+            height: 1500px;
+            background-color: #002832;
+            margin: 140px auto 0px auto
+        }
+
+        /* 이미지 스타일 */
+        img {
+            max-width: 500px;
+            /* 최대 너비 */
+            max-height: 400px;
+            /* 최대 높이 */
+            width: auto;
+            /* 자동으로 너비 조절 */
+            height: auto;
+            /* 자동으로 높이 조절 */
+        }
+
+        /* 공지사항 */
+        .notice-main {
+            width: 800px;
+            height: 2000px;
+            background-color: white;
+            margin: 0px auto 0px auto
+        }
+
+        .notice-title {
+            color: white;
+            margin-top: 80px;
+            font-size: 30px;
+            text-align: center;
+        }
+
+        .grey-bg {
+            background: #eee;
+        }
+
+        .white-bg {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .list-box {
+            padding: 10px;
+            border-bottom: 1px solid#eee;
+        }
+
+        .list-box h4 {
+            font-size: 16px;
+            margin: 5px;
+        }
+
+
+        .list-box p {
+            font-size: 13px;
+            margin: 5px;
+            color: grey;
+        }
+
+        /*              */
+
+        .detail-bg {
+            background: white;
+            padding: 15px;
+            margin: 20px;
+        }
+
+        .detail-title {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .detail-img {
+            align-items: center;
+
+        }
+
+        .detail-content {
+            padding-top: 30px;
+            font-size: 20px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="/main.js"></script>
+
+</head>
+
+<body>
+    <%- include('nav.ejs') %>
+        <div class="notice-title">공지사항</div>
+
+        <div class="notice-main">
+            <div class="detail-bg">
+                <h4 class="detail-title">
+                    <%= 글.title%>
+                </h4>
+                <hr>
+                <img class="detail-img" src="<%= 글.img%>">
+                <div class="detail-content">
+                    <pre><%= 글.content%></pre>
+                </div>
+                <hr>
+            </div>
+        </div>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+.notice-title {
+  color: white;
+  margin-top: 80px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.grey-bg {
+    background: #eee;
+  }
+  
+  .white-bg {
+    background: white;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .list-box {
+    padding: 5px;
+    border-bottom: 1px solid#eee;
+  }
+  
+  .list-box h4 {
+    font-size: 16px;
+    margin: 5px;
+  }
+  
+  
+  .list-box p {
+    font-size: 13px;
+    margin: 5px;
+    color: grey;
+  }
+  /*              */
+
