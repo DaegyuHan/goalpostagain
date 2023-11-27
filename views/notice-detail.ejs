@@ -25,20 +25,20 @@
                     <%= 글.title%>
                 </h4>
                 <hr>
-                <span>한대규</span>
+                <span><%=글.username%></span>
                 <span><%=글.today%></span>
                 <div style="margin: 20px auto 10px auto;">
                     <img class="detail-img" src="<%= 글.img%>">
                     <pre class="detail-content"><%= 글.content%></pre>
                 </div>
-                <span style="padding-left: 90%; font-size: 14px;">
+                <div style="text-align: right; font-size: 14px;">
                     <a href="/notice-edit/<%= 글._id%>">수정</a>
                     <a href="/notice-delete/<%= 글._id%>">삭제</a>
-                </span>
+                </div>
                 <hr>
-                <div>
+                <div class="flex-row">
                     <input class="comment-input" type="text">
-                    <button class="comment-button">댓글작성</button>
+                    <button class="comment-button" style="margin-left: 1%;">댓글작성</button>
                 </div>
                 <hr>
 

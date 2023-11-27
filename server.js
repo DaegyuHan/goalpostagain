@@ -40,21 +40,21 @@ const { S3Client } = require('@aws-sdk/client-s3')
 const multer = require('multer')
 const multerS3 = require('multer-s3')
 const s3 = new S3Client({
-  region: 'ap-northeast-2',
-  credentials: {
-    accessKeyId: process.env.S3_KEY,
-    secretAccessKey: process.env.S3_SECRET
-  }
+    region: 'ap-northeast-2',
+    credentials: {
+        accessKeyId: process.env.S3_KEY,
+        secretAccessKey: process.env.S3_SECRET
+    }
 })
 
 const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'bigstarhan33',
-    key: function (요청, file, cb) {
-      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
-    }
-  })
+    storage: multerS3({
+        s3: s3,
+        bucket: 'bigstarhan33',
+        key: function (요청, file, cb) {
+            cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+        }
+    })
 })
 
 
@@ -79,16 +79,14 @@ connectDB.then((client) => {
 
 
 
+
+
 app.get('/', (req, res) => {      //간단한 서버 기능, 누가 메인페이지 접속 시 응답함
   res.sendFile(__dirname + '/index.html')
 })
 
-app.get('/notice', async (req, res) => {
-      let result = await db.collection('notice').find().toArray();
-      let Today = new Date().toLocaleString()
-      console.log(Today)
-      res.render('notice.ejs', { 글목록: result, 날짜: Today});
-  });
+// app.use('/', require('./routes/notice.js'))
+
 
   app.get('/management', async (req, res) => {
     let result = await db.collection('notice').find().toArray();
@@ -99,28 +97,103 @@ app.get('/management/notice-post', async (req, res) => {
   res.render('notice-post.ejs');
 });
 
+passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
+  let result = await db.collection('user').findOne({ username: 입력한아이디 })
+  if (!result) {
+    return cb(null, false, { message: '아이디 DB에 없음' })
+  }
+
+
+  if (await bcrypt.compare(입력한비번, result.password)) {
+    return cb(null, result)
+  } else {
+    return cb(null, false, { message: '비번불일치' });
+  }
+}))
+
+// passport.authenticate('local')() 가 실행될 때 마다 아래 코드도 같이 실행됨 ( 세선만드는 코드 )
+
+passport.serializeUser((user, done) => {
+  console.log(user)
+  process.nextTick(() => {
+    done(null, { id: user._id, username: user.username })
+  })
+})
+
+passport.deserializeUser(async (user, done) => {
+  let result = await db.collection('user').findOne({ _id: new ObjectId(user.id) })
+  delete result.password
+  process.nextTick(() => {
+    done(null, result)
+  })
+})
+
+app.get('/login', async (req, res) => {
+  console.log(req.user)
+  res.render('login.ejs')
+})
+
+app.post('/login', async (req, res, next) => {
+  passport.authenticate('local', (error, user, info) => {
+    if (error) return res.status(500).json(error)
+    if (!user) return res.status(401).json(info.message)
+    req.logIn(user, (err) => {
+      if (err) return next(err)
+      res.redirect('/notice')
+    })
+
+  })(req, res, next)
+
+})
+
+app.get('/register', async (req, res) => {
+  res.render('register.ejs')
+})
+
+app.post('/register', async (req, res) => {
+
+  let 해시 = await bcrypt.hash(req.body.password, 10)
+
+  await db.collection('user').insertOne({
+    username: req.body.username,
+    password: 해시
+  })
+  res.redirect('/')
+})
+
+
+app.get('/notice', async (req, res) => {
+  let result = await db.collection('notice').find().toArray();
+  let Today = new Date().toLocaleString()
+
+  console.log(Today)
+  res.render('notice.ejs', { 글목록: result, 날짜: Today});
+});
+
 app.post('/notice-post', async (req, res) => {
   let Today = new Date().toLocaleString()
   upload.single('img1')(req, res, async (err) => {
-    if (err) return res.send('업로드에러')
-    try {
-      if (req.body.title == '') {
-        res.send('제목입력안했음')
-      } else {
-        await db.collection('notice').insertOne(
-          {
-            today: Today,
-            title: req.body.title,
-            content: req.body.content,
-            img: req.file ? req.file.location : '',
+      if (err) return res.send('업로드에러')
+      try {
+          if (req.body.title == '') {
+              res.send('제목입력안했음')
+          } else {
+              await db.collection('notice').insertOne(
+                  {
+                      today: Today,
+                      title: req.body.title,
+                      content: req.body.content,
+                      img: req.file ? req.file.location : '',
+                      user: req.user._id,
+                      username: req.user.username
+                  }
+              )
+              res.redirect('/notice')
           }
-        )
-        res.redirect('/notice')
+      } catch (e) {
+          console.log(e)
+          res.status(500).send('서버에러남')
       }
-    } catch (e) {
-      console.log(e)
-      res.status(500).send('서버에러남')
-    }
   })
 
 })
@@ -128,24 +201,24 @@ app.post('/notice-post', async (req, res) => {
 app.get('/notice-detail/:id', async (req, res) => {
   let notice = await db.collection('notice').find().toArray()
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
-  res.render('notice-detail.ejs', {글: postID,  글목록: notice})
+  res.render('notice-detail.ejs', { 글: postID, 글목록: notice })
 
 })
 
 app.get('/notice-edit/:id', async (req, res) => {
-  let postID = await db.collection('notice').findOne({ _id : new ObjectId(req.params.id)})
-  res.render('notice-edit.ejs', {글: postID})
+  let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
+  res.render('notice-edit.ejs', { 글: postID })
 })
 
 app.put('/notice-edit', async (req, res) => {
-  
+
   let result = await db.collection('notice').updateOne({ _id: new ObjectId(req.body.id) },
-    {
-      $set: {
-        title: req.body.title,
-        content: req.body.content
-      }
-    })
+      {
+          $set: {
+              title: req.body.title,
+              content: req.body.content
+          }
+      })
 
 
   res.redirect('/notice')
@@ -154,8 +227,8 @@ app.put('/notice-edit', async (req, res) => {
 
 app.get('/notice-delete/:id', async (req, res) => {
   let result = await db.collection('notice').deleteOne({
-    _id: new ObjectId(req.params.id)  
-  })  
+      _id: new ObjectId(req.params.id)
+  })
 
   res.redirect('/notice')
 })
