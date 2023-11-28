@@ -31,28 +31,33 @@
                     <img class="detail-img" src="<%= 글.img%>">
                     <pre class="detail-content"><%= 글.content%></pre>
                 </div>
+                <% if (유저.username == 글.username) {%>
                 <div style="text-align: right; font-size: 14px;">
-                    <a href="/notice-edit/<%= 글._id%>">수정</a>
+                    <a onclick="confirmDelete()" href="/notice-edit/<%= 글._id%>">수정</a>
                     <a href="/notice-delete/<%= 글._id%>">삭제</a>
                 </div>
-                <hr>
-                <div class="flex-row">
-                    <input class="comment-input" type="text">
-                    <button class="comment-button" style="margin-left: 1%;">댓글작성</button>
-                </div>
-                <hr>
+                <%}%>
 
+                <hr>
+                <form action="/comment" method="POST">
+                    <div class="flex-row">
+                    <input name="content" class="comment-input" type="text">
+                    <input name="parentId" value="<%= 글._id %>" style="display: none">
+                    <button type="submit" class="comment-button" style="margin-left: 1%;">댓글작성</button>
+                </div>
+                </form>
+                <hr>
+                <% for (let i=0; i<댓글.length; i++) {%>
                 <div style="display: flex; align-items: baseline;">
                     <p style="margin-right: 5px;"><strong>
-                            한대규
+                            <%= 댓글[i].writer%>
                         </strong>
 
                     </p>
-                    ㅇㅇㅇㅇ
-                    <div style="align-items: right;"> 
-                        <a href="/" style="font-size: 15px;">삭제</a>
-                    </div>
+                    <%= 댓글[i].content%>
                 </div>
+                <%}%>
+
 
 
                 <div class="flex-row">

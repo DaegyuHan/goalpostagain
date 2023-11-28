@@ -11,15 +11,42 @@
   <link href="/management.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="/main.js"></script>
-  
+  <script>
+
+    function showMVP() {
+      var WeeklyMVPSelect = document.getElementById("WeeklyMVPSelect");
+      var selectedMVP = WeeklyMVPSelect.value;
+      var resultDiv = document.getElementById("MVP");
+      resultDiv.innerHTML = selectedMVP;
+
+      location.href='/mvp?val=' + selectedMVP
+    }
+  </script>
 </head>
 
 <body>
   <%- include('nav.ejs') %>
-  <div class="management-title">관리</div>
+    <div class="management-title">관리</div>
     <div class="white-main">
-      <div style="height: 1000px;"><a href="/management/notice-post">공지사항 작성</a></div>
-       
+      <h4>공지사항 작성</h4>
+      <div style="height: 100px;"><a href="/management/notice-post">글쓰기</a></div>
+      <div>
+        <h4>이번 주 MVP</h4>
+        <div>
+          <div>
+            <select class="form-select"  id="WeeklyMVPSelect">
+              <option value="한대규">한대규</option>
+              <option value="이찬웅">이찬웅</option>
+              <option value="양철진">양철진</option>
+              <option value="권진백">권진백</option>
+            </select>
+            <button onclick="showMVP()">선정</button>
+          </div>
+          <div id="MVP">MVP</div>
+      </div>
+
+
+
     </div>
 </body>
 

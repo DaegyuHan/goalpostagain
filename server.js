@@ -81,8 +81,11 @@ connectDB.then((client) => {
 
 
 
-app.get('/', (req, res) => {      //간단한 서버 기능, 누가 메인페이지 접속 시 응답함
-  res.sendFile(__dirname + '/index.html')
+app.get('/', async (req, res) => {     
+  // res.sendFile(__dirname + '/index.ejs')
+  let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
+  let Weeklymvp = result.length > 0 ? result[0].mvp : null;
+  res.render('home.ejs',{MVPname: Weeklymvp})
 })
 
 // app.use('/', require('./routes/notice.js'))
@@ -98,7 +101,7 @@ app.get('/management/notice-post', async (req, res) => {
 });
 
 passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
-  let result = await db.collection('user').findOne({ username: 입력한아이디 })
+  let result = await db.collection('user').findOne({ userID: 입력한아이디 })
   if (!result) {
     return cb(null, false, { message: '아이디 DB에 없음' })
   }
@@ -116,7 +119,7 @@ passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) =
 passport.serializeUser((user, done) => {
   console.log(user)
   process.nextTick(() => {
-    done(null, { id: user._id, username: user.username })
+    done(null, { id: user._id, userID: user.userID })
   })
 })
 
@@ -128,7 +131,25 @@ passport.deserializeUser(async (user, done) => {
   })
 })
 
-app.get('/login', async (req, res) => {
+exports.isLoggedIn = (req, res, next) => {
+  // isAuthenticated()로 검사해 로그인이 되어있으면
+  if (req.isAuthenticated()) {
+     next(); // 다음 미들웨어
+  } else {
+     res.render('login.ejs');
+  }
+};
+
+exports.isNotLoggedIn = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+     next(); // 로그인 안되어있으면 다음 미들웨어
+  } else {
+     const message = encodeURIComponent('로그인한 상태입니다.');
+     res.redirect(`/?error=${message}`);
+  }
+};
+
+app.get('/login',this.isNotLoggedIn, async (req, res, next) => {
   console.log(req.user)
   res.render('login.ejs')
 })
@@ -139,12 +160,24 @@ app.post('/login', async (req, res, next) => {
     if (!user) return res.status(401).json(info.message)
     req.logIn(user, (err) => {
       if (err) return next(err)
-      res.redirect('/notice')
+      res.redirect('/')
     })
 
   })(req, res, next)
 
 })
+
+app.get('/logout', (req, res, next) => {
+  req.logOut(err => {
+    if (err) {
+      return next(err);
+    } else {
+      console.log('로그아웃됨.');
+      res.redirect('/');
+    }
+  });
+});
+
 
 app.get('/register', async (req, res) => {
   res.render('register.ejs')
@@ -155,7 +188,8 @@ app.post('/register', async (req, res) => {
   let 해시 = await bcrypt.hash(req.body.password, 10)
 
   await db.collection('user').insertOne({
-    username: req.body.username,
+    userID: req.body.userID,
+    username:req.body.username,
     password: 해시
   })
   res.redirect('/')
@@ -164,14 +198,15 @@ app.post('/register', async (req, res) => {
 
 app.get('/notice', async (req, res) => {
   let result = await db.collection('notice').find().toArray();
-  let Today = new Date().toLocaleString()
+  let Today = new Date().toLocaleDateString()
 
   console.log(Today)
+  console.log(req.user)
   res.render('notice.ejs', { 글목록: result, 날짜: Today});
 });
 
 app.post('/notice-post', async (req, res) => {
-  let Today = new Date().toLocaleString()
+  let Today = new Date().toLocaleDateString()
   upload.single('img1')(req, res, async (err) => {
       if (err) return res.send('업로드에러')
       try {
@@ -198,10 +233,15 @@ app.post('/notice-post', async (req, res) => {
 
 })
 
-app.get('/notice-detail/:id', async (req, res) => {
+app.get('/notice-detail/:id', this.isLoggedIn, async (req, res, next) => {
   let notice = await db.collection('notice').find().toArray()
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
-  res.render('notice-detail.ejs', { 글: postID, 글목록: notice })
+  let comment = await db.collection('comment').find({ parentId: new ObjectId(req.params.id) }).toArray()
+  let user = req.user
+
+
+
+  res.render('notice-detail.ejs', { 글: postID, 글목록: notice, 댓글: comment, 유저: user })
 
 })
 
@@ -231,4 +271,27 @@ app.get('/notice-delete/:id', async (req, res) => {
   })
 
   res.redirect('/notice')
+})
+
+app.post('/comment', async (req, res) => {
+  await db.collection('comment').insertOne({
+    content: req.body.content,
+    writerId: new ObjectId(req.user._id),
+    writer: req.user.username,
+    parentId: new ObjectId(req.body.parentId)
+  })
+  res.redirect('back')
+})
+
+app.get('/nav', async (req, res) => {
+  let test = 'hi'
+
+  res.render('nav', {test})
+})
+
+app.get('/mvp', async (req, res) => {
+  let result = db.collection('mvp').insertOne({
+    mvp : req.query.val
+  })
+  res.redirect('/')
 })

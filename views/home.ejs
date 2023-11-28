@@ -19,29 +19,11 @@
 </head>
 
 <body>
-  <div class="flex-row top-area">
-    <img class="top-area-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437"
-    onclick="gotoHome()">
-  </div>
-  <nav class="side-menu">
-    <div class="menu-bar" onclick="toggleMenu()">
-      <i class="fas fa-bars"></i>
-    </div>
-    <ul>
-      <li><a style="font-size: 25px;" href="/">로그인</a></li>
-      <li><a href="/">팀소개</a></li>
-      <li><a href="/">사진&영상</a></li>
-      <li><a href="/">경기결과</a></li>
-      <li><a href="/notice">공지사항</a></li>
-      <li><a href="/management">관리</a></li>
-    </ul>
-  </nav>
-  <div class="notice-title">
-d
+  <%- include('nav.ejs') %>
   </div>
   <div class="home-main">
     <button onclick="redirectTo()" class="btn btn-primary">에스빌드 풋살파크</button>
-
+    <div style="font-size: 30px; margin: 10px; color: white;" >오늘의 mvp : <%=MVPname%></div>
   </div>
 </body>
 

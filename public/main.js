@@ -8,3 +8,7 @@ function gotoHome(){
 function gotoNotice(){
   window.location.href = '/notice'
 }
+
+function confirmDelete(){
+  alert('ㅎㅇ')
+}
