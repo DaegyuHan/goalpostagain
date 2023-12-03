@@ -136,7 +136,7 @@ exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
      next(); // 다음 미들웨어
   } else {
-     res.render('login.ejs');
+     res.render('login-need', {message: '로그인이 필요합니다.'});
   }
 };
 
@@ -150,11 +150,29 @@ exports.isNotLoggedIn = (req, res, next) => {
 };
 
 app.get('/login',this.isNotLoggedIn, async (req, res, next) => {
-  console.log(req.user)
+
   res.render('login.ejs')
 })
 
 app.post('/login', async (req, res, next) => {
+  passport.authenticate('local', (error, user, info) => {
+    if (error) return res.status(500).json(error)
+    if (!user) return res.status(401).json(info.message)
+    req.logIn(user, (err) => {
+      if (err) return next(err)
+      res.redirect('/')
+    })
+
+  })(req, res, next)
+
+})
+
+app.get('/login-need',this.isNotLoggedIn, async (req, res, next) => {
+
+  res.render('login-need.ejs')
+})
+
+app.post('/login-need', async (req, res, next) => {
   passport.authenticate('local', (error, user, info) => {
     if (error) return res.status(500).json(error)
     if (!user) return res.status(401).json(info.message)
@@ -280,6 +298,14 @@ app.post('/comment', async (req, res) => {
     writer: req.user.username,
     parentId: new ObjectId(req.body.parentId)
   })
+  res.redirect('back')
+})
+
+app.get('/notice-comment-delete/:id', async (req, res) => {
+  let result = await db.collection('comment').deleteOne({
+      _id: new ObjectId(req.params.id)
+  })
+
   res.redirect('back')
 })
 

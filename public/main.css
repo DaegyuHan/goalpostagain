@@ -121,6 +121,30 @@ img {
     /* 자동으로 높이 조절 */
 }
 
+.mvp-area {
+    background-color: white;
+    width: 30%;
+}
+
+::-webkit-scrollbar {
+    width: 2px; /* 스크롤바 너비 */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: gray; /* 스크롤바 색상 */
+}
+
+.notice-comment-title {
+    width: 8%; 
+    margin-right: 5px;
+  }
+  
+  .notice-comment-content {
+    width: 80%;
+  }
+
+
+
 @media only screen and (max-width: 1000px) {
 
     /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
@@ -157,6 +181,17 @@ img {
         width: 80%;
         height: 60px;
     }
+
+    .notice-comment-title {
+        width: 20%; 
+        margin-right: 5px;
+    }
+
+    .notice-comment-content {
+        width: 70%;
+    }
+
+
 
 
 

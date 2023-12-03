@@ -4,7 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoalpostAgain</title>
+  <title>오늘도골대FC</title>
+  <link rel="apple-touch-icon" sizes="180x180"
+    href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+  <link rel="icon" type="image/png" sizes="512x512" href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="/main.css" rel="stylesheet">
@@ -15,11 +19,37 @@
 
     function showMVP() {
       var WeeklyMVPSelect = document.getElementById("WeeklyMVPSelect");
-      var selectedMVP = WeeklyMVPSelect.value;
+      var selectedMVP = WeeklyMVPSelect.options[WeeklyMVPSelect.selectedIndex].text
+
+      switch (selectedMVP) {
+        case '한대규':
+          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%EB%A3%A8%EC%8B%9C%EB%93%9C.png?updatedAt=1691021040942">
+          </div>`
+          break
+        case '이찬웅':
+          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%EA%B0%80%EC%97%94%EC%8A%AC.png?updatedAt=1691021040925">
+          </div>`
+          break
+        case '양철진':
+          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%EB%B0%98%EB%B0%98.png?updatedAt=1691021040811">
+          </div>`
+          break
+        case '권진백':
+          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%ED%95%91%ED%81%AC%EB%B9%88.png?updatedAt=1691021040901">
+          </div>`
+          break
+        default:
+          break
+      }
+
       var resultDiv = document.getElementById("MVP");
       resultDiv.innerHTML = selectedMVP;
 
-      location.href='/mvp?val=' + selectedMVP
+      location.href = '/mvp?val=' + encodeURIComponent(selectedMVP)
     }
   </script>
 </head>
@@ -34,7 +64,7 @@
         <h4>이번 주 MVP</h4>
         <div>
           <div>
-            <select class="form-select"  id="WeeklyMVPSelect">
+            <select class="form-select" id="WeeklyMVPSelect">
               <option value="한대규">한대규</option>
               <option value="이찬웅">이찬웅</option>
               <option value="양철진">양철진</option>
@@ -43,11 +73,11 @@
             <button onclick="showMVP()">선정</button>
           </div>
           <div id="MVP">MVP</div>
+        </div>
+
+
+
       </div>
-
-
-
-    </div>
 </body>
 
 </html>

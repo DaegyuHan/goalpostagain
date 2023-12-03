@@ -4,8 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoalpostAgain</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    <title>오늘도골대FC</title>
+    <link rel="apple-touch-icon" sizes="180x180"
+      href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="/main.css" rel="stylesheet">
     <link href="/notice.css" rel="stylesheet">
@@ -27,10 +31,15 @@
                 <hr>
                 <span><%=글.username%></span>
                 <span><%=글.today%></span>
-                <div style="margin: 20px auto 10px auto;">
+                <!-- <div style="margin: 20px auto 10px auto;">
                     <img class="detail-img" src="<%= 글.img%>">
                     <pre class="detail-content"><%= 글.content%></pre>
+                </div> -->
+                <div style="margin: 20px auto 10px auto; overflow: hidden;">
+                    <img class="detail-img" src="<%= 글.img%>">
+                    <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;"><%= 글.content%></div>
                 </div>
+                
                 <% if (유저.username == 글.username) {%>
                 <div style="text-align: right; font-size: 14px;">
                     <a onclick="confirmDelete()" href="/notice-edit/<%= 글._id%>">수정</a>
@@ -48,13 +57,16 @@
                 </form>
                 <hr>
                 <% for (let i=0; i<댓글.length; i++) {%>
-                <div style="display: flex; align-items: baseline;">
-                    <p style="margin-right: 5px;"><strong>
-                            <%= 댓글[i].writer%>
-                        </strong>
-
-                    </p>
-                    <%= 댓글[i].content%>
+                    <div style="display: flex; align-items: baseline;">
+                        <p class="notice-comment-title">
+                            <strong>
+                                <%= 댓글[i].writer%>
+                            </strong>
+                        </p>
+                        <span class="notice-comment-content"><%= 댓글[i].content%></span>
+                        <% if (유저.username == 댓글[i].writer) {%>
+                        <a href="/notice-comment-delete/<%= 댓글[i]._id%>" style="width: 10%; font-size: 10px; text-align: right;">X</a>
+                        <% }%>
                 </div>
                 <%}%>
 
