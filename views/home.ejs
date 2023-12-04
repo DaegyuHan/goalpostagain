@@ -16,8 +16,7 @@
   <script src="/main.js"></script>
   <script>
     function redirectTo() {
-      var levelUrl = 'https://map.naver.com/p/search/경기수원시팔달구월드컵로310에스빌드풋살파크';
-
+      var levelUrl = 'https://map.naver.com/p/search/<%=목적지.address%>';
       window.open(levelUrl, '_blank');
     }
 
@@ -28,9 +27,12 @@
   <%- include('nav.ejs') %>
     <div class="notice-title"></div>
     <div class="home-main">
-      <button onclick="redirectTo()" class="btn btn-primary">에스빌드 풋살파크</button>
+      <% if (typeof 유저 !== 'undefined' && 유저) { %>
+        <div style="color: white;"><%=유저%> 님 환영합니다.</div>
+    <% } %>
+      <button onclick="redirectTo()" class="btn btn-primary">네이버지도로 연결하기</button>
       <div style="font-size: 30px; margin: 10px; color: white;">
-        이번 주 mvp : <%-MVPname%>
+        이번 주 mvp : <%-MVP%>
       </div>
     </div>
 </body>

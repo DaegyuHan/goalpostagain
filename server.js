@@ -40,21 +40,21 @@ const { S3Client } = require('@aws-sdk/client-s3')
 const multer = require('multer')
 const multerS3 = require('multer-s3')
 const s3 = new S3Client({
-    region: 'ap-northeast-2',
-    credentials: {
-        accessKeyId: process.env.S3_KEY,
-        secretAccessKey: process.env.S3_SECRET
-    }
+  region: 'ap-northeast-2',
+  credentials: {
+    accessKeyId: process.env.S3_KEY,
+    secretAccessKey: process.env.S3_SECRET
+  }
 })
 
 const upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: 'bigstarhan33',
-        key: function (요청, file, cb) {
-            cb(null, Date.now().toString()) //업로드시 파일명 변경가능
-        }
-    })
+  storage: multerS3({
+    s3: s3,
+    bucket: 'bigstarhan33',
+    key: function (요청, file, cb) {
+      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+    }
+  })
 })
 
 
@@ -77,26 +77,49 @@ connectDB.then((client) => {
 
 
 
-
-
-
-
-app.get('/', async (req, res) => {     
-  // res.sendFile(__dirname + '/index.ejs')
-  let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
-  let Weeklymvp = result.length > 0 ? result[0].mvp : null;
-  res.render('home.ejs',{MVPname: Weeklymvp})
+app.use((req, res, next) => {
+  if (req.user) {
+    res.locals.유저 = req.user.username; 
+  }
+  next();
 })
 
-// app.use('/', require('./routes/notice.js'))
 
 
-  app.get('/management', async (req, res) => {
-    let result = await db.collection('notice').find().toArray();
-    res.render('management.ejs', { 글목록: result});
+app.get('/', async (req, res) => {
+
+  let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
+  let Weeklymvp = result.length > 0 ? result[0].mvp : null;
+
+  let navi = await db.collection('navi').find().sort({ _id: -1 }).limit(1).toArray();
+
+  res.render('home.ejs', { MVP: Weeklymvp, 목적지: navi[0] });
+})
+
+
+
+app.get('/management', async (req, res) => {
+  let result = await db.collection('notice').find().toArray();
+  let navi = await db.collection('navi').find().sort({ _id: -1 }).limit(1).toArray();
+
+  res.render('management.ejs', { 글목록: result, 목적지: navi[0] });
 });
 
+app.get('/mvp', async (req, res) => {
+  let result = db.collection('mvp').insertOne({
+    mvp: req.query.val
+  })
+  res.redirect('/')
+})
+
+app.get('/navi', async (req, res) => {
+  let result = db.collection('navi').insertOne({
+    address: req.query.val
+  })
+})
+
 app.get('/management/notice-post', async (req, res) => {
+
   res.render('notice-post.ejs');
 });
 
@@ -134,22 +157,22 @@ passport.deserializeUser(async (user, done) => {
 exports.isLoggedIn = (req, res, next) => {
   // isAuthenticated()로 검사해 로그인이 되어있으면
   if (req.isAuthenticated()) {
-     next(); // 다음 미들웨어
+    next(); // 다음 미들웨어
   } else {
-     res.render('login', {message: '로그인이 필요합니다.'});
+    res.render('login', { message: '로그인이 필요합니다.' });
   }
 };
 
 exports.isNotLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
-     next(); // 로그인 안되어있으면 다음 미들웨어
+    next(); // 로그인 안되어있으면 다음 미들웨어
   } else {
-     const message = encodeURIComponent('로그인한 상태입니다.');
-     res.redirect(`/?error=${message}`);
+    const message = encodeURIComponent('로그인한 상태입니다.');
+    res.redirect(`/?error=${message}`);
   }
 };
 
-app.get('/login',this.isNotLoggedIn, async (req, res, next) => {
+app.get('/login', this.isNotLoggedIn, async (req, res, next) => {
 
   res.render('login.ejs')
 })
@@ -182,6 +205,7 @@ app.get('/logout', (req, res, next) => {
 
 
 app.get('/register', async (req, res) => {
+
   res.render('register.ejs')
 })
 
@@ -191,7 +215,7 @@ app.post('/register', async (req, res) => {
 
   await db.collection('user').insertOne({
     userID: req.body.userID,
-    username:req.body.username,
+    username: req.body.username,
     password: 해시
   })
   res.redirect('/')
@@ -199,80 +223,82 @@ app.post('/register', async (req, res) => {
 
 
 app.get('/notice', async (req, res) => {
-  let result = await db.collection('notice').find().toArray();
-  let Today = new Date().toLocaleDateString()
+  let result = await db.collection('notice').find().sort({ _id: -1 }).toArray();
 
-  console.log(Today)
-  console.log(req.user)
-  res.render('notice.ejs', { 글목록: result, 날짜: Today});
+  res.render('notice.ejs', { 글목록: result});
 });
 
+
+app.get('/notice/:number', async (req, res) => {
+  // let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray()
+  let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number -1 ) * 10).limit(10).toArray();
+
+  res.render('notice.ejs', { 글목록: result})
+})
+
 app.post('/notice-post', async (req, res) => {
-  let Today = new Date().toLocaleDateString()
+  let Today = new Date().toLocaleDateString('ko-KR');
   upload.single('img1')(req, res, async (err) => {
-      if (err) return res.send('업로드에러')
-      try {
-          if (req.body.title == '') {
-              res.send('제목입력안했음')
-          } else {
-              await db.collection('notice').insertOne(
-                  {
-                      today: Today,
-                      title: req.body.title,
-                      content: req.body.content,
-                      img: req.file ? req.file.location : '',
-                      user: req.user._id,
-                      username: req.user.username
-                  }
-              )
-              res.redirect('/notice')
+    if (err) return res.send('업로드에러')
+    try {
+      if (req.body.title == '') {
+        res.send('제목입력안했음')
+      } else {
+        await db.collection('notice').insertOne(
+          {
+            today: Today,
+            title: req.body.title,
+            content: req.body.content,
+            img: req.file ? req.file.location : '',
+            user: req.user._id,
+            username: req.user.username
           }
-      } catch (e) {
-          console.log(e)
-          res.status(500).send('서버에러남')
+        )
+        res.redirect('/notice/1')
       }
+    } catch (e) {
+      console.log(e)
+      res.status(500).send('서버에러남')
+    }
   })
 
 })
 
-app.get('/notice-detail/:id', this.isLoggedIn, async (req, res, next) => {
+app.get('/notice/notice-detail/:id', this.isLoggedIn, async (req, res, next) => {
   let notice = await db.collection('notice').find().toArray()
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
   let comment = await db.collection('comment').find({ parentId: new ObjectId(req.params.id) }).toArray()
-  let user = req.user
 
-
-
-  res.render('notice-detail.ejs', { 글: postID, 글목록: notice, 댓글: comment, 유저: user })
+  res.render('notice-detail.ejs', { 글: postID, 글목록: notice, 댓글: comment})
 
 })
 
 app.get('/notice-edit/:id', async (req, res) => {
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
+
   res.render('notice-edit.ejs', { 글: postID })
 })
 
 app.put('/notice-edit', async (req, res) => {
 
   let result = await db.collection('notice').updateOne({ _id: new ObjectId(req.body.id) },
-      {
-          $set: {
-              title: req.body.title,
-              content: req.body.content
-          }
-      })
+    {
+      $set: {
+        title: req.body.title,
+        content: req.body.content
+      }
+    })
 
-
-  res.redirect('/notice')
+  res.redirect('/notice-detail/' + req.body.id)
 
 })
 
 app.get('/notice-delete/:id', async (req, res) => {
   let result = await db.collection('notice').deleteOne({
-      _id: new ObjectId(req.params.id)
+    _id: new ObjectId(req.params.id)
   })
 
-  res.redirect('/notice')
+  res.redirect('/notice/1')
 })
 
 app.post('/comment', async (req, res) => {
@@ -287,22 +313,10 @@ app.post('/comment', async (req, res) => {
 
 app.get('/notice-comment-delete/:id', async (req, res) => {
   let result = await db.collection('comment').deleteOne({
-      _id: new ObjectId(req.params.id)
+    _id: new ObjectId(req.params.id)
   })
   res.redirect('back')
 })
 
 
 
-app.get('/nav', async (req, res) => {
-  let test = 'hi'
-
-  res.render('nav', {test})
-})
-
-app.get('/mvp', async (req, res) => {
-  let result = db.collection('mvp').insertOne({
-    mvp : req.query.val
-  })
-  res.redirect('/')
-})

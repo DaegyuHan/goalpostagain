@@ -43,8 +43,8 @@ a {
 }
 
 .top-area-logo {
-    width: 200px;
-    height: 160px;
+    width: 150px;
+    height: 120px;
     align-items: center;
     cursor: pointer;
 }
@@ -123,25 +123,27 @@ img {
 
 .mvp-area {
     background-color: white;
-    width: 30%;
+    width: 20%;
 }
 
 ::-webkit-scrollbar {
-    width: 2px; /* 스크롤바 너비 */
+    width: 2px;
+    /* 스크롤바 너비 */
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: gray; /* 스크롤바 색상 */
+    background-color: gray;
+    /* 스크롤바 색상 */
 }
 
 .notice-comment-title {
-    width: 8%; 
+    width: 8%;
     margin-right: 5px;
-  }
-  
-  .notice-comment-content {
+}
+
+.notice-comment-content {
     width: 80%;
-  }
+}
 
 
 
@@ -177,13 +179,14 @@ img {
 
 
 
+
     .comment-input {
         width: 80%;
         height: 60px;
     }
 
     .notice-comment-title {
-        width: 20%; 
+        width: 20%;
         margin-right: 5px;
     }
 
@@ -191,7 +194,29 @@ img {
         width: 70%;
     }
 
+    .image-container {
+        text-align: center;
+        /* 가로 가운데 정렬 */
+        display: flex;
+        justify-content: center;
+        /* 세로 가운데 정렬 */
+        align-items: center;
+    }
 
+    .search {
+        width: 80%;
+        padding: 5px;
+    }
+
+    .search-send {
+        width: 15%;
+        margin-left: 3px;
+        padding: 6px 10px;
+        background: lightgray;
+        border: none;
+        border-radius: 5px;
+        vertical-align: middle;
+    }
 
 
 

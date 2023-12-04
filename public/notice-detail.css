@@ -36,7 +36,7 @@
 }
 
 .detail-bt {
-  /* width: 10%; */
+width: 15%;
   height: 50px;
   font-size: 14px;
   background-color: #002832;
@@ -45,11 +45,3 @@
   border-radius: 5px;
 }
 
-/* .notice-comment-title {
-  width: 8%; 
-  margin-right: 5px;
-}
-
-.notice-comment-content {
-  width: 80%;
-} */

@@ -34,5 +34,23 @@
     margin: 5px;
     color: grey;
   }
-  /*              */
 
+  .search-area {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 3px 10px 0px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .search {
+    padding: 5px;
+  }
+  .search-send {
+    margin-left: 3px;
+    padding: 6px 10px;
+    background: #002832;
+    border: none;
+    border-radius: 5px;
+    vertical-align: middle;
+    color: white;
+  } 

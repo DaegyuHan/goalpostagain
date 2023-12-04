@@ -20,7 +20,7 @@
 </head>
 
 <body>
-    <% if (message) { %>
+    <% if (typeof message !== 'undefined') { %>
         <script>
             alert('<%= message %>');
         </script>

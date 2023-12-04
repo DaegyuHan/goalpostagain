@@ -1,18 +1,29 @@
 <div class="flex-row top-area">
-    <img class="top-area-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437"
+  <img class="top-area-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437"
     onclick="gotoHome()">
 </div>
 <nav class="side-menu">
-    <div class="menu-bar" onclick="toggleMenu()">
-      <i class="fas fa-bars"></i>
-    </div>
-    <ul>
-      <li><a style="font-size: 25px;" href="/login">로그인하기</a></li>
-      <li><a href="/">팀소개</a></li>
-      <li><a href="/">사진&영상</a></li>
-      <li><a href="/">경기결과</a></li>
-      <li><a href="/notice">공지사항</a></li>
-      <li><a href="/management">관리</a></li>
-      <li><a href="/logout">로그아웃</a></li>
-    </ul>
-  </nav>
+  <div class="menu-bar" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <ul>
+    <% if (typeof 유저 !=='undefined' ) { %>
+      <li><a style="font-size: 25px;" href="#">
+          <%=유저%> 님
+        </a></li>
+      <% } else { %>
+        <li><a style="font-size: 25px;" href="/login">로그인하기</a></li>
+        <%}%>
+          <li><a href="/">팀소개</a></li>
+          <li><a href="/">사진&영상</a></li>
+          <li><a href="/">경기결과</a></li>
+          <li><a href="/notice/1">공지사항</a></li>
+          <% if (typeof 유저 !=='undefined' ) { %>
+            <% if (유저 == '한대규'||유저 == 'test') {%>
+              <li><a href="/management">관리</a></li>
+              <%}%>
+              <li><a href="/logout">로그아웃</a></li>
+            <% } %>
+          
+  </ul>
+</nav>

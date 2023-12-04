@@ -6,5 +6,5 @@ function gotoHome(){
   window.location.href = '/'
 }
 function gotoNotice(){
-  window.location.href = '/notice'
+  window.history.back();
 }
