@@ -54,16 +54,9 @@
           </span>
         </div>
         <%}%>
-          <div class="list-box" style="text-align: center; font-size: 18px;">
-            <% for (let i=0; i<( Math.ceil((글목록.length) /10 )); i++ ) {%>
-              <a href="/notice/<%=(i+1)%>" style="padding: 0px 3px 0px 3px;">
-                <%=(i+1)%>
-              </a>
-              <%}%>
-          </div>
           <div class="list-box" style="height: 50px;">
             <div class="flex-row">
-                <button class="detail-bt" onclick="gotoNotice_Home()">전체 목록</button>
+                <button class="detail-bt-wholelist" onclick="gotoNotice()">전체 목록</button>
             </div>
           </div>
           <div class="list-box" style="height: 50px;">

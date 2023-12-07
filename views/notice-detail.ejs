@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="/main.js"></script>
     <script>
-        function confirmDelete(event) {
+        function confirmDeleteComment(event) {
             event.preventDefault();
 
             var commentId = event.target.getAttribute('data-comment-id');
@@ -27,6 +27,17 @@
 
             if (confirmDelete) {
                 window.location.href = '/notice-comment-delete/' + commentId; // 혹은 fetch 등의 비동기 처리
+            }
+        }
+
+        function confirmDeleteNotice(event) {
+            event.preventDefault();
+
+            var commentId = event.target.getAttribute('data-notice-id');
+            var confirmDelete = confirm('글을 삭제하시겠습니까?');
+
+            if (confirmDelete) {
+                window.location.href = '/notice-delete/' + commentId; // 혹은 fetch 등의 비동기 처리
             }
         }
     </script>
@@ -46,7 +57,7 @@
                     <%=글.username%>
                 </span>
                 <span>
-                    <%=글.today%>
+                    <%=글.time%>
                 </span>
 
                 <div style="margin: 20px auto 10px auto; overflow: hidden;">
@@ -60,7 +71,7 @@
                 <% if (유저==글.username || 유저=='test') {%>
                     <div style="text-align: right; font-size: 14px;">
                         <a href="/notice-edit/<%= 글._id%>">수정</a>
-                        <a href="/notice-delete/<%= 글._id%>">삭제</a>
+                        <a href="#" class="delete-notice-button" data-notice-id="<%= 글._id%>" onclick="confirmDeleteNotice(event)">삭제</a>
                     </div>
                     <%}%>
 
@@ -86,13 +97,13 @@
                                 <% if (유저==댓글[i].writer) { %>
                                     <a href="#" class="delete-comment-button" data-comment-id="<%= 댓글[i]._id%>"
                                         style="width: 10%; font-size: 10px; text-align: right;"
-                                        onclick="confirmDelete(event)">X</a>
+                                        onclick="confirmDeleteComment(event)">X</a>
                                     <% } %>
                             </div>
                             <%}%>
 
                                 <div class="flex-row">
-                                    <button class="detail-bt" onclick="gotoNotice()">목록</button>
+                                    <button class="detail-bt-list" onclick="gotoNotice()">목록</button>
                                 </div>
             </div>
         </div>

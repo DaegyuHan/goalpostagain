@@ -252,6 +252,7 @@ app.get('/notice-search', async (req, res) => {
 
 app.post('/notice-post', async (req, res) => {
   let Today = new Date().toLocaleDateString('ko-KR');
+  let Time =  new Date().toLocaleString('ko-KR');
   upload.single('img1')(req, res, async (err) => {
     if (err) return res.send('업로드에러')
     try {
@@ -261,6 +262,7 @@ app.post('/notice-post', async (req, res) => {
         await db.collection('notice').insertOne(
           {
             today: Today,
+            time : Time,
             title: req.body.title,
             content: req.body.content,
             img: req.file ? req.file.location : '',
@@ -303,7 +305,7 @@ app.put('/notice-edit', async (req, res) => {
       }
     })
 
-  res.redirect('/notice-detail/' + req.body.id)
+  res.redirect('/notice/notice-detail/' + req.body.id)
 
 })
 
@@ -311,7 +313,6 @@ app.get('/notice-delete/:id', async (req, res) => {
   let result = await db.collection('notice').deleteOne({
     _id: new ObjectId(req.params.id)
   })
-
   res.redirect('/notice/1')
 })
 
