@@ -15,6 +15,7 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="/main.css" rel="stylesheet">
   <link href="/notice.css" rel="stylesheet">
+  <link href="/notice-detail.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="/main.js"></script>
 
@@ -22,7 +23,7 @@
 
 <body>
   <%- include('nav.ejs') %>
-    <div class="notice-title">공지사항</div>
+    <div class="notice-title">검색결과</div>
 
     <div class="white-main">
       <div class="search-area">
@@ -41,7 +42,7 @@
       <% for (let i=0; i<글목록.length; i++){ %>
         <div class="list-box">
           <h4 style="font-size: 19px;">
-            <a href="notice-detail/<%=글목록[i]._id%>">
+            <a href="notice/notice-detail/<%=글목록[i]._id%>">
               <%=글목록[i].title%>
             </a>
           </h4>
@@ -54,13 +55,19 @@
         </div>
         <%}%>
           <div class="list-box" style="text-align: center; font-size: 18px;">
-            <% for (let i=0; i<( Math.ceil((글전체.length) /10 )); i++ ) {%>
+            <% for (let i=0; i<( Math.ceil((글목록.length) /10 )); i++ ) {%>
               <a href="/notice/<%=(i+1)%>" style="padding: 0px 3px 0px 3px;">
                 <%=(i+1)%>
               </a>
               <%}%>
           </div>
           <div class="list-box" style="height: 50px;">
+            <div class="flex-row">
+                <button class="detail-bt" onclick="gotoNotice_Home()">전체 목록</button>
+            </div>
+          </div>
+          <div class="list-box" style="height: 50px;">
+            </div>
           </div>
 
     </div>

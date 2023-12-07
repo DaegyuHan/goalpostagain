@@ -232,9 +232,23 @@ app.get('/notice', async (req, res) => {
 app.get('/notice/:number', async (req, res) => {
   // let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray()
   let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number -1 ) * 10).limit(10).toArray();
-
-  res.render('notice.ejs', { 글목록: result})
+  let result2 = await db.collection('notice').find().sort({ _id: -1 }).toArray();
+  res.render('notice.ejs', { 글목록: result, 글전체: result2})
 })
+
+
+app.get('/notice-search', async (req, res) => {
+  let result = await db.collection('notice')
+    .find({
+      $or: [
+        { title: { $regex: req.query.val } },
+        { content: { $regex: req.query.val } }
+      ]
+    }).toArray()
+
+  res.render('notice-search.ejs', { 글목록: result})
+})
+
 
 app.post('/notice-post', async (req, res) => {
   let Today = new Date().toLocaleDateString('ko-KR');

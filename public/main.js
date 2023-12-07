@@ -8,3 +8,7 @@ function gotoHome(){
 function gotoNotice(){
   window.history.back();
 }
+
+function gotoNotice_Home(){
+  window.location.href = '/notice/1'
+}
