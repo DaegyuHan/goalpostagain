@@ -45,20 +45,22 @@
 
 <body>
     <%- include('nav.ejs') %>
-        <div class="notice-title">공지사항</div>
 
-        <div class="white-main">
+        <div class="whole-white-main">
             <div class="detail-bg">
                 <h4 class="detail-title">
                     <%= 글.title%>
                 </h4>
+                <div class="detail-userinfo">
+                    <span>
+                        <%=글.username%>
+                    </span>
+                    <span>
+                        <%=글.time%>
+                    </span>
+                </div>
+
                 <hr>
-                <span>
-                    <%=글.username%>
-                </span>
-                <span>
-                    <%=글.time%>
-                </span>
 
                 <div style="margin: 20px auto 10px auto; overflow: hidden;">
                     <div class="image-container">
@@ -77,13 +79,12 @@
 
                         <hr>
                         <form action="/comment" method="POST">
-                            <div class="flex-row">
+                            <div class="flex-row" style="margin-bottom: 15px;">
                                 <input name="content" class="comment-input" type="text" autocomplete="off">
                                 <input name="parentId" value="<%= 글._id %>" style="display: none">
                                 <button type="submit" class="comment-button" style="margin-left: 1%;">댓글작성</button>
                             </div>
                         </form>
-                        <hr>
                         <% for (let i=0; i<댓글.length; i++) {%>
                             <div style="display: flex; align-items: baseline;">
                                 <p class="notice-comment-title">
@@ -102,7 +103,7 @@
                             </div>
                             <%}%>
 
-                                <div class="flex-row">
+                                <div class="flex-row" style="margin-top: 10px;">
                                     <button class="detail-bt-list" onclick="gotoNotice()">목록</button>
                                 </div>
             </div>

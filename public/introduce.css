@@ -1,0 +1,91 @@
+.introduce-main {
+    width: 800px;
+    height: 90%;
+    background-color: #002832;
+    margin: 10% auto 0px auto;
+    color: white;
+}
+
+.team-mission-position {
+    width: 100%;
+
+    
+}
+
+.team-mission-area {
+    width: 400px;
+    height: 100px;
+    margin: 0px auto 0px auto;
+}
+
+.team-mission{
+    max-width: 100%; /* 부모 요소의 최대 너비에 맞게 조정 */
+    max-height: 100%; /* 부모 요소의 최대 높이에 맞게 조정 */
+    width: auto; /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
+    height: auto; /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
+}
+.team-pic-area {
+
+}
+
+.team-pic{
+    max-width: 100%; /* 부모 요소의 최대 너비에 맞게 조정 */
+    max-height: 100%; /* 부모 요소의 최대 높이에 맞게 조정 */
+    width: auto; /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
+    height: auto; /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
+}
+
+.player-profile-area {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: center; */
+  }
+
+  .player-profile-area img {
+
+    margin: 10px;
+    /* background-color: pink; */
+  }
+
+  .player-profile {
+    width: 30%;
+    margin-left: 2%;
+    margin-top: 20px;
+  }
+
+  .player-profile-name {
+    margin-top: 30px;
+    margin-left: 10px;
+    font-size: 35px;
+    font-family: 'Pretendard-Bold', sans-serif;
+    font-weight: bold;
+  }
+
+
+
+
+@media only screen and (max-width: 1000px) {
+    .introduce-main {
+        width: 100%;
+    }
+
+    .team-mission-area {
+        width: 55%;
+        height: 20%;
+        margin: 60px auto 0px auto;
+    }
+
+    .player-profile {
+        width: 45%;
+        margin-left: 3%;
+        margin-top: 6%;
+      }
+
+      .player-profile-name {
+        margin-top: 15%;
+        margin-left: 10px;
+        font-size: 30px;
+        font-family: 'Pretendard-Bold', sans-serif;
+        font-weight: bold;
+      }
+}

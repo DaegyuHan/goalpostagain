@@ -22,14 +22,16 @@
 
 <body>
   <%- include('nav.ejs') %>
-    <div class="notice-title">공지사항</div>
+    <div class="white-notice-title">
+      <div class="white-notice-title-text">공지사항</div>
+    </div>
 
-    <div class="white-main">
+    <div class="whole-white-main">
       <div class="search-area">
         <input class="search">
         <button class="search-send">검색</button>
-        <hr>
       </div>
+      <div class="notice-title-underline"></div>
 
       <script>
         document.querySelector('.search-send').addEventListener('click', function () {
@@ -40,17 +42,20 @@
 
       <% for (let i=0; i<글목록.length; i++){ %>
         <div class="list-box">
-          <h4 style="font-size: 19px;">
-            <a href="notice-detail/<%=글목록[i]._id%>">
-              <%=글목록[i].title%>
-            </a>
-          </h4>
-          <span>
-            <%=글목록[i].username%>
-          </span>
-          <span style="padding-left: 15px ;">
-            <%=글목록[i].today%>
-          </span>
+          <div class="notice-userinfo">
+            <span>
+              <%=글목록[i].today%>
+            </span>
+            <span>
+              <%=글목록[i].username%>
+            </span>
+          </div>
+          <div class="notice-title-text">
+              <a href="notice-detail/<%=글목록[i]._id%>">
+                <%=글목록[i].title%>
+              </a>
+          </div>
+
         </div>
         <%}%>
           <div class="list-box" style="text-align: center; font-size: 18px;">

@@ -335,3 +335,10 @@ app.get('/notice-comment-delete/:id', async (req, res) => {
 
 
 
+
+
+app.get('/introduce', async (req, res) => {
+
+
+  res.render('introduce.ejs');
+});
