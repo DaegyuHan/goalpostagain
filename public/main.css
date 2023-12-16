@@ -203,8 +203,8 @@ img {
     /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
     .home-main,
     .white-main {
-        width: 98%;
-        margin: 0 1%;
+        width: 100%;
+        border-radius: 0px;
     }
 
 

@@ -1,0 +1,104 @@
+.match-result-fixarea {
+    display: flex;
+}
+
+
+.match-result-scorebox {
+    display: flex;
+    align-items: center;
+    margin-left: 60px;
+}
+
+.match-result-info {
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 20px;
+}
+
+.match-result-scorebox-teamlogo1 {
+    width: 80px;
+    height: 64px;
+}
+
+.match-result-scorebox-teamlogo2 {
+    width: 64px;
+    height: 64px;
+}
+
+.match-result-resultlogo {
+    text-align: center;
+}
+
+.match-result-resultlogo img {
+    width: 70px;
+    height: 25px;
+    margin: 0px auto 20px auto;
+
+}
+
+.match-result-score {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0px 20px 0px 20px;
+}
+
+.match-result-teamfont {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    margin: 0px 40px 0px 40px;
+
+}
+
+@media only screen and (max-width: 1000px) {
+
+    .match-result-fixarea {
+        display: flex;
+    }
+
+    .match-result-scorebox {
+        margin-left: 4%;
+        width: 85%;
+    }
+
+    .match-result-info {
+        font-size: 10px;
+    }
+
+    .match-result-teamfont {
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        margin: 0px 3% 0px 3%;
+    
+    }
+
+    .match-result-scorebox-teamlogo1 {
+        width: 40px;
+        height: 32px;
+    }
+
+    .match-result-scorebox-teamlogo2 {
+        width: 32px;
+        height: 32px;
+    }
+
+    .match-result-score {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0px 3% 0px 3%;
+    }
+
+    .match-result-resultlogo img {
+        width: 12%;
+        height: 18px;
+        margin: 0px auto 20px auto;
+    
+    }
+
+
+}
