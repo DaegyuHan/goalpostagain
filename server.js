@@ -68,7 +68,7 @@ connectDB.then((client) => {
 
   // 서버 띄우는 코드
   app.listen(process.env.PORT, () => {    //서버 띄울 포트 번호
-    console.log('http://localhost:3000 에서 서버 실행 중')
+    console.log('http://localhost:5000 에서 서버 실행 중')
   })
 }).catch((err) => {
   console.log(err)
@@ -107,7 +107,9 @@ app.get('/management', async (req, res) => {
 
 app.get('/mvp', async (req, res) => {
   let result = db.collection('mvp').insertOne({
-    mvp: req.query.val
+    mvp: req.query.val,
+    month : req.query.month,
+    day : req.query.day
   })
   res.redirect('/')
 })
@@ -241,8 +243,8 @@ app.get('/notice-search', async (req, res) => {
   let result = await db.collection('notice')
     .find({
       $or: [
-        { title: { $regex: req.query.val } },
-        { content: { $regex: req.query.val } }
+        { title: { $regex: req.query.search } },
+        { content: { $regex: req.query.search } }
       ]
     }).toArray()
 
@@ -339,6 +341,10 @@ app.get('/notice-comment-delete/:id', async (req, res) => {
 
 app.get('/introduce', async (req, res) => {
 
-
   res.render('introduce.ejs');
+});
+
+app.get('/match-result', async (req, res) => {
+
+  res.render('match-result.ejs');
 });

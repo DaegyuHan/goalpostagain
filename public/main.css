@@ -1,35 +1,25 @@
-@font-face {
+/* @font-face {
     font-family: 'Pretendard-Light';
     src: url('../Pretendard-Light.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'Pretendard-Bold';
-    src: url('../Pretendard-Bold.ttf') format('ttf');
-    font-weight: normal;
-    font-style: normal;
-}
 
 @font-face {
-    font-family: 'Pretendard-Regular';
-    src: url('../Pretendard-Regular.ttf') format('ttf');
+    font-family: 'Pretendard-Regular2';
+    src: url('../Pretendard-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-}
+} */
 
-@font-face {
-    font-family: 'Pretendard-SemiBold';
-    src: url('../Pretendard-SemiBold.ttf') format('ttf');
-    font-weight: normal;
-    font-style: normal;
-}
+
+
 
 body {
     margin: 0;
     background-color: #002832;
-    font-family: 'Pretendard-Light', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 i {
@@ -101,6 +91,7 @@ a {
     background-color: #ff3ca0;
     transition: left 0.3s ease;
     /* left 속성에 트랜지션 적용 */
+    z-index: 100;
 }
 
 .side-menu ul {
@@ -162,10 +153,30 @@ img {
     /* 자동으로 높이 조절 */
 }
 
-.mvp-area {
-    background-color: white;
-    width: 20%;
+.mvp-container {
+    position: relative;
 }
+
+.mvp-area {
+    margin: 0px auto 0px auto;
+    /* background-color: white; */
+    width: 100%;
+}
+
+.overlay-text {
+    position: absolute;
+    top: 85%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 450%;
+    font-weight: bold;
+    box-sizing: border-box;
+
+    width: 60%;
+    height: 80px;
+    text-align: center;
+  }
 
 ::-webkit-scrollbar {
     width: 2px;
@@ -236,5 +247,8 @@ img {
         border-radius: 2px;
     }
 
+    .overlay-text {
+        left: 35%;
+      }
 
 }

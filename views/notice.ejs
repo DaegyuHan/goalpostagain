@@ -16,7 +16,13 @@
   <link href="/main.css" rel="stylesheet">
   <link href="/notice.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
+    rel="stylesheet">
   <script src="/main.js"></script>
+
 
 </head>
 
@@ -27,18 +33,21 @@
     </div>
 
     <div class="whole-white-main">
+      <form action="/notice-search" method="GET">
       <div class="search-area">
-        <input class="search">
-        <button class="search-send">검색</button>
+        <div class="search-container">
+          <img
+            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EA%B2%80%EC%83%89.png?updatedAt=1702379922187"
+            alt="search" class="search-icon">
+          <input type="text" name="search" class="search-input" id="search-input" placeholder="검색어입력" autocomplete="off">
+          <img
+            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EB%8B%AB%EA%B8%B0%EC%B0%BD.png?updatedAt=1702379922132"
+            alt="clear" class="clear-icon" onclick="clearInput()">
+        </div>
       </div>
+    </form>
       <div class="notice-title-underline"></div>
 
-      <script>
-        document.querySelector('.search-send').addEventListener('click', function () {
-          let inputdata = document.querySelector('.search').value
-          location.href = '/notice-search?val=' + inputdata
-        })
-      </script>
 
       <% for (let i=0; i<글목록.length; i++){ %>
         <div class="list-box">
@@ -51,9 +60,9 @@
             </span>
           </div>
           <div class="notice-title-text">
-              <a href="notice-detail/<%=글목록[i]._id%>">
-                <%=글목록[i].title%>
-              </a>
+            <a href="notice-detail/<%=글목록[i]._id%>">
+              <%=글목록[i].title%>
+            </a>
           </div>
 
         </div>

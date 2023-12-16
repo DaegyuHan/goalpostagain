@@ -11,3 +11,8 @@ function gotoHome(){
 function gotoNotice(){
   window.location.href = '/notice/1'
 }
+
+function clearInput() {
+  document.getElementById('search-input').value = '';
+
+}

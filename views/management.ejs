@@ -16,12 +16,20 @@
   <link href="/main.css" rel="stylesheet">
   <link href="/management.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
+    rel="stylesheet">
   <script src="/main.js"></script>
   <script>
 
     function showMVP() {
       var WeeklyMVPSelect = document.getElementById("WeeklyMVPSelect");
       var selectedMVP = WeeklyMVPSelect.options[WeeklyMVPSelect.selectedIndex].text
+      var month = document.getElementById("mvp-date-month").value;
+      var day = document.getElementById("mvp-date-day").value;
+
 
       switch (selectedMVP) {
         case '한대규':
@@ -35,9 +43,10 @@
           </div>`
           break
         case '양철진':
-          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/%EC%9D%B4%EA%B1%B0.png?updatedAt=1701677330097">
-          </div>`
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div>
+            <div class="mvp-area"><img
+                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/3.%20MVP.png?updatedAt=1702216958902">
+            </div>`
           break
         case '권진백':
           var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
@@ -49,7 +58,7 @@
       }
 
 
-      location.href = '/mvp?val=' + encodeURIComponent(selectedMVP)
+      location.href = `/mvp?val=${encodeURIComponent(selectedMVP)}&month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}`;
     }
 
     function navi_input() {
@@ -73,12 +82,15 @@
         <div style="height: 100px;">
           <input id="navi_address" style="width: 250px;" type="text" placeholder="주소">
           <button onclick="navi_input()">입력</button>
-          <div>현재 저장된 주소 : <%=목적지.address%></div>
+          <div>현재 저장된 주소 : <%=목적지.address%>
+          </div>
         </div>
       </div>
       <div>
         <h4>이번 주 MVP</h4>
         <div>
+          <input class="mvp-date" type="text" id="mvp-date-month">월
+          <input class="mvp-date" type="text" id="mvp-date-day">일
           <div>
             <select class="form-select" id="WeeklyMVPSelect">
               <option value="한대규">한대규</option>

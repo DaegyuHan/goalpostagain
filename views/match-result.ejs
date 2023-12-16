@@ -14,6 +14,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="/main.css" rel="stylesheet">
+  <link href="/management.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,36 +22,20 @@
     href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="/main.js"></script>
-  <script>
-    function redirectTo() {
-      var levelUrl = 'https://map.naver.com/p/search/<%=목적지.address%>';
-      window.open(levelUrl, '_blank');
-    }
-
-  </script>
+ 
 </head>
 
 <body>
   <%- include('nav.ejs') %>
-    <div class="notice-title"></div>
-    <div class="home-main">
-      <% if (typeof 유저 !=='undefined' && 유저) { %>
-        <div style="color: white;">
-          <%=유저%> 님 환영합니다.
-        </div>
-        <% } %>
-        <div style="width: 95%; height: 200px; background-color: white; border-radius: 15px; margin: 0px auto 30px auto;">
-          <button onclick="redirectTo()" class="btn btn-primary">네이버지도로 연결하기</button>
-        </div>
+    <div class="notice-title">경기결과</div>
+    <div class="white-main">
 
-          <div class="mvp-container">
-            <%-MVP%>
-            <!-- <div class="overlay-text">12.12</div>
-            <div class="mvp-area"><img
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/3.%20MVP.png?updatedAt=1702216958902">
-            </div> -->
-          </div>
-    </div>
+
+
+
+
+
+      </div>
 </body>
 
 </html>

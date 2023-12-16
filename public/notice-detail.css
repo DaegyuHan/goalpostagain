@@ -5,14 +5,12 @@
 .detail-title {
   margin-top: 20px;
   margin-bottom: 10px;
-  /* font-family: 'Pretendard-SemiBold', sans-serif; */
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 600;
   color: #0c0c0c;
 }
 
 .detail-userinfo {
-  /* font-family: 'Pretendard-Regular', sans-serif; */
   color: #787878;
   padding-top: 20px;
   padding-bottom: 4px;
@@ -20,20 +18,19 @@
 
 .detail-img {
   align-items: center;
-
+  margin-bottom: 20px;
 }
 
 .detail-content {
   padding-top: 3%;
   padding-bottom: 10%;
   font-size: 18px;
-  /* font-family: 'Pretendard-Regular', sans-serif; */
-  font-weight: bold;
+  font-weight: 400;
   color: #002832;
 }
 
 .comment-input {
-  width: 75%;
+  width: 600px;
   height: 60px;
 }
 
@@ -98,5 +95,8 @@
     padding-top: 10%;
     padding-bottom: 2%;
   }
-
+  .comment-input {
+    width: 73%;
+    height: 60px;
+  }
 }

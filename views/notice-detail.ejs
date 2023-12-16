@@ -17,6 +17,11 @@
     <link href="/notice.css" rel="stylesheet">
     <link href="/notice-detail.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
+        rel="stylesheet">
     <script src="/main.js"></script>
     <script>
         function confirmDeleteComment(event) {
@@ -65,15 +70,16 @@
                 <div style="margin: 20px auto 10px auto; overflow: hidden;">
                     <div class="image-container">
                         <img class="detail-img" src="<%= 글.img%>">
-                      </div>
+                    </div>
                     <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;"><%= 글.content%></div>
                 </div>
 
 
-                <% if (유저==글.username || 유저=='test') {%>
+                <% if (유저==글.username || 유저=='test' ) {%>
                     <div style="text-align: right; font-size: 14px;">
                         <a href="/notice-edit/<%= 글._id%>">수정</a>
-                        <a href="#" class="delete-notice-button" data-notice-id="<%= 글._id%>" onclick="confirmDeleteNotice(event)">삭제</a>
+                        <a href="#" class="delete-notice-button" data-notice-id="<%= 글._id%>"
+                            onclick="confirmDeleteNotice(event)">삭제</a>
                     </div>
                     <%}%>
 

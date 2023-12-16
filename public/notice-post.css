@@ -32,3 +32,10 @@
     width: 100%;
     height: 200px;
   }
+
+  @media only screen and (max-width: 1000px) {
+
+    .form-box {
+      width: 99%;
+    }
+  }
