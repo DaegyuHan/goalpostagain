@@ -1,18 +1,61 @@
-.match-result-fixarea {
-    display: flex;
+.match-result-main {
+    width: 800px;
+    height: 90%;
+    background-color: white;
+    margin: 0px auto 0px auto;
+    border-radius: 8px;
+    position: relative;
+    z-index: 1;
+    top: -270px;
 }
 
+.match-result-lastmatch {
+    width: 700px;
+    height: 300px;
+    background-color: white;
+    border-radius: 15px;
+    margin: 0px auto 0px auto;
+    z-index: 2;
+    position: relative;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+}
+
+.lastmatch-result-area {
+    position: relative;
+    transform: translate(0%, -10%);
+}
+
+.match-result-empty {
+    height: 300px;
+}
+
+.match-result-line {
+    width: 94%;
+    height: 1px;
+    background-color: black;
+    margin: 0px auto 10px auto;
+}
 
 .match-result-scorebox {
     display: flex;
     align-items: center;
-    margin-left: 60px;
+}
+
+.lastmatch-result-scorebox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    transform: translate(0%, -10%);
 }
 
 .match-result-info {
     text-align: center;
-    padding-top: 30px;
+    padding-top: 10px;
     padding-bottom: 20px;
+}
+
+.lastmatch-result-info {
+    text-align: center;
 }
 
 .match-result-scorebox-teamlogo1 {
@@ -20,61 +63,143 @@
     height: 64px;
 }
 
+.lastmatch-result-scorebox-teamlogo1 {
+    width: 140px;
+    height: 112px;
+}
+
 .match-result-scorebox-teamlogo2 {
     width: 64px;
     height: 64px;
+}
+
+.lastmatch-result-scorebox-teamlogo2 {
+    width: 112px;
+    height: 112px;
+}
+
+.match-result-teamarea1 {
+    width: 40%;
+    display: flex;
+    justify-content: end;
+    text-align: right;
+}
+
+.lastmatch-result-teamarea1 {
+    width: 40%;
+    text-align: center;
+}
+
+.match-result-teamarea2 {
+    width: 40%;
+    display: flex;
+}
+
+.lastmatch-result-teamarea2 {
+    width: 40%;
+    text-align: center;
 }
 
 .match-result-resultlogo {
     text-align: center;
 }
 
+.lastmatch-result-resultlogo {
+    text-align: center;
+    position: relative;
+    transform: translate(35%, -115%);
+}
+
 .match-result-resultlogo img {
     width: 70px;
     height: 25px;
-    margin: 0px auto 20px auto;
+    margin-bottom: 10px;
+}
 
+
+
+.lastmatch-result-resultlogo img {
+    width: 70px;
+    height: 25px;
+    margin-bottom: 10px;
 }
 
 .match-result-score {
     font-size: 30px;
     font-weight: 700;
-    margin: 0px 20px 0px 20px;
+    text-align: center;
+    width: 20%;
+}
+
+.lastmatch-result-score {
+    font-size: 80px;
+    font-weight: 700;
+    text-align: center;
+    width: 50%;
 }
 
 .match-result-teamfont {
     font-size: 20px;
     font-weight: 500;
-    text-align: center;
     display: flex;
+    text-align: center;
     align-items: center;
-    margin: 0px 40px 0px 40px;
+    margin: 0px 30px 0px 30px;
+    
+}
+
+.lastmatch-result-teamfont {
+    font-size: 20px;
+    font-weight: 500;
+    padding-top: 10px;
+    align-items: center;
 
 }
 
+
+
+.match-result-lastmatch-font {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0px auto 0px auto;
+    padding-top: 10px;
+    font-size: 40px;
+    font-weight: 800;
+    position: relative;
+}
+
+.lastmatch-result-time {
+    font-size: 20px;
+    text-align: center;
+    position: relative;
+    top: -10px;
+    left: 0px;
+
+}
+
+
+
 @media only screen and (max-width: 1000px) {
 
-    .match-result-fixarea {
-        display: flex;
+    .match-result-lastmatch {
+        width: 96%;
+        height: 170px;
     }
 
-    .match-result-scorebox {
-        margin-left: 4%;
-        width: 85%;
+    .match-result-empty {
+        height: 170px;
+    }
+
+    .match-result-main {
+        width: 100%;
+        border-radius: 0px;
+        top: -150px;
     }
 
     .match-result-info {
         font-size: 10px;
-    }
-
-    .match-result-teamfont {
-        font-size: 12px;
-        font-weight: 500;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        margin: 0px 3% 0px 3%;
-    
+        padding-top: 2px;
     }
 
     .match-result-scorebox-teamlogo1 {
@@ -87,6 +212,16 @@
         height: 32px;
     }
 
+    .match-result-teamfont {
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        margin: 0px 7% 0px 7%;
+
+    }
+
     .match-result-score {
         font-size: 20px;
         font-weight: bold;
@@ -94,11 +229,9 @@
     }
 
     .match-result-resultlogo img {
-        width: 12%;
-        height: 18px;
-        margin: 0px auto 20px auto;
-    
+        width: 11%;
+        height: 14px;
+        margin: 0px auto 5px auto;
+
     }
-
-
 }
