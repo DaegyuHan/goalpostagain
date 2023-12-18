@@ -107,7 +107,9 @@
 .lastmatch-result-resultlogo {
     text-align: center;
     position: relative;
-    transform: translate(35%, -115%);
+    width: 70px;
+    height: 25px;
+    transform: translate(800%, -165%);
 }
 
 .match-result-resultlogo img {
@@ -263,6 +265,7 @@
         text-align: center;
         width: 50%;
     }
+    
 
     .match-result-resultlogo img {
         width: 11%;
@@ -271,10 +274,18 @@
 
     }
 
-    .lastmatch-result-resultlogo img {
+    .lastmatch-result-resultlogo {
+        text-align: center;
+        position: relative;
         width: 11%;
-        height: 14px;
-        margin-bottom: 7px;
+        height: 10%;
+        transform: translate(720%, -150%);
+    }
+
+    .lastmatch-result-resultlogo img {
+        width: 100%;
+        height: 80%;
+        /* margin-bottom: 7px; */
     }
 
     .match-result-lastmatch-font {
