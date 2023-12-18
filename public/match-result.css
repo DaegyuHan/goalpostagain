@@ -173,7 +173,7 @@
     font-size: 20px;
     text-align: center;
     position: relative;
-    top: -10px;
+    top: -20px;
     left: 0px;
 
 }
@@ -202,14 +202,35 @@
         padding-top: 2px;
     }
 
+    .lastmatch-result-info {
+        text-align: center;
+        font-size: 70%;
+        font-weight: 500;
+        padding-top: 0px;
+    }
+
+    .lastmatch-result-scorebox {
+        transform: translate(0%, -10%);
+    }
+
     .match-result-scorebox-teamlogo1 {
         width: 40px;
         height: 32px;
     }
 
+    .lastmatch-result-scorebox-teamlogo1 {
+        width: 70px;
+        height: 56px;
+    }
+
     .match-result-scorebox-teamlogo2 {
         width: 32px;
         height: 32px;
+    }
+
+    .lastmatch-result-scorebox-teamlogo2 {
+        width: 56px;
+        height: 56px;
     }
 
     .match-result-teamfont {
@@ -219,8 +240,16 @@
         display: flex;
         align-items: center;
         margin: 0px 7% 0px 7%;
-
     }
+
+    .lastmatch-result-teamfont {
+        font-size: 65%;
+        font-weight: 400;
+        padding-top: 10%;
+        align-items: center;
+    
+    }
+
 
     .match-result-score {
         font-size: 20px;
@@ -228,10 +257,38 @@
         margin: 0px 3% 0px 3%;
     }
 
+    .lastmatch-result-score {
+        font-size: 240%;
+        font-weight: bold;
+        text-align: center;
+        width: 50%;
+    }
+
     .match-result-resultlogo img {
         width: 11%;
         height: 14px;
         margin: 0px auto 5px auto;
 
+    }
+
+    .lastmatch-result-resultlogo img {
+        width: 11%;
+        height: 14px;
+        margin-bottom: 7px;
+    }
+
+    .match-result-lastmatch-font {
+        padding-top: 2%;
+        font-size: 150%;
+        font-weight: 800;
+        position: relative;
+    }
+
+    .lastmatch-result-time {
+        font-size: 70%;
+        font-weight: 600;
+        top: -15px;
+        left: 0px;
+    
     }
 }
