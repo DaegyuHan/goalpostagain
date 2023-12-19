@@ -66,6 +66,20 @@
       location.href = '/navi?val=' + navi_address
       alert('저장되었습니다.')
     }
+
+    function upload_match() {
+      var month = document.getElementById("match-result-month").value;
+      var day = document.getElementById("match-result-day").value;
+      var time = document.getElementById("match-result-time").value;
+      var place = document.getElementById("match-result-place").value;
+      var homescore = document.getElementById("match-result-homescore").value;
+      var awayscore = document.getElementById("match-result-awayscore").value;
+      var awayname = document.getElementById("match-result-awayname").value;
+
+      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}`;
+    }
+
+
   </script>
 </head>
 
@@ -88,7 +102,7 @@
       </div>
       <div>
         <h4>이번 주 MVP</h4>
-        <div>
+        <div style="height: 150px;">
           <input class="mvp-date" type="text" id="mvp-date-month">월
           <input class="mvp-date" type="text" id="mvp-date-day">일
           <div>
@@ -101,9 +115,29 @@
             <button onclick="showMVP()">선정</button>
           </div>
         </div>
-
-
-
+      </div>
+      <div>
+        <h4>경기결과</h4>
+        <div style="height: 150px;">
+          <div>          
+            24년 
+            <input type="text" id="match-result-month">월 
+            <input type="text" id="match-result-day">일 
+            <input type="text" id="match-result-time">시작시간
+          </div>
+          <div>
+            장소 <input type="text" id="match-result-place">
+          </div>
+          <div>
+            오늘도골대 
+            <input type="text" id="match-result-homescore" placeholder="오늘도골대 점수"> : 
+            <input type="text" id="match-result-awayscore" placeholder="상대팀 점수"> 
+            <input type="text" id="match-result-awayname" placeholder="상대팀 명">
+          </div>
+          <div>
+            <button onclick="upload_match()">등록</button>
+          </div>
+        </div>
       </div>
 </body>
 

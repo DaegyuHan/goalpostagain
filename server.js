@@ -120,6 +120,19 @@ app.get('/navi', async (req, res) => {
   })
 })
 
+app.get('/result', async (req, res) => {
+  let result = db.collection('result').insertOne({
+    month: req.query.month,
+    day : req.query.day,
+    time : req.query.time,
+    place : req.query.place,
+    homescore : req.query.homescore,
+    awayscore : req.query.awayscore,
+    awayname : req.query.awayname
+  })
+  res.redirect('/match-result')
+})
+
 app.get('/management/notice-post', async (req, res) => {
 
   res.render('notice-post.ejs');
@@ -345,6 +358,6 @@ app.get('/introduce', async (req, res) => {
 });
 
 app.get('/match-result', async (req, res) => {
-
-  res.render('match-result.ejs');
+  let result = await db.collection('result').find().sort({ _id: -1 }).toArray();
+  res.render('match-result.ejs', {result : result});
 });

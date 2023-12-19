@@ -30,16 +30,18 @@
     <div class="notice-title">경기결과</div>
     <div class="match-result-lastmatch">
 
-        <div class="match-result-lastmatch-font">
-          LAST MATCH
-        </div>
-        <div class="lastmatch-result-resultlogo">
-          <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577" alt="lastmatch-result">
-        </div>
+      <div class="match-result-lastmatch-font">
+        LAST MATCH
+      </div>
+      <div class="lastmatch-result-resultlogo">
+        <img
+          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
+          alt="lastmatch-result">
+      </div>
 
       <div class="lastmatch-result-area">
         <div class="lastmatch-result-info">
-          <span>수원 에스빌드 풋살 파크</span>
+          <span><%=result[0].place%></span>
         </div>
         <div class="lastmatch-result-scorebox">
           <div class="lastmatch-result-teamarea1">
@@ -55,7 +57,7 @@
 
 
           <div class="lastmatch-result-score">
-            14 - 10
+            <%=result[0].homescore%> - <%=result[0].awayscore%>
           </div>
           <div class="lastmatch-result-teamarea2">
             <div>
@@ -65,13 +67,13 @@
             </div>
 
             <div class="lastmatch-result-teamfont">
-              보노보노FC
+              <%=result[0].awayname%>
             </div>
           </div>
         </div>
 
         <div class="lastmatch-result-time">
-          23.11.29, 금요일, 23:00
+          23.<%=result[0].month%>.<%=result[0].day%>, 금요일, <%=result[0].time%>
         </div>
 
 
@@ -92,186 +94,53 @@
     <div class="match-result-main">
       <div class="match-result-empty"></div>
       <div class="match-result-line"></div>
-      <div class="match-result-area">
-        <div class="match-result-info">
-          <span>23.11.29(금) 23:00 |</span>
-          <span>수원 에스빌드 풋살 파크</span>
-        </div>
-        <div class="match-result-scorebox">
-          <div class="match-result-teamarea1">
-            <div class="match-result-teamfont">
-              오늘도골대FC
+
+      <% for (let i=1; i<result.length; i++ ){ %>
+        <div class="match-result-area">
+          <div class="match-result-info">
+            <span>23.<%=result[i].month%>.<%=result[i].day%>(금) <%=result[i].time%> |</span>
+            <span><%=result[i].place%></span>
+          </div>
+          <div class="match-result-scorebox">
+            <div class="match-result-teamarea1">
+              <div class="match-result-teamfont">
+                오늘도골대FC
+              </div>
+              <div>
+                <img class="match-result-scorebox-teamlogo1"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
+                  alt="오늘도골대FC로고">
+              </div>
             </div>
-            <div>
-              <img class="match-result-scorebox-teamlogo1"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
-                alt="오늘도골대FC로고">
+
+
+            <div class="match-result-score" style="width: 20%;">
+              <%=result[i].homescore%> : <%=result[i].awayscore%>
+            </div>
+            <div class="match-result-teamarea2">
+              <div>
+                <img class="match-result-scorebox-teamlogo2"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
+                  alt="상대팀로고">
+              </div>
+
+              <div class="match-result-teamfont">
+                <%=result[i].awayname%>
+              </div>
             </div>
           </div>
 
 
-          <div class="match-result-score" style="width: 20%;">
-            9 : 8
+          <div class="match-result-resultlogo">
+            <img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
+              alt="win">
           </div>
-          <div class="match-result-teamarea2">
-            <div>
-              <img class="match-result-scorebox-teamlogo2"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
-                alt="상대팀로고">
-            </div>
+          <hr>
 
-            <div class="match-result-teamfont">
-              보노FC
-            </div>
-          </div>
         </div>
 
-
-        <div class="match-result-resultlogo">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-            alt="win">
-        </div>
-        <hr>
-
-      </div>
-
-
-      <div class="match-result-area">
-        <div class="match-result-info">
-          <span>23.11.29(금) 23:00 |</span>
-          <span>수원 에스빌드 풋살 파크</span>
-        </div>
-        <div class="match-result-scorebox">
-          <div class="match-result-teamarea1">
-            <div class="match-result-teamfont">
-              오늘도골대FC
-            </div>
-            <div>
-              <img class="match-result-scorebox-teamlogo1"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
-                alt="오늘도골대FC로고">
-            </div>
-          </div>
-
-
-          <div class="match-result-score" style="width: 20%;">
-            14 : 10
-          </div>
-          <div class="match-result-teamarea2">
-            <div>
-              <img class="match-result-scorebox-teamlogo2"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
-                alt="상대팀로고">
-            </div>
-
-            <div class="match-result-teamfont">
-              보노보노보노FC
-            </div>
-          </div>
-        </div>
-
-
-        <div class="match-result-resultlogo">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-            alt="win">
-        </div>
-        <hr>
-
-      </div>
-
-      <div class="match-result-area">
-        <div class="match-result-info">
-          <span>23.11.29(금) 23:00 |</span>
-          <span>수원 에스빌드 풋살 파크</span>
-        </div>
-        <div class="match-result-scorebox">
-          <div class="match-result-teamarea1">
-            <div class="match-result-teamfont">
-              오늘도골대FC
-            </div>
-            <div>
-              <img class="match-result-scorebox-teamlogo1"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
-                alt="오늘도골대FC로고">
-            </div>
-          </div>
-
-
-          <div class="match-result-score" style="width: 20%;">
-            14 : 10
-          </div>
-          <div class="match-result-teamarea2">
-            <div>
-              <img class="match-result-scorebox-teamlogo2"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
-                alt="상대팀로고">
-            </div>
-
-            <div class="match-result-teamfont">
-              보노보노FC
-            </div>
-          </div>
-        </div>
-
-
-        <div class="match-result-resultlogo">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-            alt="win">
-        </div>
-        <hr>
-
-      </div>
-
-      <div class="match-result-area">
-        <div class="match-result-info">
-          <span>23.11.29(금) 23:00 |</span>
-          <span>수원 에스빌드 풋살 파크</span>
-        </div>
-        <div class="match-result-scorebox">
-          <div class="match-result-teamarea1">
-            <div class="match-result-teamfont">
-              오늘도골대FC
-            </div>
-            <div>
-              <img class="match-result-scorebox-teamlogo1"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
-                alt="오늘도골대FC로고">
-            </div>
-          </div>
-
-
-          <div class="match-result-score" style="width: 20%;">
-            14 : 10
-          </div>
-          <div class="match-result-teamarea2">
-            <div>
-              <img class="match-result-scorebox-teamlogo2"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
-                alt="상대팀로고">
-            </div>
-
-            <div class="match-result-teamfont">
-              보노보노FC
-            </div>
-          </div>
-        </div>
-
-
-        <div class="match-result-resultlogo">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-            alt="win">
-        </div>
-        <hr>
-
-      </div>
-
-
-
-
+        <%}%>
     </div>
 </body>
 
