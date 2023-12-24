@@ -72,11 +72,28 @@
       var day = document.getElementById("match-result-day").value;
       var time = document.getElementById("match-result-time").value;
       var place = document.getElementById("match-result-place").value;
-      var homescore = document.getElementById("match-result-homescore").value;
-      var awayscore = document.getElementById("match-result-awayscore").value;
+      var homescore = parseInt(document.getElementById("match-result-homescore").value, 10);
+      var awayscore = parseInt(document.getElementById("match-result-awayscore").value, 10);
       var awayname = document.getElementById("match-result-awayname").value;
+      var resultlogo;
 
-      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}`;
+      if (homescore > awayscore) {
+        resultlogo = `<img
+          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
+          alt="win">`
+      } else if (homescore == awayscore) {
+        resultlogo = `<img
+          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EB%AC%B4%EC%8A%B9%EB%B6%80.png?updatedAt=1702704505369"
+          alt="draw">`
+      } else if (homescore < awayscore) {
+        resultlogo = `<img
+          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%ED%8C%A8%EB%B0%B0.png?updatedAt=1702704505579"
+          alt="lose">`
+      }
+
+      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}&resultlogo=${encodeURIComponent(resultlogo)}`;
+
+      alert("등록되었습니다.")
     }
 
 
@@ -118,20 +135,20 @@
       </div>
       <div>
         <h4>경기결과</h4>
-        <div style="height: 150px;">
-          <div>          
-            24년 
-            <input type="text" id="match-result-month">월 
-            <input type="text" id="match-result-day">일 
+        <div style="height: 250px;">
+          <div>
+            24년
+            <input type="text" id="match-result-month">월
+            <input type="text" id="match-result-day">일
             <input type="text" id="match-result-time">시작시간
           </div>
           <div>
             장소 <input type="text" id="match-result-place">
           </div>
           <div>
-            오늘도골대 
-            <input type="text" id="match-result-homescore" placeholder="오늘도골대 점수"> : 
-            <input type="text" id="match-result-awayscore" placeholder="상대팀 점수"> 
+            오늘도골대
+            <input type="text" id="match-result-homescore" placeholder="오늘도골대 점수"> :
+            <input type="text" id="match-result-awayscore" placeholder="상대팀 점수">
             <input type="text" id="match-result-awayname" placeholder="상대팀 명">
           </div>
           <div>

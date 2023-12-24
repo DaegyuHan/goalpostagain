@@ -147,7 +147,7 @@
     text-align: center;
     align-items: center;
     margin: 0px 30px 0px 30px;
-    
+
 }
 
 .lastmatch-result-teamfont {
@@ -178,6 +178,14 @@
     top: -20px;
     left: 0px;
 
+}
+
+.match-result-delete {
+    margin-right: 10px;
+    font-size: 17px;
+    text-align: right;
+    position: relative;
+    top: -15px;
 }
 
 
@@ -249,7 +257,7 @@
         font-weight: 400;
         padding-top: 10%;
         align-items: center;
-    
+
     }
 
 
@@ -265,10 +273,10 @@
         text-align: center;
         width: 50%;
     }
-    
+
 
     .match-result-resultlogo img {
-        width: 11%;
+        width: 10%;
         height: 14px;
         margin: 0px auto 5px auto;
 
@@ -277,9 +285,9 @@
     .lastmatch-result-resultlogo {
         text-align: center;
         position: relative;
-        width: 11%;
+        width: 10%;
         height: 10%;
-        transform: translate(720%, -150%);
+        transform: translate(800%, -150%);
     }
 
     .lastmatch-result-resultlogo img {
@@ -300,6 +308,12 @@
         font-weight: 600;
         top: -15px;
         left: 0px;
-    
+
+    }
+
+    .match-result-delete {
+        margin-right: 5%;
+        font-size: 55%;
+        top: -20px;
     }
 }

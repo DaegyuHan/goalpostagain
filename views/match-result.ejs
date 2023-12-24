@@ -22,6 +22,29 @@
     href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="/main.js"></script>
+  <script>
+    function confirmDeleteResult(event) {
+      event.preventDefault();
+
+      var commentId = event.target.getAttribute('data-result-id');
+      var confirmDelete = confirm('글을 삭제하시겠습니까?');
+
+      if (confirmDelete) {
+        window.location.href = '/match-result-delete/' + commentId;
+      }
+    }
+
+    function confirmDeleteLastResult(event) {
+      event.preventDefault();
+
+      var commentId = event.target.getAttribute('data-last-result-id');
+      var confirmDelete = confirm('글을 삭제하시겠습니까?');
+
+      if (confirmDelete) {
+        window.location.href = '/match-result-delete/' + commentId;
+      }
+    }
+  </script>
 
 </head>
 
@@ -34,14 +57,14 @@
         LAST MATCH
       </div>
       <div class="lastmatch-result-resultlogo">
-        <img
-          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-          alt="lastmatch-result">
+        <%-result[0].resultlogo%>
       </div>
 
       <div class="lastmatch-result-area">
         <div class="lastmatch-result-info">
-          <span><%=result[0].place%></span>
+          <span>
+            <%=result[0].place%>
+          </span>
         </div>
         <div class="lastmatch-result-scorebox">
           <div class="lastmatch-result-teamarea1">
@@ -75,15 +98,16 @@
         <div class="lastmatch-result-time">
           23.<%=result[0].month%>.<%=result[0].day%>, 금요일, <%=result[0].time%>
         </div>
-
+        <% if (typeof 유저 !=='undefined' ) { %>
+          <% if (유저=='test' ) { %>
+            <div class="match-result-delete">
+              <a href="#" data-last-result-id="<%=result[0]._id%>" onclick="confirmDeleteLastResult(event)">삭제</a>
+            </div>
+            <%}}%>
 
       </div>
 
     </div>
-
-
-
-
 
 
 
@@ -99,7 +123,9 @@
         <div class="match-result-area">
           <div class="match-result-info">
             <span>23.<%=result[i].month%>.<%=result[i].day%>(금) <%=result[i].time%> |</span>
-            <span><%=result[i].place%></span>
+            <span>
+              <%=result[i].place%>
+            </span>
           </div>
           <div class="match-result-scorebox">
             <div class="match-result-teamarea1">
@@ -132,11 +158,15 @@
 
 
           <div class="match-result-resultlogo">
-            <img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%8A%B9%EB%A6%AC.png?updatedAt=1702704505577"
-              alt="win">
+            <%-result[i].resultlogo%>
           </div>
-          <hr>
+          <% if (typeof 유저 !=='undefined' ) { %>
+            <% if (유저=='test' ) { %>
+              <div class="match-result-delete">
+                <a href="#" data-result-id="<%=result[i]._id%>" onclick="confirmDeleteResult(event)">삭제</a>
+              </div>
+              <%}}%>
+                <hr>
 
         </div>
 

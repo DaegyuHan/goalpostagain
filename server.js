@@ -128,9 +128,17 @@ app.get('/result', async (req, res) => {
     place : req.query.place,
     homescore : req.query.homescore,
     awayscore : req.query.awayscore,
-    awayname : req.query.awayname
+    awayname : req.query.awayname,
+    resultlogo : req.query.resultlogo
   })
   res.redirect('/match-result')
+})
+
+app.get('/match-result-delete/:id', async (req, res) => {
+  let result = await db.collection('result').deleteOne({
+    _id: new ObjectId(req.params.id)
+  })
+  res.redirect('back')
 })
 
 app.get('/management/notice-post', async (req, res) => {
@@ -227,7 +235,9 @@ app.get('/register', async (req, res) => {
 app.post('/register', async (req, res) => {
 
   let 해시 = await bcrypt.hash(req.body.password, 10)
-
+  // if (req.body.memberCode == 'bigstarhan') {
+    
+  // }
   await db.collection('user').insertOne({
     userID: req.body.userID,
     username: req.body.username,
