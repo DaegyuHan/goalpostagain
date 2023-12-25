@@ -45,10 +45,46 @@
                 window.location.href = '/notice-delete/' + commentId; // 혹은 fetch 등의 비동기 처리
             }
         }
+
+
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     const commentForm = document.querySelector('form');
+
+        //     commentForm.addEventListener('submit', async function (event) {
+        //         event.preventDefault();
+
+        //         const commentContent = document.querySelector('.comment-input').value.trim();
+
+        //         if (!commentContent) {
+        //             const response = await fetch('/comment', {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'Content-Type': 'application/json',
+        //                 },
+        //                 body: JSON.stringify({ content: commentContent }),
+        //             });
+
+        //             const responseData = await response.json();
+
+        //             if (responseData.error) {
+        //                 alert(responseData.error);
+        //             } else {
+        //                 // 서버에서 정상적으로 처리된 경우에 대한 로직
+        //             }
+        //         }
+        //     });
+        // });
+
+
     </script>
 </head>
 
 <body>
+    <!-- <% if (typeof Needcomment_Message !=='undefined' ) { %>
+        <script>
+            alert('<%= Needcomment_Message %>');
+        </script>
+    <% } %> -->
     <%- include('nav.ejs') %>
 
         <div class="whole-white-main">
@@ -71,7 +107,8 @@
                     <div class="image-container">
                         <img class="detail-img" src="<%= 글.img%>">
                     </div>
-                    <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;"><%= 글.content%></div>
+                    <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;"><%= 글.content%>
+                    </div>
                 </div>
 
 
@@ -88,7 +125,7 @@
                             <div class="flex-row" style="margin-bottom: 15px;">
                                 <input name="content" class="comment-input" type="text" autocomplete="off">
                                 <input name="parentId" value="<%= 글._id %>" style="display: none">
-                                <button type="submit" class="comment-button" style="margin-left: 1%;">댓글작성</button>
+                                <button type="submit" class="comment-button" style="margin-left: 1%;">작성</button>
                             </div>
                         </form>
                         <% for (let i=0; i<댓글.length; i++) {%>

@@ -90,10 +90,10 @@ app.get('/', async (req, res) => {
 
   let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
   let Weeklymvp = result.length > 0 ? result[0].mvp : null;
-
+  let match_result = await db.collection('result').find().sort({ _id: -1 }).toArray();
   let navi = await db.collection('navi').find().sort({ _id: -1 }).limit(1).toArray();
 
-  res.render('home.ejs', { MVP: Weeklymvp, 목적지: navi[0] });
+  res.render('home.ejs', { MVP: Weeklymvp, 목적지: navi[0], result : match_result });
 })
 
 
@@ -129,7 +129,8 @@ app.get('/result', async (req, res) => {
     homescore : req.query.homescore,
     awayscore : req.query.awayscore,
     awayname : req.query.awayname,
-    resultlogo : req.query.resultlogo
+    resultlogo : req.query.resultlogo,
+    home_resultlogo : req.query.home_resultlogo
   })
   res.redirect('/match-result')
 })
@@ -182,7 +183,7 @@ exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     next(); // 다음 미들웨어
   } else {
-    res.render('login', { message: '로그인이 필요합니다.' });
+    res.render('login', { Needlogin_Message: '로그인이 필요합니다.' });
   }
 };
 
@@ -233,17 +234,23 @@ app.get('/register', async (req, res) => {
 })
 
 app.post('/register', async (req, res) => {
-
+  const timeZone = 'Asia/Seoul';
+  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
   let 해시 = await bcrypt.hash(req.body.password, 10)
-  // if (req.body.memberCode == 'bigstarhan') {
-    
-  // }
-  await db.collection('user').insertOne({
-    userID: req.body.userID,
-    username: req.body.username,
-    password: 해시
-  })
-  res.redirect('/')
+
+  if (req.body.memberCode == 'bigstarhan') {
+    await db.collection('user').insertOne({
+      userID: req.body.userID,
+      username: req.body.username,
+      password: 해시,
+      time : Time
+    })
+    res.render('login', { Register_Message: '회원가입이 완료되었습니다.' });
+  }
+  else {
+    res.render('register', { Member_Message: '멤버코드가 일치하지 않습니다.' });
+  }
+
 })
 
 
@@ -276,8 +283,11 @@ app.get('/notice-search', async (req, res) => {
 
 
 app.post('/notice-post', async (req, res) => {
-  let Today = new Date().toLocaleDateString('ko-KR');
-  let Time =  new Date().toLocaleString('ko-KR');
+
+  const timeZone = 'Asia/Seoul';
+
+  let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
+  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
   upload.single('img1')(req, res, async (err) => {
     if (err) return res.send('업로드에러')
     try {
@@ -342,14 +352,24 @@ app.get('/notice-delete/:id', async (req, res) => {
 })
 
 app.post('/comment', async (req, res) => {
-  await db.collection('comment').insertOne({
-    content: req.body.content,
-    writerId: new ObjectId(req.user._id),
-    writer: req.user.username,
-    parentId: new ObjectId(req.body.parentId)
-  })
-  res.redirect('back')
-})
+
+  // if (!req.body.content) {
+  //   return res.status(400).json({ error: '댓글을 입력하세요.' });
+  // } else if (req.body.content) {
+    await db.collection('comment').insertOne({
+      content: req.body.content,
+      writerId: new ObjectId(req.user._id),
+      writer: req.user.username,
+      parentId: new ObjectId(req.body.parentId)
+    })
+    res.redirect('back')
+  }
+
+
+
+// }
+)
+
 
 app.get('/notice-comment-delete/:id', async (req, res) => {
   let result = await db.collection('comment').deleteOne({

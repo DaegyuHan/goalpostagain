@@ -34,19 +34,92 @@
   <%- include('nav.ejs') %>
     <div class="notice-title"></div>
     <div class="home-main">
-      <% if (typeof 유저 !=='undefined' && 유저) { %>
+      <!-- <% if (typeof 유저 !=='undefined' && 유저) { %>
         <div style="color: white;">
           <%=유저%> 님 환영합니다.
         </div>
-        <% } %>
-        <div style="width: 95%; height: 200px; background-color: white; border-radius: 15px; margin: 0px auto 30px auto;">
-          <button onclick="redirectTo()" class="btn btn-primary">네이버지도로 연결하기</button>
+        <% } %> -->
+      <div class="match-plan-area">
+        <div onclick="redirectTo()" class="navi-button">네이버지도로 연결하기</div>
+      </div>
+
+      <div class="home-lastmatch-container">
+        <div class="home-lastmatch-area">
+          <div style="margin-left: 15px;">LAST MATCH
+          </div>
         </div>
 
-          <div class="mvp-container">
-            <%-MVP%>
+        <div class="home-lastmatch-matcharea">
+          <img class="sharklogo"
+            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+            alt="logo">
+          <div>
+            <div class="home-lastmatch-info">
+              <div class="home-lastmatch-awayname">
+                <%=result[0].awayname%>
+              </div>
+              <div class="home-lastmatch-date">
+                23.<%=result[0].month%>.<%=result[0].day%>
+              </div>
+            </div>
+
           </div>
-    </div>
+
+            <div class="home-lastmatch-score">
+              <%=result[0].homescore%>-<%=result[0].awayscore%>
+            </div>
+            <%-result[0].home_resultlogo%>
+          </div>
+
+
+
+
+
+        <div class="home-lastmatch-matcharea">
+          <img class="sharklogo"
+            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+            alt="logo">
+          <div>
+            <div class="home-lastmatch-info">
+              <div class="home-lastmatch-awayname">
+                <%=result[1].awayname%>
+              </div>
+              <div class="home-lastmatch-date">
+                23.<%=result[1].month%>.<%=result[1].day%>
+              </div>
+            </div>
+          </div>
+          <div class="home-lastmatch-score">
+            <%=result[1].homescore%>-<%=result[1].awayscore%>
+          </div>
+          <%-result[1].home_resultlogo%>
+        </div>
+
+        <div class="home-lastmatch-matcharea">
+          <img class="sharklogo"
+            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+            alt="logo">
+          <div>
+            <div class="home-lastmatch-info">
+              <div class="home-lastmatch-awayname">
+                <%=result[2].awayname%>
+              </div>
+              <div class="home-lastmatch-date">
+                23.<%=result[2].month%>.<%=result[2].day%>
+              </div>
+            </div>
+          </div>
+          <div class="home-lastmatch-score">
+            <%=result[2].homescore%>-<%=result[2].awayscore%>
+          </div>
+          <%-result[2].home_resultlogo%>
+        </div>
+
+
+
+        <div class="mvp-container">
+          <%-MVP%>
+        </div>
 </body>
 
 </html>

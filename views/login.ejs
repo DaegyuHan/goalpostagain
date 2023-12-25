@@ -14,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="/main.css" rel="stylesheet">
+    <link href="/login.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,34 +22,73 @@
         href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
         rel="stylesheet">
     <script src="/main.js"></script>
+    <script>
+        function gotoRegister() {
+            window.location.href = '/register';
+        }
+    </script>
 
 </head>
 
 <body>
-    <% if (typeof message !=='undefined' ) { %>
+    <% if (typeof Needlogin_Message !=='undefined' ) { %>
         <script>
-            alert('<%= message %>');
+            alert('<%= Needlogin_Message %>');
         </script>
-        <% } %>
-            <%- include('nav.ejs') %>
+    <% } %>
+    <% if (typeof Register_Message !=='undefined' ) { %>
+        <script>
+            alert('<%= Register_Message %>');
+        </script>
+    <% } %>
+    <% if (typeof WrongID_Message !=='undefined' ) { %>
+        <script>
+            alert('<%= WrongID_Message %>');
+        </script>
+    <% } %>
 
-                <div class="home-main">
-                    <div class="white-main">
-                        <form class="form-box" action="/login" method="POST">
-                            <h4>로그인</h4>
-                            <div>
-                                ID <input name="username">
-                            </div>
-                            <div>
-                                PW <input name="password" type="password">
-                            </div>
-                            <button type="submit">로그인</button>
-                            <div>
-                                <a href="/register">회원가입</a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                            <%- include('nav.ejs') %>
+
+                                <div class="home-main">
+                                    <div class="login-main">
+                                        <form class="form-box" action="/login" method="POST">
+                                            <div class="login-title-area">
+                                                <div class="login-first-title">
+                                                    환영합니다!
+                                                </div>
+                                                <div class="login-second-title">
+                                                    오늘도골대 홈페이지 입니다.
+                                                </div>
+                                            </div>
+                                            <div class="login-second-container">
+                                                <div>
+                                                    <div class="login-input-font">
+                                                        아이디
+                                                    </div>
+                                                    <input class="login-input" name="username">
+                                                </div>
+                                                <div>
+                                                    <div class="login-input-font">
+                                                        패스워드
+                                                    </div>
+                                                    <input class="login-input" name="password" type="password">
+                                                </div>
+
+                                                <button class="login-button" type="submit">로그인</button>
+
+                                                <div class="separator">
+                                                    <div class="line"></div>
+                                                    <div class="text">OR</div>
+                                                </div>
+
+
+                                            </div>
+                                        </form>
+                                        <div class="login-bottom-margin">
+                                            <button class="register-button" onclick="gotoRegister()">회원가입</button>
+                                        </div>
+                                    </div>
+                                </div>
 
 </body>
 

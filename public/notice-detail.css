@@ -1,3 +1,7 @@
+button:hover {
+  background-color: #ff3ca0;
+}
+
 .detail-bg {
   padding: 15px;
 }
@@ -30,8 +34,8 @@
 }
 
 .comment-input {
-  width: 600px;
-  height: 60px;
+  width: 90%;
+  height: 40px;
 }
 
 /* .comment-button {
@@ -45,11 +49,12 @@
 } */
 
 .comment-button {
-  height: 50px;
-  font-size: 14px;
-  background-color: #002832;
+  width: 8%;
+  height: 40px;
+  font-size: 16px;
+  background-color: black;
   color: white;
-  border: #002832;
+  border: black;
   border-radius: 5px;
 }
 
@@ -58,9 +63,9 @@
   width: 80px;
   height: 30px;
   font-size: 16px;
-  background-color: #002832;
+  background-color: black;
   color: white;
-  border: #002832;
+  border: black;
   border-radius: 18px;
 }
 
@@ -96,7 +101,13 @@
     padding-bottom: 2%;
   }
   .comment-input {
-    width: 73%;
-    height: 60px;
+    width: 80%;
+    height: 30px;
+  }
+
+  .comment-button {
+    width: 15%;
+    height: 30px;
+    font-size: 90%
   }
 }

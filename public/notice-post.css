@@ -1,3 +1,7 @@
+button:hover {
+  background-color: #ff3ca0;
+}
+
 .form-box {
     background: white;
     padding: 25px;

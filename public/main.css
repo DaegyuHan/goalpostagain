@@ -26,18 +26,17 @@ i {
     color: white;
 }
 
-button:hover {
-    background-color: #ff3ca0;
-}
 
 
-a:hover {
-    color: #ff3ca0;
-}
+
 
 a {
     color: black;
     text-decoration: none;
+}
+
+a:hover {
+    color: #002832;
 }
 
 .flex-row {
@@ -92,6 +91,16 @@ a {
     transition: left 0.3s ease;
     /* left 속성에 트랜지션 적용 */
     z-index: 100;
+    /* background-image: url(https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437);
+    background-repeat: no-repeat;
+    background-position: -100px 100px; */
+}
+
+.side-menu img {
+    width: 35%;
+    height: 28%;
+    margin-left: 30px;
+    cursor: pointer;
 }
 
 .side-menu ul {
@@ -102,21 +111,27 @@ a {
 
 .side-menu ul li {
     width: 250px;
-    margin: 20px;
+    margin: 30px;
     /* border-bottom: 1px solid white; */
 }
 
-.side-menu ul li a {
+.nav-menu-font {
     text-decoration: none;
     color: white;
-    font-size: 18px;
+    font-size: 25px;
     display: block;
-    padding-bottom: 20px;
+    padding-bottom: 0px;
     /* 흰색 선과 글씨 사이 여백 추가 */
     border-bottom: 0px solid white;
     /* 흰색 선 추가 */
     box-sizing: border-box;
     /* padding 포함하도록 box-sizing 설정 */
+}
+
+.nav-user-font {
+    font-size: 29px; 
+    border-bottom: 1px solid white;
+    color: white;
 }
 
 .home-main {
@@ -153,14 +168,34 @@ img {
     /* 자동으로 높이 조절 */
 }
 
+.match-plan-area {
+    width: 95%; 
+    height: 200px; 
+    background-color: white; 
+    border-radius: 15px; 
+    margin: 0px auto 30px auto;
+}
+
+.navi-button {
+    width: 100%;
+    height: 20%;
+    background-color: #ff3ca0;
+    color: white;
+    text-align: center;
+    align-items: center;
+    border: 0px solid;
+    cursor: pointer;
+}
+
 .mvp-container {
     position: relative;
+    margin-top: 30px;
 }
 
 .mvp-area {
     margin: 0px auto 0px auto;
     /* background-color: white; */
-    width: 100%;
+    width: 96%;
 }
 
 .overlay-text {
@@ -195,6 +230,64 @@ img {
     font-size: 30px;
     text-align: center;
   }
+
+
+  .home-lastmatch-area {
+    width: 95%;
+    height: 40px;
+    background-color: #ff3ca0;
+    color: white;
+    font-size: 25px;
+    margin: 0px auto 0px auto;
+  }
+  .home-lastmatch-matcharea {
+    width: 95%;
+    height: 100px;
+    background-color: #002832;
+    border-bottom: 2px solid #ff3ca0;
+    border-left: 2px solid #ff3ca0;
+    border-right: 2px solid #ff3ca0;
+    color: white;
+    margin: 0px auto 0px auto;
+    display: flex;
+    /* justify-content: space-around; */
+    align-items: center;
+  }
+
+  .sharklogo {
+    width: 10%;
+    height: 80%;
+    margin-left: 10px;
+    margin-right: 20px;
+  }
+  
+  .home-lastmatch-info {
+
+    width: 250px;
+    margin-right: 170px;
+  }
+  .home-lastmatch-awayname {
+    font-size: 200%;
+    font-weight: 500;
+  }
+
+  .home-lastmatch-date {
+    font-size: 120%;
+    color: #DCDCDC;
+  }
+
+
+  .home-lastmatch-score {
+    font-size: 310%;
+    font-weight: 500;
+  }
+
+  .home-lastmatch-result-logo {
+    position: absolute;
+    width: 4%;
+    margin-left: 48%;
+  }
+
 
 
 
@@ -251,4 +344,100 @@ img {
         left: 35%;
       }
 
+      .nav-menu-font {
+        font-size: 22px;
+
+    }
+
+    .home-lastmatch-area {
+        width: 95%;
+        height: 30px;
+        font-size: 90%;
+
+      }
+  .home-lastmatch-matcharea {
+    height: 70px;
+  }
+
+  .sharklogo {
+    width: 13%;
+    height: 70%;
+    margin-left: 7px;
+    margin-right: 7px;
+  }
+  
+  .home-lastmatch-info {
+
+    width: 100%;
+    margin-right: 250%;
+  }
+  .home-lastmatch-awayname {
+    font-size: 130%;
+  }
+
+  .home-lastmatch-date {
+    font-size: 90%;
+    color: #DCDCDC;
+  }
+
+
+  .home-lastmatch-score {
+    font-size: 180%;
+    margin-left: 18%;
+  }
+
+  .home-lastmatch-result-logo {
+    position: absolute;
+    width: 8%;
+    margin-left: 84%;
+    margin-top: 1%;
+  }
+    
+
+  /* .home-lastmatch-matcharea {
+    width: 95%;
+    height: 100px;
+    background-color: #002832;
+    border-bottom: 2px solid #ff3ca0;
+    border-left: 2px solid #ff3ca0;
+    border-right: 2px solid #ff3ca0;
+    color: white;
+    margin: 0px auto 0px auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .sharklogo {
+    width: 10%;
+    height: 80%;
+    margin-left: 10px;
+    margin-right: 20px;
+  }
+  
+  .home-lastmatch-info {
+
+    width: 250px;
+    margin-right: 170px;
+  }
+  .home-lastmatch-awayname {
+    font-size: 200%;
+    font-weight: 500;
+  }
+
+  .home-lastmatch-date {
+    font-size: 120%;
+    color: #DCDCDC;
+  }
+
+
+  .home-lastmatch-score {
+    font-size: 310%;
+    font-weight: 500;
+  }
+
+  .home-lastmatch-result-logo {
+    position: absolute;
+    width: 4%;
+    margin-left: 48%;
+  } */
 }

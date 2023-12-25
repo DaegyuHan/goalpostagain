@@ -14,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="/main.css" rel="stylesheet">
+    <link href="/login.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,33 +22,66 @@
         href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
         rel="stylesheet">
     <script src="/main.js"></script>
+    <style>
+        .register-button-margin {
+            padding-bottom: 40px;
+        }
+    </style>
 
 </head>
 
 <body>
+    <% if (typeof Member_Message !=='undefined' ) { %>
+        <script>
+            alert('<%= Member_Message %>');
+        </script>
+        <% } %>
     <%- include('nav.ejs') %>
 
-        <div class="home-main">
-            <div class="white-main">
-                <form class="form-box" action="/register" method="POST">
-                    <h4>회원가입</h4>
+    <div class="home-main">
+        <div class="login-main">
+            <form class="form-box" action="/register" method="POST">
+                <div class="login-title-area">
+                    <div class="login-first-title">
+                        반갑습니다!
+                    </div>
+                    <div class="login-second-title">
+                        오늘도골대 멤버가 되어주세요.
+                    </div>
+                </div>
+                <div class="login-second-container">
                     <div>
-                        Name <input name="username">
+                        <div class="login-input-font">
+                            이름
+                        </div>
+                        <input class="login-input" name="username" autocomplete="off">
                     </div>
                     <div>
-                        ID <input name="userID">
+                        <div class="login-input-font">
+                            아이디
+                        </div>
+                        <input class="login-input" name="userID" autocomplete="off">
                     </div>
                     <div>
-                        PW <input name="password" type="password">
+                        <div class="login-input-font">
+                            패스워드
+                        </div>
+                        <input class="login-input" name="password" type="password">
                     </div>
                     <div>
-                        멤버코드 <input name="memberCode">
+                        <div class="login-input-font">
+                            멤버코드
+                        </div>
+                        <input class="login-input" name="memberCode" autocomplete="off">
                     </div>
-                    <button type="submit">가입</button>
 
-                </form>
-            </div>
+                    <button class="login-button" type="submit">회원가입</button>
+                    <div class="register-button-margin"></div>
+                </div>
+            </form>
+
         </div>
+    </div>
 </body>
 
 </html>

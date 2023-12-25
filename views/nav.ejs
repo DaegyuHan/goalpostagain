@@ -7,23 +7,26 @@
     <i class="fas fa-bars"></i>
   </div>
   <div class="menu-bar-text">
+
   <ul>
+    <img onclick="gotoHome()" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437" alt="logo">
+
     <% if (typeof 유저 !=='undefined' ) { %>
-      <li><a style="font-size: 25px; border-bottom: 1px solid white;" href="#">
+      <li><div class="nav-user-font">
           <%=유저%> 님
-        </a></li>
+      </div></li>
       <% } else { %>
-        <li><a style="font-size: 25px; border-bottom: 1px solid white;" href="/login">로그인하기</a></li>
+        <li><a class="nav-user-font" href="/login">로그인하기</a></li>
         <%}%>
-          <li><a href="/introduce">팀소개</a></li>
-          <li><a href="/">사진&영상</a></li>
-          <li><a href="/match-result">경기결과</a></li>
-          <li><a href="/notice/1">공지사항</a></li>
+          <li><a class="nav-menu-font" href="/introduce">팀소개</a></li>
+          <li><a class="nav-menu-font" href="/">사진&영상</a></li>
+          <li><a class="nav-menu-font" href="/match-result">경기결과</a></li>
+          <li><a class="nav-menu-font" href="/notice/1">공지사항</a></li>
           <% if (typeof 유저 !=='undefined' ) { %>
             <% if (유저 == '한대규'||유저 == 'test') {%>
-              <li><a href="/management">관리</a></li>
+              <li><a class="nav-menu-font" href="/management">운영관리</a></li>
               <%}%>
-              <li><a href="/logout">로그아웃</a></li>
+              <li><a class="nav-menu-font" href="/logout">로그아웃</a></li>
             <% } %>
           
   </ul>
