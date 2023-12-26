@@ -1,0 +1,284 @@
+.match-plan-area {
+    width: 95%;
+    height: 260px;
+    background-color: white;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    margin: 0px auto 0px auto;
+}
+
+.main-planmatch-datefont {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0px auto 0px auto;
+    padding-top: 10px;
+    font-size: 25px;
+    font-weight: 400;
+    position: relative;
+}
+
+.planmatch-result-area {
+    position: relative;
+    transform: translate(0%, -10%);
+}
+
+
+.planmatch-result-scorebox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    transform: translate(0%, -30%);
+}
+
+
+
+.planmatch-result-vs {
+    position: relative;
+    transform: translate(0%, 40%);
+    text-align: center;
+    font-size: 40px;
+    font-weight: 800;
+}
+
+
+.planmatch-result-scorebox-teamlogo1 {
+    width: 140px;
+    height: 112px;
+}
+
+
+
+.planmatch-result-scorebox-teamlogo2 {
+    width: 112px;
+    height: 112px;
+}
+
+
+
+.planmatch-result-teamarea1 {
+    width: 40%;
+    text-align: center;
+}
+
+
+
+.planmatch-result-teamarea2 {
+    width: 40%;
+    text-align: center;
+}
+
+
+
+.planmatch-time {
+    font-size: 50px;
+    font-weight: 700;
+    text-align: center;
+    width: 50%;
+    position: relative;
+    transform: translate(0%, 30%);
+}
+
+
+
+.planmatch-result-teamfont {
+    font-size: 20px;
+    font-weight: 800;
+    padding-top: 10px;
+    align-items: center;
+
+}
+
+
+
+
+
+.planmatch-place {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+    justify-content: center;
+    position: relative;
+    top: -50px;
+    display: flex;
+
+}
+
+.planmatch-place-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    margin-top: 4px;
+}
+
+.planmatch-place-copy {
+    font-size: 14px;
+    color: blue;
+    margin-left: 4px;
+    margin-top: 7px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.navi-button-area {
+    display: flex;
+    width: 95%;
+    height: 60px;
+    font-size: 130%;
+    background-color: #ff3ca0;
+    color: white;
+    border: 0px solid;
+    cursor: pointer;
+    margin: 0px auto 50px auto;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.navi-logo {
+    width: 25px;
+    height: 32px;
+    margin-right: 5px;
+}
+
+
+
+
+
+@media only screen and (max-width: 1000px) {
+
+    .match-plan-area {
+        height: 150px;
+    }
+
+
+    .main-planmatch-datefont {
+        font-size: 100%;
+    }
+
+    .planmatch-result-area {
+        transform: translate(0%, -10%);
+    }
+
+
+    .planmatch-result-scorebox {
+        transform: translate(0%, -30%);
+    }
+
+
+
+    .planmatch-result-vs {
+        transform: translate(0%, 40%);
+        font-size: 160%;
+    }
+
+
+    .planmatch-result-scorebox-teamlogo1 {
+        width: 65%;
+        height: 52%;
+    }
+
+
+
+    .planmatch-result-scorebox-teamlogo2 {
+        width: 52%;
+        height: 52%;
+    }
+
+
+
+    .planmatch-result-teamarea1 {
+        width: 30%;
+        text-align: center;
+    }
+
+
+
+    .planmatch-result-teamarea2 {
+        width: 30%;
+        text-align: center;
+    }
+
+
+
+    .planmatch-time {
+        font-size: 170%;
+        transform: translate(0%, 30%);
+    }
+
+
+
+    .planmatch-result-teamfont {
+        font-size: 70%;
+    }
+
+
+
+
+
+    .planmatch-place {
+        font-size: 70%;
+        top: -40px;
+
+    }
+
+    .planmatch-place-logo {
+        width: 4%;
+        height: 4%;
+        margin-right: 1%;
+        margin-top: 1%;
+    }
+
+    .planmatch-place-copy {
+        font-size: 80%;
+        color: blue;
+        margin-left: 1%;
+        margin-top: 1%;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+
+    .planmatch-place {
+        font-size: 80%;
+        top: -30px;
+    }
+
+    .planmatch-place-logo {
+        width: 4%;
+        height: 4%;
+        margin-right: 2px;
+        margin-top: 4px;
+    }
+
+    .planmatch-place-copy {
+        font-size: 80%;
+        margin-left: 4px;
+        margin-top: 3px;
+    }
+
+    .navi-button-area {
+        height: 40px;
+        font-size: 80%;
+    }
+
+    .navi-logo {
+        width: 5%;
+        height: 60%;
+        margin-right: 5px;
+    }
+
+}
+
+@media only screen and (max-width: 300px) {
+    .planmatch-time {
+        font-size: 130%;
+        transform: translate(0%, 30%);
+    }
+
+    .planmatch-place {
+        font-size: 60%;
+        top: -30px;
+    }
+}

@@ -14,6 +14,10 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="/main.css" rel="stylesheet">
+  <link href="/main-mvp.css" rel="stylesheet">
+  <link href="/main-match-result.css" rel="stylesheet">
+  <link href="/main-planmatch.css" rel="stylesheet">
+  <link href="/match-result.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,80 +44,156 @@
         </div>
         <% } %> -->
       <div class="match-plan-area">
-        <div onclick="redirectTo()" class="navi-button">네이버지도로 연결하기</div>
+
+        <div class="main-planmatch-datefont">
+          23. 12. 01 (금)
+        </div>
+
+        <div class="planmatch-result-area">
+          <div class="planmatch-result-vs">
+            vs
+          </div>
+          <div class="planmatch-result-scorebox">
+            <div class="planmatch-result-teamarea1">
+              <div>
+                <img class="planmatch-result-scorebox-teamlogo1"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837"
+                  alt="오늘도골대FC로고">
+              </div>
+              <div class="planmatch-result-teamfont">
+                오늘도골대FC
+              </div>
+            </div>
+            <div class="planmatch-time">
+              23:00-01:00
+            </div>
+            <div class="planmatch-result-teamarea2">
+              <div>
+                <img class="planmatch-result-scorebox-teamlogo2"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
+                  alt="상대팀로고">
+              </div>
+
+              <div class="planmatch-result-teamfont">
+                <%=result[0].awayname%>
+              </div>
+            </div>
+          </div>
+
+          <div class="planmatch-place">
+            <img class="planmatch-place-logo"
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/1.%20%EC%9E%A5%EC%86%8C.png?updatedAt=1703600879483"
+              alt="place">
+            <div>
+              에스빌드 풋살파크
+            </div>
+            <div class="planmatch-place-copy">
+              복사
+            </div>
+          </div>
+
+        </div>
+
       </div>
+
+
+
+
+
+
+
+
+
+      <div class="navi-button-area">
+        <img class="navi-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/1.%20%EB%84%A4%EC%9D%B4%EB%B2%84%EC%A7%80%EB%8F%84.png?updatedAt=1703600879468" alt="naver-place-logo">
+        <div onclick="redirectTo()" class="navi-button-font">네이버지도 연결</div>
+      </div>
+
 
       <div class="home-lastmatch-container">
         <div class="home-lastmatch-area">
-          <div style="margin-left: 15px;">LAST MATCH
+          <div class="home-lastmatch-area-font">LAST MATCH
           </div>
         </div>
 
         <div class="home-lastmatch-matcharea">
-          <img class="sharklogo"
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-            alt="logo">
-          <div>
-            <div class="home-lastmatch-info">
-              <div class="home-lastmatch-awayname">
-                <%=result[0].awayname%>
-              </div>
-              <div class="home-lastmatch-date">
-                23.<%=result[0].month%>.<%=result[0].day%>
-              </div>
-            </div>
-
+          <div class="home-lastmatch-logo-area">
+            <img class="sharklogo"
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+              alt="logo">
           </div>
-
+          <div class="home-lastmatch-info-area">
+            <div class="home-lastmatch-awayname">
+              <%=result[0].awayname%>
+            </div>
+            <div class="home-lastmatch-date">
+              23.<%=result[0].month%>.<%=result[0].day%>
+            </div>
+          </div>
+          <div class="home-lastmatch-score-area">
             <div class="home-lastmatch-score">
               <%=result[0].homescore%>-<%=result[0].awayscore%>
             </div>
-            <%-result[0].home_resultlogo%>
+            <div class="home-lastmatch-result-logo-area">
+              <%-result[0].home_resultlogo%>
+            </div>
           </div>
-
-
-
+        </div>
 
 
         <div class="home-lastmatch-matcharea">
-          <img class="sharklogo"
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-            alt="logo">
-          <div>
-            <div class="home-lastmatch-info">
-              <div class="home-lastmatch-awayname">
-                <%=result[1].awayname%>
-              </div>
-              <div class="home-lastmatch-date">
-                23.<%=result[1].month%>.<%=result[1].day%>
-              </div>
+          <div class="home-lastmatch-logo-area">
+            <img class="sharklogo"
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+              alt="logo">
+          </div>
+          <div class="home-lastmatch-info-area">
+            <div class="home-lastmatch-awayname">
+              <%=result[1].awayname%>
+            </div>
+            <div class="home-lastmatch-date">
+              23.<%=result[1].month%>.<%=result[1].day%>
             </div>
           </div>
-          <div class="home-lastmatch-score">
-            <%=result[1].homescore%>-<%=result[1].awayscore%>
+          <div class="home-lastmatch-score-area">
+            <div class="home-lastmatch-score">
+              <%=result[1].homescore%>-<%=result[1].awayscore%>
+            </div>
+            <div class="home-lastmatch-result-logo-area">
+              <%-result[1].home_resultlogo%>
+            </div>
           </div>
-          <%-result[1].home_resultlogo%>
         </div>
 
+
         <div class="home-lastmatch-matcharea">
-          <img class="sharklogo"
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-            alt="logo">
-          <div>
-            <div class="home-lastmatch-info">
-              <div class="home-lastmatch-awayname">
-                <%=result[2].awayname%>
-              </div>
-              <div class="home-lastmatch-date">
-                23.<%=result[2].month%>.<%=result[2].day%>
-              </div>
+          <div class="home-lastmatch-logo-area">
+            <img class="sharklogo"
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
+              alt="logo">
+          </div>
+          <div class="home-lastmatch-info-area">
+            <div class="home-lastmatch-awayname">
+              <%=result[2].awayname%>
+            </div>
+            <div class="home-lastmatch-date">
+              23.<%=result[2].month%>.<%=result[2].day%>
             </div>
           </div>
-          <div class="home-lastmatch-score">
-            <%=result[2].homescore%>-<%=result[2].awayscore%>
+          <div class="home-lastmatch-score-area">
+            <div class="home-lastmatch-score">
+              <%=result[2].homescore%>-<%=result[2].awayscore%>
+            </div>
+            <div class="home-lastmatch-result-logo-area">
+              <%-result[2].home_resultlogo%>
+            </div>
           </div>
-          <%-result[2].home_resultlogo%>
         </div>
+
+
+
+
+
 
 
 

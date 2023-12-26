@@ -1,0 +1,127 @@
+.home-lastmatch-area {
+    width: 95%;
+    height: 40px;
+    background-color: #ff3ca0;
+    color: white;
+    font-size: 25px;
+    margin: 0px auto 0px auto;
+}
+
+.home-lastmatch-area-font {
+    margin-left: 15px;
+    font-weight: 600;
+}
+
+.home-lastmatch-matcharea {
+    width: 95%;
+    height: 100px;
+    background-color: #002832;
+    border-bottom: 2px solid #ff3ca0;
+    border-left: 2px solid #ff3ca0;
+    border-right: 2px solid #ff3ca0;
+    color: white;
+    margin: 0px auto 0px auto;
+    display: flex;
+    /* justify-content: space-around; */
+    align-items: center;
+}
+
+.home-lastmatch-logo-area {
+    margin-left: 1%;
+    width: 13%;
+}
+
+.sharklogo {
+    width: 85%;
+}
+
+.home-lastmatch-info-area {
+    margin-left: 1%;
+    width: 52%;
+}
+
+.home-lastmatch-awayname {
+    font-size: 200%;
+}
+
+.home-lastmatch-date {
+    font-size: 120%;
+}
+
+.home-lastmatch-score-area {
+    width: 35%;
+    display: flex;
+}
+
+.home-lastmatch-score {
+    width: 60%;
+    font-size: 330%;
+    text-align: center;
+}
+
+.home-lastmatch-result-logo-area {
+    width: 40%;
+    text-align: center;
+}
+
+.home-lastmatch-result-logo {
+    width: 50%;
+    margin-top: 18%;
+}
+
+
+
+@media only screen and (max-width: 1000px) {
+    .home-lastmatch-area {
+        width: 95%;
+        height: 30px;
+        font-size: 90%;
+
+    }
+
+    .home-lastmatch-matcharea {
+        height: 70px;
+    }
+
+    .home-lastmatch-logo-area {
+        margin-left: 2%;
+        width: 13%;
+    }
+
+    .sharklogo {
+        width: 100%;
+    }
+
+    .home-lastmatch-info-area {
+        margin-left: 4%;
+        width: 47%;
+    }
+
+    .home-lastmatch-awayname {
+        font-size: 130%;
+    }
+
+    .home-lastmatch-date {
+        font-size: 80%;
+    }
+
+    .home-lastmatch-score-area {
+        width: 40%;
+    }
+
+    .home-lastmatch-score {
+        font-size: 180%;
+    }
+
+
+
+
+}
+
+@media only screen and (max-width: 300px) {
+
+    .home-lastmatch-score {
+        font-size: 140%;
+    }
+
+}

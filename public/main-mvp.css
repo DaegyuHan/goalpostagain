@@ -1,0 +1,32 @@
+.mvp-container {
+    position: relative;
+    margin-top: 30px;
+  }
+  
+  .mvp-area {
+    margin: 0px auto 0px auto;
+    /* background-color: white; */
+    width: 96%;
+  }
+  
+  .overlay-text {
+    position: absolute;
+    top: 85%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 450%;
+    font-weight: bold;
+    box-sizing: border-box;
+  
+    width: 60%;
+    height: 80px;
+    text-align: center;
+  }
+  
+
+  @media only screen and (max-width: 1000px) {
+    .overlay-text {
+        left: 35%;
+      }
+  }

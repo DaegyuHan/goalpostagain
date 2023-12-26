@@ -1,29 +1,13 @@
-/* @font-face {
-    font-family: 'Pretendard-Light';
-    src: url('../Pretendard-Light.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-
-@font-face {
-    font-family: 'Pretendard-Regular2';
-    src: url('../Pretendard-Regular.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-} */
-
-
 
 
 body {
-    margin: 0;
-    background-color: #002832;
-    font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+  background-color: #002832;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 i {
-    color: white;
+  color: white;
 }
 
 
@@ -31,413 +15,236 @@ i {
 
 
 a {
-    color: black;
-    text-decoration: none;
+  color: black;
+  text-decoration: none;
 }
 
 a:hover {
-    color: #002832;
+  color: #002832;
 }
 
 .flex-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .flex-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .top-area {
-    background-color: #ff3ca0;
-    width: 100%;
-    height: 100px;
+  background-color: #ff3ca0;
+  width: 100%;
+  height: 100px;
 }
 
 .top-area-logo {
-    width: 150px;
-    height: 120px;
-    align-items: center;
-    cursor: pointer;
+  width: 150px;
+  height: 120px;
+  align-items: center;
+  cursor: pointer;
 }
 
 .menu-bar {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    font-size: 24px;
-    cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 .menu-bar-text {
-    font-weight: bold;
-    font-size: 25px;
+  font-weight: bold;
+  font-size: 25px;
 }
 
 
 .side-menu {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    /* 메뉴 영역을 왼쪽으로 숨김 */
-    width: 300px;
-    height: 100%;
-    background-color: #ff3ca0;
-    transition: left 0.3s ease;
-    /* left 속성에 트랜지션 적용 */
-    z-index: 100;
-    /* background-image: url(https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437);
+  position: fixed;
+  top: 0;
+  left: -300px;
+  /* 메뉴 영역을 왼쪽으로 숨김 */
+  width: 300px;
+  height: 100%;
+  background-color: #ff3ca0;
+  transition: left 0.3s ease;
+  /* left 속성에 트랜지션 적용 */
+  z-index: 100;
+  /* background-image: url(https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437);
     background-repeat: no-repeat;
     background-position: -100px 100px; */
 }
 
 .side-menu img {
-    width: 35%;
-    height: 28%;
-    margin-left: 30px;
-    cursor: pointer;
+  width: 35%;
+  height: 28%;
+  margin-left: 30px;
+  cursor: pointer;
 }
 
 .side-menu ul {
-    list-style: none;
-    padding-top: 70px;
-    padding-left: 0px;
+  list-style: none;
+  padding-top: 70px;
+  padding-left: 0px;
 }
 
 .side-menu ul li {
-    width: 250px;
-    margin: 30px;
-    /* border-bottom: 1px solid white; */
+  width: 250px;
+  margin: 30px;
+  /* border-bottom: 1px solid white; */
 }
 
 .nav-menu-font {
-    text-decoration: none;
-    color: white;
-    font-size: 25px;
-    display: block;
-    padding-bottom: 0px;
-    /* 흰색 선과 글씨 사이 여백 추가 */
-    border-bottom: 0px solid white;
-    /* 흰색 선 추가 */
-    box-sizing: border-box;
-    /* padding 포함하도록 box-sizing 설정 */
+  text-decoration: none;
+  color: white;
+  font-size: 25px;
+  display: block;
+  padding-bottom: 0px;
+  /* 흰색 선과 글씨 사이 여백 추가 */
+  border-bottom: 0px solid white;
+  /* 흰색 선 추가 */
+  box-sizing: border-box;
+  /* padding 포함하도록 box-sizing 설정 */
 }
 
 .nav-user-font {
-    font-size: 29px; 
-    border-bottom: 1px solid white;
-    color: white;
+  font-size: 29px;
+  border-bottom: 1px solid white;
+  color: white;
 }
 
 .home-main {
-    width: 800px;
-    height: 90%;
-    background-color: #002832;
-    margin: 10% auto 0px auto
+  width: 800px;
+  height: 90%;
+  background-color: #002832;
+  margin: 10% auto 0px auto
 }
 
 .white-main {
-    width: 800px;
-    height: 90%;
-    background-color: white;
-    margin: 0px auto 0px auto;
-    border-radius: 8px;
+  width: 800px;
+  height: 90%;
+  background-color: white;
+  margin: 0px auto 0px auto;
+  border-radius: 8px;
 }
 
 .whole-white-main {
-    width: 800px;
-    height: 90%;
-    background-color: white;
-    margin: 0px auto 0px auto;
+  width: 800px;
+  height: 90%;
+  background-color: white;
+  margin: 0px auto 0px auto;
 }
 
 /* 이미지 스타일 */
 img {
-    max-width: 500px;
-    /* 최대 너비 */
-    max-height: 400px;
-    /* 최대 높이 */
-    width: auto;
-    /* 자동으로 너비 조절 */
-    height: auto;
-    /* 자동으로 높이 조절 */
+  max-width: 500px;
+  /* 최대 너비 */
+  max-height: 400px;
+  /* 최대 높이 */
+  width: auto;
+  /* 자동으로 너비 조절 */
+  height: auto;
+  /* 자동으로 높이 조절 */
 }
 
-.match-plan-area {
-    width: 95%; 
-    height: 200px; 
-    background-color: white; 
-    border-radius: 15px; 
-    margin: 0px auto 30px auto;
-}
 
 .navi-button {
-    width: 100%;
-    height: 20%;
-    background-color: #ff3ca0;
-    color: white;
-    text-align: center;
-    align-items: center;
-    border: 0px solid;
-    cursor: pointer;
+  width: 95%;
+  height: 40px;
+  background-color: #ff3ca0;
+  color: white;
+  text-align: center;
+  align-items: center;
+  border: 0px solid;
+  cursor: pointer;
+  margin: 0px auto 50px auto;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
 }
 
-.mvp-container {
-    position: relative;
-    margin-top: 30px;
-}
-
-.mvp-area {
-    margin: 0px auto 0px auto;
-    /* background-color: white; */
-    width: 96%;
-}
-
-.overlay-text {
-    position: absolute;
-    top: 85%;
-    left: 20%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 450%;
-    font-weight: bold;
-    box-sizing: border-box;
-
-    width: 60%;
-    height: 80px;
-    text-align: center;
-  }
 
 ::-webkit-scrollbar {
-    width: 2px;
-    /* 스크롤바 너비 */
+  width: 2px;
+  /* 스크롤바 너비 */
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: gray;
-    /* 스크롤바 색상 */
+  background-color: gray;
+  /* 스크롤바 색상 */
 }
 
 .notice-title {
-    color: white;
-    margin-top: 80px;
-    margin-bottom: 20px;
-    font-size: 30px;
-    text-align: center;
-  }
-
-
-  .home-lastmatch-area {
-    width: 95%;
-    height: 40px;
-    background-color: #ff3ca0;
-    color: white;
-    font-size: 25px;
-    margin: 0px auto 0px auto;
-  }
-  .home-lastmatch-matcharea {
-    width: 95%;
-    height: 100px;
-    background-color: #002832;
-    border-bottom: 2px solid #ff3ca0;
-    border-left: 2px solid #ff3ca0;
-    border-right: 2px solid #ff3ca0;
-    color: white;
-    margin: 0px auto 0px auto;
-    display: flex;
-    /* justify-content: space-around; */
-    align-items: center;
-  }
-
-  .sharklogo {
-    width: 10%;
-    height: 80%;
-    margin-left: 10px;
-    margin-right: 20px;
-  }
-  
-  .home-lastmatch-info {
-
-    width: 250px;
-    margin-right: 170px;
-  }
-  .home-lastmatch-awayname {
-    font-size: 200%;
-    font-weight: 500;
-  }
-
-  .home-lastmatch-date {
-    font-size: 120%;
-    color: #DCDCDC;
-  }
-
-
-  .home-lastmatch-score {
-    font-size: 310%;
-    font-weight: 500;
-  }
-
-  .home-lastmatch-result-logo {
-    position: absolute;
-    width: 4%;
-    margin-left: 48%;
-  }
+  color: white;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  font-size: 30px;
+  text-align: center;
+}
 
 
 
 
 @media only screen and (max-width: 1000px) {
 
-    /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
-    .home-main,
-    .white-main {
-        width: 100%;
-        border-radius: 0px;
-    }
+  /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
+  .home-main,
+  .white-main {
+    width: 100%;
+    border-radius: 0px;
+  }
 
 
 
-    .top-area {
-        background-color: #ff3ca0;
-        width: 100%;
-        height: 70px;
-    }
-
-    .top-area-logo {
-        width: 80px;
-        height: 60px;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    .notice-title {
-        color: white;
-        margin-top: 40px;
-        margin-bottom: 20px;
-        font-size: 30px;
-        text-align: center;
-      }
-
-    .white-bg {
-        padding: 3px;
-        margin: 3px;
-    }
-
-    /* 이미지 스타일을 조정합니다. */
-    img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .detail-bg {
-        padding: 5px;
-        margin: 6px;
-        border-radius: 2px;
-    }
-
-    .overlay-text {
-        left: 35%;
-      }
-
-      .nav-menu-font {
-        font-size: 22px;
-
-    }
-
-    .home-lastmatch-area {
-        width: 95%;
-        height: 30px;
-        font-size: 90%;
-
-      }
-  .home-lastmatch-matcharea {
+  .top-area {
+    background-color: #ff3ca0;
+    width: 100%;
     height: 70px;
   }
 
-  .sharklogo {
-    width: 13%;
-    height: 70%;
-    margin-left: 7px;
-    margin-right: 7px;
-  }
-  
-  .home-lastmatch-info {
-
-    width: 100%;
-    margin-right: 250%;
-  }
-  .home-lastmatch-awayname {
-    font-size: 130%;
-  }
-
-  .home-lastmatch-date {
-    font-size: 90%;
-    color: #DCDCDC;
-  }
-
-
-  .home-lastmatch-score {
-    font-size: 180%;
-    margin-left: 18%;
-  }
-
-  .home-lastmatch-result-logo {
-    position: absolute;
-    width: 8%;
-    margin-left: 84%;
-    margin-top: 1%;
-  }
-    
-
-  /* .home-lastmatch-matcharea {
-    width: 95%;
-    height: 100px;
-    background-color: #002832;
-    border-bottom: 2px solid #ff3ca0;
-    border-left: 2px solid #ff3ca0;
-    border-right: 2px solid #ff3ca0;
-    color: white;
-    margin: 0px auto 0px auto;
-    display: flex;
+  .top-area-logo {
+    width: 80px;
+    height: 60px;
     align-items: center;
+    cursor: pointer;
   }
 
-  .sharklogo {
-    width: 10%;
-    height: 80%;
-    margin-left: 10px;
-    margin-right: 20px;
-  }
-  
-  .home-lastmatch-info {
-
-    width: 250px;
-    margin-right: 170px;
-  }
-  .home-lastmatch-awayname {
-    font-size: 200%;
-    font-weight: 500;
+  .notice-title {
+    color: white;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 30px;
+    text-align: center;
   }
 
-  .home-lastmatch-date {
-    font-size: 120%;
-    color: #DCDCDC;
+  .white-bg {
+    padding: 3px;
+    margin: 3px;
   }
 
-
-  .home-lastmatch-score {
-    font-size: 310%;
-    font-weight: 500;
+  /* 이미지 스타일을 조정합니다. */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 
-  .home-lastmatch-result-logo {
-    position: absolute;
-    width: 4%;
-    margin-left: 48%;
-  } */
+  .detail-bg {
+    padding: 5px;
+    margin: 6px;
+    border-radius: 2px;
+  }
+
+  .overlay-text {
+    left: 35%;
+  }
+
+  .nav-menu-font {
+    font-size: 22px;
+
+  }
+
 }
