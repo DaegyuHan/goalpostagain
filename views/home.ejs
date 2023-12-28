@@ -31,11 +31,41 @@
       window.open(levelUrl, '_blank');
     }
 
+    function copyToClipboard() {
+      var textarea = document.createElement('textarea');
+      textarea.value = '<%=목적지.address %>';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      showNotification('클립보드에 복사되었습니다: ' + '<%=목적지.address %>');
+
+      // 1초 후에 알림 숨기기
+      setTimeout(function () {
+        hideNotification();
+      }, 2000);
+
+    }
+
+    function showNotification(message) {
+      var notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.display = 'block';
+    }
+
+    function hideNotification() {
+      var notification = document.getElementById('notification');
+      notification.style.display = 'none';
+    }
+
+
   </script>
 </head>
 
 <body>
   <%- include('nav.ejs') %>
+    <div id="notification"></div>
     <div class="notice-title"></div>
     <div class="home-main">
       <!-- <% if (typeof 유저 !=='undefined' && 유저) { %>
@@ -87,7 +117,7 @@
             <div>
               에스빌드 풋살파크
             </div>
-            <div class="planmatch-place-copy">
+            <div onclick="copyToClipboard()" class="planmatch-place-copy" id="planmatch-place-copy">
               복사
             </div>
           </div>
@@ -104,9 +134,11 @@
 
 
 
-      <div class="navi-button-area">
-        <img class="navi-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/1.%20%EB%84%A4%EC%9D%B4%EB%B2%84%EC%A7%80%EB%8F%84.png?updatedAt=1703600879468" alt="naver-place-logo">
-        <div onclick="redirectTo()" class="navi-button-font">네이버지도 연결</div>
+      <div onclick="redirectTo()" class="navi-button-area">
+        <img class="navi-logo"
+          src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/1.%20%EB%84%A4%EC%9D%B4%EB%B2%84%EC%A7%80%EB%8F%84.png?updatedAt=1703600879468"
+          alt="naver-place-logo">
+        <div class="navi-button-font">네이버지도 연결</div>
       </div>
 
 
@@ -119,8 +151,8 @@
         <div class="home-lastmatch-matcharea">
           <div class="home-lastmatch-logo-area">
             <img class="sharklogo"
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-              alt="logo">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/KakaoTalk_20231228_145702327_01.png?updatedAt=1703773524251"
+              alt="sharklogo">
           </div>
           <div class="home-lastmatch-info-area">
             <div class="home-lastmatch-awayname">
@@ -144,8 +176,8 @@
         <div class="home-lastmatch-matcharea">
           <div class="home-lastmatch-logo-area">
             <img class="sharklogo"
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-              alt="logo">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/KakaoTalk_20231228_145702327_01.png?updatedAt=1703773524251"
+              alt="sharklogo">
           </div>
           <div class="home-lastmatch-info-area">
             <div class="home-lastmatch-awayname">
@@ -169,8 +201,8 @@
         <div class="home-lastmatch-matcharea">
           <div class="home-lastmatch-logo-area">
             <img class="sharklogo"
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%EC%95%84%EA%B8%B0%EC%83%81%EC%96%B4.png?updatedAt=1703502072933"
-              alt="logo">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/KakaoTalk_20231228_145702327_01.png?updatedAt=1703773524251"
+              alt="sharklogo">
           </div>
           <div class="home-lastmatch-info-area">
             <div class="home-lastmatch-awayname">

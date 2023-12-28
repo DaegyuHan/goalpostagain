@@ -21,6 +21,7 @@
 .planmatch-result-area {
     position: relative;
     transform: translate(0%, -10%);
+    height: 80%;
 }
 
 
@@ -164,6 +165,7 @@
 
     .planmatch-result-scorebox {
         transform: translate(0%, -30%);
+        width: 100%;
     }
 
 
@@ -219,7 +221,7 @@
 
     .planmatch-place {
         font-size: 70%;
-        top: -40px;
+        transform: translate(0%, 10%);
 
     }
 
@@ -271,7 +273,7 @@
 
 }
 
-@media only screen and (max-width: 300px) {
+@media only screen and (max-width: 354px) {
     .planmatch-time {
         font-size: 130%;
         transform: translate(0%, 30%);
@@ -279,6 +281,6 @@
 
     .planmatch-place {
         font-size: 60%;
-        top: -30px;
+        transform: translate(0%, 0%);
     }
 }

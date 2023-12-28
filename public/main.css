@@ -153,19 +153,6 @@ img {
 }
 
 
-.navi-button {
-  width: 95%;
-  height: 40px;
-  background-color: #ff3ca0;
-  color: white;
-  text-align: center;
-  align-items: center;
-  border: 0px solid;
-  cursor: pointer;
-  margin: 0px auto 50px auto;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-}
 
 
 ::-webkit-scrollbar {
@@ -184,6 +171,20 @@ img {
   margin-bottom: 20px;
   font-size: 30px;
   text-align: center;
+}
+
+#notification {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 
