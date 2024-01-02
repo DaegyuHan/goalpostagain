@@ -1,0 +1,91 @@
+.MvpBoard-Container {
+    margin: 0;
+    margin-top: 50px;
+    width: 95%;
+    margin: 30px auto 100px auto;
+
+}
+
+
+
+.MvpBoard-title {
+    color: white;
+    font-size: 300%;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.MvpBoard-menu {
+    background-color: white;
+    display: flex;
+    color: #002832;
+    font-size: 120%;
+    font-weight: 500;
+    padding: 10px 0px 10px 0px;
+    margin-bottom: 20px;
+}
+
+.MvpBoard-bar {
+    width: 1px;
+    background-color: #002832;
+}
+
+.MvpBoard-area {
+    color: #002832;
+    font-size: 120%;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    margin-top: 0px;
+    border-top: 1px solid transparent;
+}
+
+.MvpBoard-area-rank {
+    width: 20%;
+    background-color: #002832;
+    padding: 10px 0px 10px 0px;
+    color: white;
+    border: 2px solid white;
+
+
+}
+
+
+.MvpBoard-area-name {
+    width: 60%;
+    background-color: white;
+    padding: 10px 0px 10px 0px;
+
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .MvpBoard-title {
+        font-size: 200%;
+    }
+
+    .MvpBoard-menu {
+        font-size: 80%;
+        padding: 5px 0px 5px 0px;
+        margin-bottom: 10px;
+    }
+
+    .MvpBoard-area {
+        font-size: 80%;
+        font-weight: 500;   
+        margin-bottom: 3px;
+ 
+    }
+
+    .MvpBoard-area-rank {
+        width: 20%;
+        padding: 5px 0px 5px 0px;
+    
+    }
+    
+    .MvpBoard-area-name {
+        width: 60%;
+        padding: 5px 0px 5px 0px;
+    }
+  }

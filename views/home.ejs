@@ -17,6 +17,7 @@
   <link href="/main-mvp.css" rel="stylesheet">
   <link href="/main-match-result.css" rel="stylesheet">
   <link href="/main-planmatch.css" rel="stylesheet">
+  <link href="/main-mvpboard.css" rel="stylesheet">
   <link href="/match-result.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,19 +28,19 @@
   <script src="/main.js"></script>
   <script>
     function redirectTo() {
-      var levelUrl = 'https://map.naver.com/p/search/<%=목적지.address%>';
+      var levelUrl = 'https://map.naver.com/p/search/<%=매치일정[0].address%>';
       window.open(levelUrl, '_blank');
     }
 
     function copyToClipboard() {
       var textarea = document.createElement('textarea');
-      textarea.value = '<%=목적지.address %>';
+      textarea.value = '<%=매치일정[0].address %>';
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
 
-      showNotification('클립보드에 복사되었습니다: ' + '<%=목적지.address %>');
+      showNotification('클립보드에 복사되었습니다.');
 
       // 1초 후에 알림 숨기기
       setTimeout(function () {
@@ -60,6 +61,7 @@
     }
 
 
+
   </script>
 </head>
 
@@ -76,7 +78,7 @@
       <div class="match-plan-area">
 
         <div class="main-planmatch-datefont">
-          23. 12. 01 (금)
+          24. <%=매치일정[0].month %>. <%=매치일정[0].date %> (금)
         </div>
 
         <div class="planmatch-result-area">
@@ -95,7 +97,7 @@
               </div>
             </div>
             <div class="planmatch-time">
-              23:00-01:00
+              <%=매치일정[0].time %>-<%=매치일정[0].timeto %>
             </div>
             <div class="planmatch-result-teamarea2">
               <div>
@@ -105,7 +107,7 @@
               </div>
 
               <div class="planmatch-result-teamfont">
-                <%=result[0].awayname%>
+                <%=매치일정[0].awayteam%>
               </div>
             </div>
           </div>
@@ -115,7 +117,7 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/1.%20%EC%9E%A5%EC%86%8C.png?updatedAt=1703600879483"
               alt="place">
             <div>
-              에스빌드 풋살파크
+              <%=매치일정[0].place %>
             </div>
             <div onclick="copyToClipboard()" class="planmatch-place-copy" id="planmatch-place-copy">
               복사
@@ -223,15 +225,39 @@
         </div>
 
 
-
-
-
-
-
-
         <div class="mvp-container">
           <%-MVP%>
         </div>
+
+        <div class="MvpBoard-Container">
+          <div class="MvpBoard-title">
+            MVP BOARD
+          </div>
+          <div class="MvpBoard-menu">
+            <div style="width: 20%; text-align: center;">RANK</div>
+            <div class="MvpBoard-bar"></div>
+            <div style="width: 60%; text-align: center;">NAME</div>
+            <div class="MvpBoard-bar"></div>
+            <div style="width: 20%; text-align: center;">SCORE</div>
+          </div>
+          <%for (i=1; i<13; i++) {%>
+            <div class="MvpBoard-area">
+              <div class="MvpBoard-area-rank"><%=i%></div>
+              <div class="MvpBoard-area-name">한대규</div>
+              <div class="MvpBoard-area-rank">265</div>
+            </div>
+          <%}%>
+
+
+
+
+
+
+
+
+        </div>
+
+      </div>
 </body>
 
 </html>

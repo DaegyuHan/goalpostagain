@@ -89,14 +89,14 @@
         resultlogo = `<img
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EB%AC%B4%EC%8A%B9%EB%B6%80.png?updatedAt=1702704505369"
           alt="draw">`
-          home_resultlogo = `<img class="home-lastmatch-result-logo"
+        home_resultlogo = `<img class="home-lastmatch-result-logo"
             src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/KakaoTalk_20231228_145702327.png?updatedAt=1703773523870"
             alt="draw">`
       } else if (homescore < awayscore) {
         resultlogo = `<img
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%ED%8C%A8%EB%B0%B0.png?updatedAt=1702704505579"
           alt="lose">`
-          home_resultlogo = `<img class="home-lastmatch-result-logo"
+        home_resultlogo = `<img class="home-lastmatch-result-logo"
             src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/2.%20%ED%8C%A8%EB%B0%B0.png?updatedAt=1703502072486"
             alt="win">`
       }
@@ -118,20 +118,39 @@
         <h4>공지사항 작성</h4>
         <div style="height: 100px;"><a href="/management/notice-post">공지사항 작성하기</a></div>
       </div>
+
+      <form class="form-box" action="/match-plan" method="POST">
       <div>
-        <h4>네비게이션</h4>
-        <div style="height: 100px;">
-          <input id="navi_address" style="width: 250px;" type="text" placeholder="주소">
-          <button onclick="navi_input()">입력</button>
-          <div>현재 저장된 주소 : <%=목적지.address%>
-          </div>
+        <h4>이번 주 매치</h4>
+        <div>
+          24년
+          <input class="management-input" type="text" name="planmonth" placeholder="00">월
+          <input class="management-input" type="text" name="plandate" placeholder="00">일
+          <br>
+          시간 : <input class="management-input2" name="plantime" type="text" placeholder="00:00"> - <input class="management-input2" name="plantimeto" type="text" placeholder="00:00">
+          <br>
+          상대팀명 : <input class="management-input3" type="text" name="planawayteam" placeholder="상대팀명">
+          <br>
+          장소 : <input class="management-input3" type="text" name="planplace" placeholder="풋살구장 이름">
         </div>
       </div>
       <div>
+        <div style="height: 160px;">
+          주소 : <input id="navi_address" style="width: 200px;" name="planaddress" type="text" placeholder="주소">
+          <div>현재 저장된 주소 : <%=매치일정[0].address%>
+          </div>
+          <button type="submit">등록</button>
+        </div>
+      </div>
+      </form>
+
+
+
+      <div>
         <h4>이번 주 MVP</h4>
         <div style="height: 150px;">
-          <input class="mvp-date" type="text" id="mvp-date-month">월
-          <input class="mvp-date" type="text" id="mvp-date-day">일
+          <input class="mvp-date" type="text" id="mvp-date-month" placeholder="00">월
+          <input class="mvp-date" type="text" id="mvp-date-day" placeholder="00">일
           <div>
             <select class="form-select" id="WeeklyMVPSelect">
               <option value="한대규">한대규</option>
@@ -148,23 +167,27 @@
         <div style="height: 250px;">
           <div>
             24년
-            <input type="text" id="match-result-month">월
-            <input type="text" id="match-result-day">일
-            <input type="text" id="match-result-time">시작시간
-          </div>
-          <div>
-            장소 <input type="text" id="match-result-place">
-          </div>
-          <div>
+            <input class="management-input" type="text" id="match-result-month" placeholder="00">월
+            <input class="management-input" type="text" id="match-result-day" placeholder="00">일
+            <br>
+            시작시간 : <input class="management-input2" type="text" id="match-result-time" placeholder="00:00">
+            <br>
+            장소 : <input class="management-input3" type="text" id="match-result-place" placeholder="풋살구장 이름">
+            <br>
             오늘도골대
-            <input type="text" id="match-result-homescore" placeholder="오늘도골대 점수"> :
-            <input type="text" id="match-result-awayscore" placeholder="상대팀 점수">
-            <input type="text" id="match-result-awayname" placeholder="상대팀 명">
+            <input class="management-input2" type="text" id="match-result-homescore" placeholder="오골 점수"> :
+            <input class="management-input2" type="text" id="match-result-awayscore" placeholder="상대 점수">
+            <input class="management-input2" type="text" id="match-result-awayname" placeholder="상대팀명">
           </div>
           <div>
             <button onclick="upload_match()">등록</button>
           </div>
         </div>
+      </div>
+
+      <div>
+        <h4>MVP BOARD</h4>
+        <div style="height: 500px;"></div>
       </div>
 </body>
 

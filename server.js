@@ -91,18 +91,18 @@ app.get('/', async (req, res) => {
   let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
   let Weeklymvp = result.length > 0 ? result[0].mvp : null;
   let match_result = await db.collection('result').find().sort({ _id: -1 }).toArray();
-  let navi = await db.collection('navi').find().sort({ _id: -1 }).limit(1).toArray();
+  let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
 
-  res.render('home.ejs', { MVP: Weeklymvp, 목적지: navi[0], result : match_result });
+  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result : match_result });
 })
 
 
 
 app.get('/management', async (req, res) => {
   let result = await db.collection('notice').find().toArray();
-  let navi = await db.collection('navi').find().sort({ _id: -1 }).limit(1).toArray();
+  let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
 
-  res.render('management.ejs', { 글목록: result, 목적지: navi[0] });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan });
 });
 
 app.get('/mvp', async (req, res) => {
@@ -114,10 +114,17 @@ app.get('/mvp', async (req, res) => {
   res.redirect('/')
 })
 
-app.get('/navi', async (req, res) => {
-  let result = db.collection('navi').insertOne({
-    address: req.query.val
+app.post('/match-plan', async (req, res) => {
+  let result = db.collection('matchplan').insertOne({
+    month: req.body.planmonth,
+    date : req.body.plandate,
+    time : req.body.plantime,
+    timeto : req.body.plantimeto,
+    awayteam : req.body.planawayteam,
+    place : req.body.planplace,
+    address : req.body.planaddress
   })
+  res.redirect('/')
 })
 
 app.get('/result', async (req, res) => {
@@ -192,7 +199,8 @@ exports.isNotLoggedIn = (req, res, next) => {
     next(); // 로그인 안되어있으면 다음 미들웨어
   } else {
     const message = encodeURIComponent('로그인한 상태입니다.');
-    res.redirect(`/?error=${message}`);
+    // res.redirect(`/?error=${message}`);
+    res.redirect('/');
   }
 };
 

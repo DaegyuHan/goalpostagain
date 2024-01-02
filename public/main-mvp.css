@@ -1,6 +1,7 @@
 .mvp-container {
     position: relative;
-    margin-top: 30px;
+    margin-top: 80px;
+    align-items: center;
   }
   
   .mvp-area {
