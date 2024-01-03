@@ -92,8 +92,10 @@ app.get('/', async (req, res) => {
   let Weeklymvp = result.length > 0 ? result[0].mvp : null;
   let match_result = await db.collection('result').find().sort({ _id: -1 }).toArray();
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
+  let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
+  let mvpboard = mvpboardDic[0].member_score;
 
-  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result : match_result });
+  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result : match_result, mvpboard : mvpboard });
 })
 
 
@@ -101,15 +103,42 @@ app.get('/', async (req, res) => {
 app.get('/management', async (req, res) => {
   let result = await db.collection('notice').find().toArray();
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
+  let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
+  let mvpboard = mvpboardDic[0].member_score;
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan });
+  console.log(mvpboard)
+
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard : mvpboard });
 });
 
 app.get('/mvp', async (req, res) => {
-  let result = db.collection('mvp').insertOne({
+  let result = await db.collection('mvp').insertOne({
     mvp: req.query.val,
     month : req.query.month,
     day : req.query.day
+  })
+  res.redirect('/')
+})
+
+
+
+app.get('/mvpboard', async (req, res) => {
+  let member_score = {
+    박승룡: req.query.num1,
+    오연택: req.query.num2,
+    양철진: req.query.num4,
+    석범수: req.query.num5,
+    장희승: req.query.num6,
+    노용준: req.query.num7,
+    안태훈: req.query.num9,
+    김정훈: req.query.num10,
+    이찬웅: req.query.num14,
+    나현수: req.query.num23,
+    한대규: req.query.num33,
+    유성진: req.query.num96
+  }
+  let result = await db.collection('mvpboard').insertOne({
+    member_score
   })
   res.redirect('/')
 })
