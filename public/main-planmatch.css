@@ -14,7 +14,7 @@
 
 .match-plan-area {
     width: 95%;
-    height: 260px;
+    height: 9%;
     background-color: white;
     border-top-right-radius: 15px;
     border-top-left-radius: 15px;
@@ -114,7 +114,7 @@
     text-align: center;
     justify-content: center;
     position: relative;
-    top: -50px;
+    top: -20%;
     display: flex;
 
 }
@@ -162,11 +162,6 @@
 
 
 @media only screen and (max-width: 1000px) {
-
-    .match-plan-area {
-        height: 150px;
-    }
-
 
     .main-planmatch-datefont {
         font-size: 100%;
@@ -258,7 +253,7 @@
 
     .planmatch-place {
         font-size: 80%;
-        top: -30px;
+        top: -20%;
     }
 
     .planmatch-place-logo {
@@ -293,8 +288,25 @@
         transform: translate(0%, 30%);
     }
 
+}
+
+@media only screen and (min-width: 500px) and (max-width: 600px) {
     .planmatch-place {
-        font-size: 60%;
-        transform: translate(0%, 0%);
+        font-size: 80%;
+        top: -40%;
+    }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 700px) {
+    .planmatch-place {
+        font-size: 80%;
+        top: -50%;
+    }
+}
+
+@media only screen and (min-width: 700px) and (max-width: 800px) {
+    .planmatch-place {
+        font-size: 80%;
+        top: -60%;
     }
 }

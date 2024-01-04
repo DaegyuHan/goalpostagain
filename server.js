@@ -106,8 +106,6 @@ app.get('/management', async (req, res) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
 
-  console.log(mvpboard)
-
   res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard : mvpboard });
 });
 

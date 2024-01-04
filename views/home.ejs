@@ -240,19 +240,23 @@
             <div class="MvpBoard-bar"></div>
             <div style="width: 20%; text-align: center;">SCORE</div>
           </div>
-          <%for (i=0; i<12; i++) {%>
-            <div class="MvpBoard-area">
-              <div class="MvpBoard-area-rank"><%=i+1%></div>
-              <div class="MvpBoard-area-name"><%=Object.keys(mvpboard)[i]%></div>
-              <div class="MvpBoard-area-rank"><%=Object.values(mvpboard)[i]%></div>
-            </div>
-          <%}%>
-
-
-
-
-
-
+          <% 
+          const mvpArray=Object.entries(mvpboard); 
+          mvpArray.sort((a, b)=> b[1] - a[1]);
+          for (i=0; i<12; i++) {
+          %>
+              <div class="MvpBoard-area">
+                <div class="MvpBoard-area-rank">
+                  <%=i+1%>
+                </div>
+                <div class="MvpBoard-area-name">
+                  <%=mvpArray[i][0]%>
+                </div>
+                <div class="MvpBoard-area-rank">
+                  <%=mvpArray[i][1]%>
+                </div>
+              </div>
+              <%}%>
 
 
         </div>

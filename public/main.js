@@ -16,3 +16,4 @@ function clearInput() {
   document.getElementById('search-input').value = '';
 
 }
+
