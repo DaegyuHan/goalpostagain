@@ -5,16 +5,21 @@
   }
   
   .mvp-area {
+    text-align: center;
     margin: 0px auto 0px auto;
     /* background-color: white; */
     width: 96%;
   }
+
+  /* .mvp-area img {
+    margin: 0px auto 0px auto;
+  } */
   
   .overlay-text {
     position: absolute;
     top: 85%;
     left: 20%;
-    transform: translate(-50%, -50%);
+    transform: translate(-10%, -50%);
     color: white;
     font-size: 450%;
     font-weight: bold;
@@ -29,5 +34,7 @@
   @media only screen and (max-width: 1000px) {
     .overlay-text {
         left: 35%;
+        transform: translate(-50%, -50%);
+
       }
   }

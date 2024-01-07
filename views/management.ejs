@@ -169,10 +169,10 @@
 
 
       <div>
-        <h4>이번 주 MVP</h4>
+        <h4>MVP</h4>
         <div style="height: 150px;">
-          <input class="mvp-date" type="text" id="mvp-date-month" placeholder="00">월
-          <input class="mvp-date" type="text" id="mvp-date-day" placeholder="00">일
+          <input class="mvp-date" type="text" id="mvp-date-month" value="<%=매치일정[0].month %>">월
+          <input class="mvp-date" type="text" id="mvp-date-day" value="<%=매치일정[0].date %>">일
           <div>
             <select class="form-select" id="WeeklyMVPSelect">
               <option value="한대규">한대규</option>
@@ -189,17 +189,17 @@
         <div style="height: 250px;">
           <div>
             24년
-            <input class="management-input" type="text" id="match-result-month" placeholder="00">월
-            <input class="management-input" type="text" id="match-result-day" placeholder="00">일
+            <input class="management-input" type="text" id="match-result-month" value="<%=매치일정[0].month %>">월
+            <input class="management-input" type="text" id="match-result-day" value="<%=매치일정[0].date %>">일
             <br>
-            시작시간 : <input class="management-input2" type="text" id="match-result-time" placeholder="00:00">
+            시작시간 : <input class="management-input2" type="text" id="match-result-time" value="<%=매치일정[0].time %>">
             <br>
-            장소 : <input class="management-input3" type="text" id="match-result-place" placeholder="풋살구장 이름">
+            장소 : <input class="management-input3" type="text" id="match-result-place" value="<%=매치일정[0].place %>">
             <br>
             오늘도골대
             <input class="management-input2" type="text" id="match-result-homescore" placeholder="오골 점수"> :
             <input class="management-input2" type="text" id="match-result-awayscore" placeholder="상대 점수">
-            <input class="management-input2" type="text" id="match-result-awayname" placeholder="상대팀명">
+            <input class="management-input3" type="text" id="match-result-awayname" value="<%=매치일정[0].awayteam %>">
           </div>
           <div>
             <button onclick="upload_match()">등록</button>

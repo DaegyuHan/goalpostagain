@@ -426,3 +426,8 @@ app.get('/match-result', async (req, res) => {
   let result = await db.collection('result').find().sort({ _id: -1 }).toArray();
   res.render('match-result.ejs', {result : result});
 });
+
+app.get('/gamezone', async (req, res) => {
+
+  res.render('gamezone.ejs');
+});

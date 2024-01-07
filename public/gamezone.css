@@ -1,0 +1,84 @@
+.gamezone-main {
+    width: 800px;
+    background-color: #002832;
+    margin: 10% auto 0px auto;
+    color: white;
+    text-align: center;
+}
+
+.gamezone-area {
+    display: none;
+    width: 96%;
+    height: 500px;
+    background-color: white;
+}
+
+.gamezone-start-button {
+    width: 70%;
+    height: 70px;
+}
+
+.gaolpost-area {
+    background-color: white;
+    height: 60%;
+    padding-top: 35px;
+}
+
+.goalpost {
+    width: 50%;
+    height: 50%;
+    border: 5px solid black;
+    border-bottom: white;
+    margin: 0px auto 0px auto;
+    display: flex;
+}
+
+.goalpost-left {
+    background-color: #eaeff1;
+    width: 33%;
+}
+.goalpost-center {
+    background-color: #eaeff1;
+    width: 34%;
+}
+.goalpost-right {
+    background-color: #eaeff1;
+    width: 33%;
+}
+
+.shoot-way-bt-area {
+    display: flex;
+    height: 30%;
+    text-align: center;
+    justify-content: center;
+}
+
+.shoot-way-bt {
+    width: 20%;
+    height: 45%;
+    background-color: #002832;
+    color: white;
+    font-size: 130%;
+    justify-content: center;
+    align-items: center;
+    margin: 0px 10px 0px 10px;
+    cursor: pointer;
+    border: 1px transparent;
+    border-radius: 8px;
+    display: flex;
+}
+
+.gamezone-scorearea {
+    padding-top: 0px;
+    background-color: white;
+    color: black;
+    font-size: 400%;
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .gamezone-main {
+        width: 100%;
+    }
+
+}

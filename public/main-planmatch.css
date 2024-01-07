@@ -14,7 +14,7 @@
 
 .match-plan-area {
     width: 95%;
-    height: 9%;
+    height: 260px;
     background-color: white;
     border-top-right-radius: 15px;
     border-top-left-radius: 15px;
@@ -162,6 +162,10 @@
 
 
 @media only screen and (max-width: 1000px) {
+
+    .match-plan-area {
+        height: 9%;
+    }
 
     .main-planmatch-datefont {
         font-size: 100%;

@@ -38,7 +38,7 @@
     text-align: center;
     display: flex;
     margin-top: 0px;
-    border-top: 1px solid transparent;
+    border-top: 3px solid transparent;
 }
 
 .MvpBoard-area-rank {
@@ -75,7 +75,7 @@
         font-size: 80%;
         font-weight: 500;   
         margin-bottom: 3px;
- 
+        border-top: 0px solid transparent;
     }
 
     .MvpBoard-area-rank {
