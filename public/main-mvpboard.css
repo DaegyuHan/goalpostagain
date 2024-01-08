@@ -2,8 +2,8 @@
     margin: 0;
     margin-top: 50px;
     width: 95%;
-    margin: 30px auto 100px auto;
-
+    margin: 80px auto 100px auto;
+    padding-bottom: 50px;
 }
 
 
@@ -61,6 +61,11 @@
 
 
 @media only screen and (max-width: 1000px) {
+
+    .MvpBoard-Container {
+        padding-bottom: 0px;
+    }
+
     .MvpBoard-title {
         font-size: 200%;
     }

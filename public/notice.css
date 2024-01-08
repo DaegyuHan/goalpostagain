@@ -17,14 +17,15 @@ button:hover {
   font-weight: bold;
   color: #002832;
 
-  
+
 }
+
 .white-notice-title-text {
   margin-left: 10px;
 }
- 
+
 .notice-title-underline {
-  width:95%;
+  width: 95%;
   height: 2px;
   background-color: #002832;
   margin: 0px auto 0px auto;
@@ -106,7 +107,8 @@ button:hover {
 }
 
 .search-icon {
-  width: 20px; /* 돋보기 이미지의 크기에 맞게 조절 */
+  width: 20px;
+  /* 돋보기 이미지의 크기에 맞게 조절 */
   margin-right: 10px;
 }
 
@@ -120,9 +122,16 @@ button:hover {
 }
 
 .clear-icon {
-  width: 20px; /* x 표시 이미지의 크기에 맞게 조절 */
+  width: 20px;
+  /* x 표시 이미지의 크기에 맞게 조절 */
   margin-left: 10px;
   cursor: pointer;
+}
+
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 
@@ -138,7 +147,7 @@ button:hover {
     height: 100%;
   }
 
-  .white-notice-title{
+  .white-notice-title {
     width: 100%;
     font-size: 34px;
     border-bottom: 4px solid white;
@@ -173,7 +182,7 @@ button:hover {
   .image-container {
     text-align: center;
     /* 가로 가운데 정렬 */
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     /* 세로 가운데 정렬 */
     align-items: center;
@@ -194,6 +203,7 @@ button:hover {
   .search-container {
     width: 90%;
   }
+
   .search-input {
     width: 80%;
   }

@@ -105,9 +105,17 @@
 
                 <div style="margin: 20px auto 10px auto; overflow: hidden;">
                     <div class="image-container">
-                        <img class="detail-img" src="<%= 글.img%>">
+                        <% if (글.img != null) {%>
+
+                            
+                        <% for ( i=0; i< 글.img.length; i++) {%>
+                                <img class="detail-img" src="<%= 글.img[i].location%>">
+                            <%}%>
+                            <%}%>
+                            
                     </div>
-                    <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;"><%= 글.content%>
+                    <div class="detail-content" style="overflow-y: hidden; white-space: pre-wrap;">
+<%= 글.content%>
                     </div>
                 </div>
 

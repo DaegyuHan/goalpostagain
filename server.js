@@ -323,19 +323,21 @@ app.post('/notice-post', async (req, res) => {
 
   let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
   let Time =  new Date().toLocaleString('ko-KR', { timeZone });
-  upload.single('img1')(req, res, async (err) => {
+  upload.array('img1',5)(req, res, async (err) => {
     if (err) return res.send('업로드에러')
     try {
       if (req.body.title == '') {
         res.send('제목입력안했음')
       } else {
+        const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
+        
         await db.collection('notice').insertOne(
           {
             today: Today,
             time : Time,
             title: req.body.title,
             content: req.body.content,
-            img: req.file ? req.file.location : '',
+            img : imageArray,
             user: req.user._id,
             username: req.user.username
           }
