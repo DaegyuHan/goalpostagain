@@ -433,3 +433,8 @@ app.get('/gamezone', async (req, res) => {
 
   res.render('gamezone.ejs');
 });
+
+app.get('/photo', async (req, res) => {
+
+  res.render('photo.ejs');
+});

@@ -1,0 +1,33 @@
+.story-main {
+    width: 800px;
+    background-color: white;
+    margin: 10% auto 0px auto;
+    color: black;
+    text-align: center;
+}
+
+.story-bt-area {
+    display: flex;
+    justify-content: center;   
+}
+
+.story-photo-bt {
+    width: 47%;
+    height: 5vh;
+    background-color: #ff3ca0;
+    color: white;
+}
+
+.story-video-bt {
+    width: 47%;
+    background-color: #02313d;
+    color: white;
+}
+
+
+
+@media only screen and (max-width: 1000px) {
+    .story-main {
+        width: 98%;
+    }
+}

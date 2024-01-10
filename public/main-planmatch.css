@@ -10,6 +10,8 @@
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 2;
+    width: 40%;
+    text-align: center;
   }
 
 .match-plan-area {
@@ -308,9 +310,32 @@
     }
 }
 
-@media only screen and (min-width: 700px) and (max-width: 800px) {
+@media only screen and (min-width: 750px) and (max-width: 1000px) {
     .planmatch-place {
         font-size: 80%;
         top: -60%;
+    }
+
+    .match-plan-area {
+        height: 10%;
+    }
+
+    .planmatch-place-logo {
+        width: 3%;
+        height: 3%;
+        margin-right: 0%;
+        margin-top: 0%;
+    }
+
+    .navi-logo {
+        width: 3%;
+        height: 60%;
+        margin-right: 5px;
+    }
+
+    .planmatch-place {
+        font-size: 70%;
+        transform: translate(0%, 50%);
+
     }
 }
