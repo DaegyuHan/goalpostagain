@@ -34,25 +34,65 @@
 
 
       switch (selectedMVP) {
-        case '한대규':
-          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/22222.png?updatedAt=1701677016990">
+        case '박승룡':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%B0%95%EC%8A%B9%EB%A3%A1MVP.png?updatedAt=1705229239655">
           </div>`
           break
-        case '이찬웅':
-          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%EA%B0%80%EC%97%94%EC%8A%AC.png?updatedAt=1691021040925">
+        case '오연택':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%98%A4%EC%97%B0%ED%83%9DMVP.png?updatedAt=1705229239093">
           </div>`
           break
         case '양철진':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div>
             <div class="mvp-area"><img
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/Home/3.%20MVP.png?updatedAt=1702216958902">
+                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%96%91%EC%B2%A0%EC%A7%84MVP.png?updatedAt=1705229241080">
             </div>`
           break
-        case '권진백':
-          var selectedMVP = `<div style="color:red">${WeeklyMVPSelect.value}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/%EB%B3%B4%EC%8A%A4/%ED%95%91%ED%81%AC%EB%B9%88.png?updatedAt=1691021040901">
+        case '석범수':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%84%9D%EB%B2%94%EC%88%98MVP.png?updatedAt=1705229367311">
+          </div>`
+          break
+          case '장희승':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9E%A5%ED%9D%AC%EC%8A%B9MVP.png?updatedAt=1705229367278">
+          </div>`
+          break
+          case '노용준':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%85%B8%EC%9A%A9%EC%A4%80MVP.png?updatedAt=1705229241093">
+          </div>`
+          break
+          case '안태훈':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%95%88%ED%83%9C%ED%9B%88MVP.png?updatedAt=1705229241071">
+          </div>`
+          break
+          case '김정훈':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EA%B9%80%EC%A0%95%ED%9B%88MVP.png?updatedAt=1705229241209">
+          </div>`
+          break
+          case '이찬웅':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276">
+          </div>`
+          break
+          case '나현수':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%82%98%ED%98%84%EC%88%98MVP.png?updatedAt=1705229241083">
+          </div>`
+          break
+          case '한대규':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%ED%95%9C%EB%8C%80%EA%B7%9CMVP.png?updatedAt=1705229240781">
+          </div>`
+          break
+          case '유성진':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1705229239545">
           </div>`
           break
         default:
@@ -177,10 +217,18 @@
           <input class="mvp-date" type="text" id="mvp-date-day" value="<%=매치일정[0].date %>">일
           <div>
             <select class="form-select" id="WeeklyMVPSelect">
-              <option value="한대규">한대규</option>
-              <option value="이찬웅">이찬웅</option>
+              <option value="박승룡">박승룡</option>
+              <option value="오연택">오연택</option>
               <option value="양철진">양철진</option>
-              <option value="권진백">권진백</option>
+              <option value="석범수">석범수</option>
+              <option value="장희승">장희승</option>
+              <option value="노용준">노용준</option>
+              <option value="안태훈">안태훈</option>
+              <option value="김정훈">김정훈</option>
+              <option value="이찬웅">이찬웅</option>
+              <option value="나현수">나현수</option>
+              <option value="한대규">한대규</option>
+              <option value="유성진">유성진</option>
             </select>
             <button onclick="showMVP()">선정</button>
           </div>

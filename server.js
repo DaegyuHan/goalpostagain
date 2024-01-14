@@ -363,11 +363,10 @@ app.post('/notice-post', async (req, res) => {
 })
 
 app.get('/notice/notice-detail/:id', this.isLoggedIn, async (req, res, next) => {
-  let notice = await db.collection('notice').find().toArray()
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
   let comment = await db.collection('comment').find({ parentId: new ObjectId(req.params.id) }).toArray()
 
-  res.render('notice-detail.ejs', { 글: postID, 글목록: notice, 댓글: comment})
+  res.render('notice-detail.ejs', { 글: postID, 댓글: comment})
 
 })
 
@@ -444,7 +443,96 @@ app.get('/gamezone', async (req, res) => {
   res.render('gamezone.ejs');
 });
 
-app.get('/photo', async (req, res) => {
 
-  res.render('photo.ejs');
+// app.get('/photo', this.isLoggedIn, async (req, res, next) => {
+//   let photo = await db.collection('photo').find().sort({ _id: -1 }).toArray()
+//   let comment = await db.collection('photo-comment').find().sort({ _id: -1 }).toArray()
+
+//   console.log(photo)
+//   console.log(comment)
+//   res.render('photo.ejs', { 포토: photo, 댓글: comment})
+
+// })
+
+app.get('/photo', this.isLoggedIn, async (req, res, next) => {
+  try {
+    let result = await db.collection('photo').aggregate([
+      {
+        $lookup: {
+          from: 'photo-comment',
+          localField: '_id',
+          foreignField: 'parentId',
+          as: 'comments'
+        }
+      },
+      {
+        $sort: {
+          _id: -1
+        }
+      }
+    ]).toArray();
+
+    console.log(result.comments);
+    res.render('photo.ejs', { 포토: result });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 });
+
+
+
+app.get('/photo-post', async (req, res) => {
+
+  res.render('photo-post.ejs');
+});
+
+
+
+app.post('/photo-post', async (req, res) => {
+
+  const timeZone = 'Asia/Seoul';
+
+  let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
+  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
+  upload.array('img1',10)(req, res, async (err) => {
+    if (err) return res.send('업로드에러')
+    try {
+      if (req.body.title == '') {
+        res.send('제목입력안했음')
+      } else {
+        const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
+        
+        await db.collection('photo').insertOne(
+          {
+            today: Today,
+            time : Time,
+            content: req.body.content,
+            img : imageArray,
+            user: req.user._id,
+            username: req.user.username
+          }
+        )
+        res.redirect('/photo')
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).send('서버에러남')
+    }
+  })
+
+})
+
+app.post('/photo-comment', async (req, res) => {
+
+
+    await db.collection('photo-comment').insertOne({
+      content: req.body.content,
+      writerId: new ObjectId(req.user._id),
+      writer: req.user.username,
+      parentId: new ObjectId(req.body.parentId)
+    })
+    res.redirect('back')
+  }
+
+)
