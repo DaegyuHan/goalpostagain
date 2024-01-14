@@ -6,6 +6,10 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
+:root {
+  color-scheme: light only;
+}
+
 i {
   color: white;
 }
@@ -177,7 +181,7 @@ img {
 
 
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 500px) {
 
   /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
   .home-main,
@@ -235,4 +239,13 @@ img {
 
   }
 
+}
+
+@media only screen and (min-width: 500px) and (max-width: 1000px) {
+
+  .home-main,
+  .white-main {
+    width: 480px;
+    border-radius: 0px;
+  }
 }

@@ -142,6 +142,16 @@ app.get('/mvpboard', async (req, res) => {
 })
 
 app.post('/match-plan', async (req, res) => {
+
+  let previousAddress = req.body.planaddress;
+
+  if (!previousAddress) {
+    let lastRecord = await db.collection('matchplan').findOne({}, { sort: { _id: -1 } });
+    if (lastRecord) {
+      previousAddress = lastRecord.address;
+    }
+  }
+
   let result = db.collection('matchplan').insertOne({
     month: req.body.planmonth,
     date : req.body.plandate,
@@ -149,7 +159,7 @@ app.post('/match-plan', async (req, res) => {
     timeto : req.body.plantimeto,
     awayteam : req.body.planawayteam,
     place : req.body.planplace,
-    address : req.body.planaddress
+    address : previousAddress
   })
   res.redirect('/')
 })

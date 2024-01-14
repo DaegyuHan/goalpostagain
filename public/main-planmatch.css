@@ -296,7 +296,14 @@
 
 }
 
-@media only screen and (min-width: 500px) and (max-width: 600px) {
+@media only screen and (min-width: 400px) and (max-width: 500px) {
+    .planmatch-place {
+        font-size: 80%;
+        top: -30%;
+    }
+}
+
+/* @media only screen and (min-width: 500px) and (max-width: 600px) {
     .planmatch-place {
         font-size: 80%;
         top: -40%;
@@ -308,9 +315,9 @@
         font-size: 80%;
         top: -50%;
     }
-}
+} */
 
-@media only screen and (min-width: 750px) and (max-width: 1000px) {
+@media only screen and (min-width: 500px) and (max-width: 1000px) {
     .planmatch-place {
         font-size: 80%;
         top: -60%;
@@ -335,7 +342,7 @@
 
     .planmatch-place {
         font-size: 70%;
-        transform: translate(0%, 50%);
+        transform: translate(0%, 300%);
 
     }
 }

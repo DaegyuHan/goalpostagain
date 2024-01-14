@@ -1,8 +1,20 @@
+/* 이미지 스타일 */
+img {
+    max-width: 100%;
+    /* 최대 너비 */
+    max-height: 300px;
+    /* 최대 높이 */
+    width: auto;
+    /* 자동으로 너비 조절 */
+    height: auto;
+    /* 자동으로 높이 조절 */
+  }
+
 .story-main {
-    width: 800px;
-    background-color: white;
+    width: 600px;
+    background-color: #002832;
     margin: 10% auto 0px auto;
-    color: black;
+    color: white;
     text-align: center;
 }
 
@@ -23,6 +35,27 @@
     background-color: #02313d;
     color: white;
 }
+
+.stroy-photo-info {
+    display: flex;
+    padding-bottom: 20px;
+}
+
+.carousel {
+    height: 300px; 
+}
+
+
+
+.story-photo-content {
+    display: flex;
+}
+
+
+
+  
+
+
 
 
 
