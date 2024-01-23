@@ -13,6 +13,10 @@ img {
     /* 자동으로 높이 조절 */
 }
 
+.carousel {
+    height: 350px;
+}
+
 .story-main {
     width: 500px;
     background-color: #002832;
@@ -21,6 +25,7 @@ img {
     text-align: center;
     align-items: center;
     justify-content: center;
+    padding-top: 100px;
 }
 
 .story-bt-area {
@@ -36,7 +41,7 @@ img {
     background-color: #ff3ca0;
     color: white;
     font-size: 130%;
-
+    cursor: pointer;
 }
 
 .story-video-bt {
@@ -83,9 +88,7 @@ img {
     margin-right: 3%;
 }
 
-.carousel {
-    height: 350px;
-}
+
 
 .carousel-img {
     margin: auto 0px auto 0px;

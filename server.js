@@ -471,8 +471,7 @@ app.get('/photo', this.isLoggedIn, async (req, res, next) => {
         }
       }
     ]).toArray();
-
-    console.log(result.comments);
+    console.log(result[0].img[0].location)
     res.render('photo.ejs', { 포토: result });
   } catch (error) {
     console.error(error);
