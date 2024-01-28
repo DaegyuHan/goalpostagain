@@ -471,7 +471,6 @@ app.get('/photo', this.isLoggedIn, async (req, res, next) => {
         }
       }
     ]).toArray();
-    console.log(result[0].img[0].location)
     res.render('photo.ejs', { 포토: result });
   } catch (error) {
     console.error(error);
@@ -522,6 +521,13 @@ app.post('/photo-post', async (req, res) => {
 
 })
 
+app.get('/photo-delete/:id', async (req, res) => {
+  let result = await db.collection('photo').deleteOne({
+    _id: new ObjectId(req.params.id)
+  })
+  res.redirect('/photo')
+})
+
 app.post('/photo-comment', async (req, res) => {
 
 
@@ -535,3 +541,10 @@ app.post('/photo-comment', async (req, res) => {
   }
 
 )
+
+app.get('/photo-comment-delete/:id', async (req, res) => {
+  let result = await db.collection('photo-comment').deleteOne({
+    _id: new ObjectId(req.params.id)
+  })
+  res.redirect('back')
+})

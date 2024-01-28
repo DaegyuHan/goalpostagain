@@ -2,7 +2,7 @@ p {
     margin-bottom: 2px;
 }
 /* 이미지 스타일 */
-img {
+.carousel-item img {
     max-width: 100%;
     /* 최대 너비 */
     max-height: 350px;
@@ -11,7 +11,10 @@ img {
     /* 자동으로 너비 조절 */
     height: auto;
     /* 자동으로 높이 조절 */
+    margin-left: auto;
+    margin-right: auto;
 }
+
 
 .carousel {
     height: 350px;
@@ -86,8 +89,12 @@ img {
     width: 35%;
     font-size: 70%;
     margin-right: 3%;
+    color: white;
 }
 
+.story-photo-edit a {
+    color: white;
+}
 
 
 .carousel-img {
@@ -177,6 +184,8 @@ img {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: white;
+    font-size: 12px;
 }
 
 
