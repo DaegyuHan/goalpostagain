@@ -1,0 +1,22 @@
+.story-main {
+    width: 500px;
+    background-color: #002832;
+    margin: 10% auto 0px auto;
+    color: white;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding-top: 100px;
+}
+
+.story-bt-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media only screen and (max-width: 1000px) {
+    .story-main {
+        width: 100%;
+    }
+}

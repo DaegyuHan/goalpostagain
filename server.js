@@ -548,3 +548,8 @@ app.get('/photo-comment-delete/:id', async (req, res) => {
   })
   res.redirect('back')
 })
+
+app.get('/video', async (req, res) => {
+
+  res.render('video.ejs');
+});

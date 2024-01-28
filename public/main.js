@@ -17,3 +17,12 @@ function clearInput() {
 
 }
 
+
+
+function gotoPhoto() {
+  window.location.href = '/photo'
+}
+
+function gotoVideo() {
+  window.location.href = '/video'
+}

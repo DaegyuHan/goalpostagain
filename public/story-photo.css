@@ -20,22 +20,7 @@ p {
     height: 350px;
 }
 
-.story-main {
-    width: 500px;
-    background-color: #002832;
-    margin: 10% auto 0px auto;
-    color: white;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    padding-top: 100px;
-}
 
-.story-bt-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 .story-photo-bt {
     width: 47%;
@@ -54,6 +39,11 @@ p {
     background-color: #02313d;
     color: white;
     font-size: 130%;
+    cursor: pointer;
+}
+
+.story-video-bt:hover {
+    background-color: #ff3ca0;
 }
 
 .story-photo-post {
@@ -192,8 +182,3 @@ p {
 
 
 
-@media only screen and (max-width: 1000px) {
-    .story-main {
-        width: 100%;
-    }
-}
