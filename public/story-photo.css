@@ -1,17 +1,7 @@
 p {
     margin-bottom: 2px;
 }
-/* .carousel-item img {
-    max-width: 100%;
-    max-height: 350px;
-    width: auto;
-    height: auto;
-    margin-left: auto;
-    margin-right: auto;
-} */
 
-
-/* 이미지 스타일 */
 .carousel {
     display: flex;
     justify-content: center;
@@ -26,8 +16,18 @@ p {
     max-height: 450px;
     width: auto;
     height: auto;
-    margin: auto; /* 상하 및 좌우 중앙 정렬을 위해 */
+    margin: auto; 
 }
+
+.carousel-inner {
+    display: flex;
+    align-items: center;
+    height: 100%; /* 부모 요소인 .carousel의 높이에 맞춤 */
+}
+
+
+
+
 
 
 
