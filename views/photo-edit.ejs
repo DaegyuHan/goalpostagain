@@ -26,7 +26,9 @@
         href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
         rel="stylesheet">
     <script src="/main.js"></script>
+    <script>
 
+    </script>
 
 </head>
 
@@ -34,16 +36,19 @@
     <%- include('nav.ejs') %>
         <div class="management-title"></div>
         <div class="flex-col white-main">
-            <form class="form-box" action="/notice-post" method="POST" enctype="multipart/form-data">
-                <h4>공지작성</h4>
-                <input name="title" autocomplete="off" placeholder="title">
-                <input type="file" name="img1" accept="image/*" multiple>
-                <div style="margin-left: 1px;"><textarea class="textarea-notice" name="content" placeholder="content"></textarea></div>
+            <form class="form-box" action="/photo-edit?_method=PUT" method="POST">
+                <h4>글 수정</h4>
+                <input name="id" value="<%= 포토._id%>" style="display: none;">
+                <!-- <input type="file" name="img1" accept="image/*" multiple> -->
+                <div style="margin-left: 1px;">
+                    <textarea class="textarea-notice" name="content"><%=포토.content%></textarea>
+                </div>
                 <div style="text-align: center;">
-                    <button type="submit">등록</button>
+                    <button type="submit">수정</button>
                 </div>
             </form>
         </div>
+
 
 </body>
 

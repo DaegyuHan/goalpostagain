@@ -28,6 +28,33 @@
         function gotoRegister() {
             window.location.href = '/register';
         }
+
+        function CheckID(event) {
+            event.preventDefault();
+            var commentInput = document.getElementById('id-input');
+            var commentId = commentInput.value;
+
+            if (commentId == '') {
+                alert('아이디를 입력하세요')
+            } else {
+                var form = commentInput.closest('form');
+                form.submit();
+            }
+        }
+
+        function CheckPW(event) {
+            event.preventDefault();
+            var commentInput = document.getElementById('pw-input');
+            var commentId = commentInput.value;
+
+            if (commentId == '') {
+                alert('비밀번호를 입력하세요')
+            } else {
+                var form = commentInput.closest('form');
+                form.submit();
+            }
+        }
+
     </script>
 
 </head>
@@ -67,13 +94,13 @@
                                                     <div class="login-input-font">
                                                         아이디
                                                     </div>
-                                                    <input class="login-input" name="username">
+                                                    <input id="id-input" class="login-input" name="username">
                                                 </div>
                                                 <div>
                                                     <div class="login-input-font">
                                                         패스워드
                                                     </div>
-                                                    <input class="login-input" name="password" type="password">
+                                                    <input id="password-input" class="login-input" name="password" type="password">
                                                 </div>
 
                                                 <button class="login-button" type="submit">로그인</button>

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
     <title>오늘도골대FC</title>
@@ -51,7 +51,13 @@
 
         }
 
-        
+        function EditPhoto(event) {
+
+
+            var editId = event.target.getAttribute('data-photo-id');
+            window.location.href = '/photo-edit/' + editId; // 혹은 fetch 등의 비동기 처리
+
+        }
 
 
 
@@ -77,9 +83,33 @@
             }
         }
 
+        function PostPhotoComment(event) {
+            event.preventDefault();
+            var commentInput = document.getElementById('story-photo-add-comment-input');
+            var commentId = commentInput.value;
+
+            if (commentId == '') {
+                alert('댓글을 입력하세요')
+            } else {
+                var form = commentInput.closest('form');
+                form.submit();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 모든 캐러셀 요소를 가져와서 반복
+            var carousels = document.querySelectorAll('.carousel');
+            carousels.forEach(function (carousel) {
+                // 부트스트랩 캐러셀 초기화
+                new bootstrap.Carousel(carousel, {
+                    interval: false  // 자동 슬라이드를 비활성화하려면 이 부분을 추가합니다.
+                });
+            });
+        });
+
 
     </script>
-    
+
 
 
 
@@ -108,56 +138,53 @@
                         </div>
                         <% if (유저==포토[i].username || 유저=='관리자' ) {%>
                             <div class="story-photo-edit">
-                                <div style="margin-right: 5px; cursor: pointer;">수정</div>
+                                <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="EditPhoto(event)"
+                                    style="margin-right: 5px; cursor: pointer;">수정</a>
                                 <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="confirmDeletePhoto(event)">삭제</a>
                             </div>
                             <%}%>
                     </div>
 
-                    <div id="carouselExampleIndicators<%=i%>" class="carousel slide">
-
+                    <div id="carouselExampleIndicators<%= i %>" class="carousel slide">
                         <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#carouselExampleIndicators<%=i%>" data-bs-slide-to="0"
-                                class="active" aria-current="true" aria-label="Slide 1"></button>
-                            <% if (포토[i].img[1] !=undefined ) {%>
-                                <%for (j=1; j<포토[i].img.length; j++) {%>
-                                    <button type="button" data-bs-target="#carouselExampleIndicators<%=(j+1)%>"
-                                        data-bs-slide-to="<%=j%>" aria-label="Slide <%=(j+1)%>"></button>
-                                    <%}%>
+                            <button type="button" data-bs-target="#carouselExampleIndicators<%= i %>"
+                                data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <% if (포토[i].img[1] !=undefined) { %>
+                                <% for (j=1; j < 포토[i].img.length; j++) { %>
+                                    <button type="button" data-bs-target="#carouselExampleIndicators<%= i %>"
+                                        data-bs-slide-to="<%= j %>" aria-label="Slide <%= j + 1 %>"></button>
+                                    <% } %>
+                                        <% } %>
                         </div>
-                        <%}%>
-                            <div class="carousel-inner">
-                                <% if (포토[i].img[1]===undefined ) {%>
+                        <div class="carousel-inner">
+                            <% if (포토[i].img[1]===undefined) { %>
+                                <div class="carousel-item active">
+                                    <img class="carousel-img d-block" src="<%= 포토[i].img[0].location %>" alt="...">
+                                </div>
+                                <% } else { %>
                                     <div class="carousel-item active">
-                                        <img class="carousel-img d-block" src="<%= 포토[i].img[0].location%>" alt="...">
+                                        <img class="carousel-img d-block" src="<%= 포토[i].img[0].location %>" alt="...">
                                     </div>
-                                    <%} else {%>
-                                        <div class="carousel-item active">
-                                            <img class="carousel-img d-block" src="<%= 포토[i].img[0].location%>"
+                                    <% for (k=1; k < 포토[i].img.length; k++) { %>
+                                        <div class="carousel-item">
+                                            <img class="carousel-img d-block" src="<%= 포토[i].img[k].location %>"
                                                 alt="...">
                                         </div>
-                                        <%for (k=1; k<포토[i].img.length; k++) {%>
-                                            <div class="carousel-item">
-                                                <img class="carousel-img d-block" src="<%= 포토[i].img[k].location%>"
-                                                    alt="...">
-                                            </div>
-                                            <%}%>
-                                                <%}%>
-                            </div>
-                            <% if (포토[i].img[1] !=undefined ) {%>
-
-                                <button class="carousel-control-prev" type="button"
-                                    data-bs-target="#carouselExampleIndicators<%=i%>" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button"
-                                    data-bs-target="#carouselExampleIndicators<%=i%>" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-
-                                <%}%>
+                                        <% } %>
+                                            <% } %>
+                        </div>
+                        <% if (포토[i].img[1] !=undefined) { %>
+                            <button class="carousel-control-prev" type="button"
+                                data-bs-target="#carouselExampleIndicators<%= i %>" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                data-bs-target="#carouselExampleIndicators<%= i %>" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            <% } %>
                     </div>
 
                     <div style="text-align: left;">
@@ -174,24 +201,21 @@
 
                         </div>
 
-                        
+
                         <div onclick="openInputComment('<%= i %>')" class="story-photo-add-comment">
                             댓글달기...
                         </div>
-            
-            
 
-                        <script>
-                            
-                        </script>
+
                         <form action="/photo-comment" method="POST">
                             <input name="parentId" value="<%= 포토[i]._id%>" style="display: none;">
 
                             <div id="story-photo-add-comment-input-area0<%= i %>" style="display: none;">
                                 <div id="story-photo-add-comment-input-area" class="story-photo-add-comment-input-area">
-                                    <input name="content" class="story-photo-add-comment-input" type="text"
-                                        autocomplete="off">
-                                    <button type="submit" class="story-photo-add-comment-inputBt">게시</button>
+                                    <input id="story-photo-add-comment-input" name="content"
+                                        class="story-photo-add-comment-input" type="text" autocomplete="off">
+                                    <button type="submit" class="story-photo-add-comment-inputBt"
+                                        onclick="PostPhotoComment(event)">게시</button>
                                 </div>
                             </div>
                         </form>
@@ -222,7 +246,7 @@
                         </div> -->
 
                                         <hr>
-                                    
+
                                         <%}%>
                     </div>
                 </div>
@@ -233,7 +257,7 @@
 
         </div>
 
-        
+
 </body>
 
 </html>

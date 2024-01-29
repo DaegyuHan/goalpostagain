@@ -34,13 +34,13 @@
 
 <body>
     <%- include('nav.ejs') %>
-        <div class="management-title">관리</div>
+        <div class="management-title"></div>
         <div class="flex-col white-main">
             <form class="form-box" action="/notice-edit?_method=PUT" method="POST">
                 <h4>공지수정</h4>
                 <input name="id" value="<%= 글._id%>" style="display: none;">
                 <input name="title" value="<%=글.title%>">
-                <input type="file" name="img1" accept="image/*" multiple>
+                <!-- <input type="file" name="img1" accept="image/*" multiple> -->
                 <div style="margin-left: 1px;">
                     <textarea class="textarea-notice" name="content"><%=글.content%></textarea>
                 </div>
@@ -49,6 +49,7 @@
                 </div>
             </form>
         </div>
+
 
 </body>
 

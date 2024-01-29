@@ -48,34 +48,20 @@
             }
         }
 
+        function PostNoticeComment(event) {
+            event.preventDefault();
+            var commentInput = document.getElementById('comment-input');
+            var commentId = commentInput.value;
 
-        // document.addEventListener('DOMContentLoaded', function () {
-        //     const commentForm = document.querySelector('form');
+            if (commentId == '') {
+                alert('댓글을 입력하세요')
+            } else {
+                var form = commentInput.closest('form');
+                form.submit();
+            }
+        }
 
-        //     commentForm.addEventListener('submit', async function (event) {
-        //         event.preventDefault();
 
-        //         const commentContent = document.querySelector('.comment-input').value.trim();
-
-        //         if (!commentContent) {
-        //             const response = await fetch('/comment', {
-        //                 method: 'POST',
-        //                 headers: {
-        //                     'Content-Type': 'application/json',
-        //                 },
-        //                 body: JSON.stringify({ content: commentContent }),
-        //             });
-
-        //             const responseData = await response.json();
-
-        //             if (responseData.error) {
-        //                 alert(responseData.error);
-        //             } else {
-        //                 // 서버에서 정상적으로 처리된 경우에 대한 로직
-        //             }
-        //         }
-        //     });
-        // });
 
 
     </script>
@@ -122,7 +108,7 @@
                 </div>
 
 
-                <% if (유저==글.username || 유저=='test' ) {%>
+                <% if (유저==글.username || 유저=='관리자' ) {%>
                     <div style="text-align: right; font-size: 14px;">
                         <a href="/notice-edit/<%= 글._id%>">수정</a>
                         <a href="#" class="delete-notice-button" data-notice-id="<%= 글._id%>"
@@ -133,9 +119,9 @@
                         <hr>
                         <form action="/comment" method="POST">
                             <div class="flex-row" style="margin-bottom: 15px;">
-                                <input name="content" class="comment-input" type="text" autocomplete="off">
+                                <input name="content" id="comment-input" class="comment-input" type="text" autocomplete="off">
                                 <input name="parentId" value="<%= 글._id %>" style="display: none">
-                                <button type="submit" class="comment-button" style="margin-left: 1%;">작성</button>
+                                <button onclick="PostNoticeComment(event)" type="submit" class="comment-button" style="margin-left: 1%;">작성</button>
                             </div>
                         </form>
                         <% for (let i=0; i<댓글.length; i++) {%>

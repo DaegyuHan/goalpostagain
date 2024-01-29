@@ -521,6 +521,25 @@ app.post('/photo-post', async (req, res) => {
 
 })
 
+app.get('/photo-edit/:id', async (req, res) => {
+  let photoID = await db.collection('photo').findOne({ _id: new ObjectId(req.params.id) })
+
+  res.render('photo-edit.ejs', { 포토: photoID })
+})
+
+app.put('/photo-edit', async (req, res) => {
+
+  let result = await db.collection('photo').updateOne({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        content: req.body.content
+      }
+    })
+
+  res.redirect('/photo')
+
+})
+
 app.get('/photo-delete/:id', async (req, res) => {
   let result = await db.collection('photo').deleteOne({
     _id: new ObjectId(req.params.id)
