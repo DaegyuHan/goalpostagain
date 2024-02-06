@@ -52,9 +52,10 @@
     <%- include('nav.ejs') %>
 
         <div class="story-main">
+            <div class="notice-title">사진&영상</div>
             <div class="story-bt-area">
-                <div onclick="gotoPhoto()" class="story-change-photo-bt">PHOTO</div>
-                <div onclick="gotoVideo()" class="story-change-video-bt">VIDEO</div>
+                <button onclick="gotoPhoto()" class="story-change-photo-bt">PHOTO</button>
+                <button onclick="gotoVideo()" class="story-change-video-bt">VIDEO</button>
             </div>
 
             <% for ( i=0; i<URL.length; i++) {%>

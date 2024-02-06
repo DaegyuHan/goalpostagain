@@ -1,5 +1,3 @@
-
-
 body {
   margin: 0;
   background-color: #002832;
@@ -19,9 +17,12 @@ i {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* 필요에 따라 조절할 수 있습니다. */
-  background-color: #fff; /* 배경색을 원하는 색상으로 설정합니다. */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과를 추가할 수 있습니다. */
+  z-index: 1000;
+  /* 필요에 따라 조절할 수 있습니다. */
+  background-color: #fff;
+  /* 배경색을 원하는 색상으로 설정합니다. */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 그림자 효과를 추가할 수 있습니다. */
 }
 
 
@@ -54,12 +55,23 @@ a:hover {
   background-color: #ff3ca0;
   width: 100%;
   height: 100px;
+  position: relative;
 }
 
 .top-area-logo {
   width: 150px;
   height: 120px;
   align-items: center;
+  cursor: pointer;
+  position: fixed;
+}
+
+.nav-myprofileBt {
+  width: 30px;
+  height: 30px;
+  position: fixed;
+  top: 3%;
+  right: 10px;
   cursor: pointer;
 }
 
@@ -88,9 +100,9 @@ a:hover {
   transition: left 0.3s ease;
   /* left 속성에 트랜지션 적용 */
   z-index: 100;
-  /* background-image: url(https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437);
-    background-repeat: no-repeat;
-    background-position: -100px 100px; */
+  background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%83%81%EC%96%B4(opacity5_).png?updatedAt=1707219499837');
+  background-repeat: no-repeat;
+  background-position: -250px -100px;
 }
 
 .side-menu img {
@@ -117,12 +129,8 @@ a:hover {
   color: white;
   font-size: 25px;
   display: block;
-  padding-bottom: 0px;
-  /* 흰색 선과 글씨 사이 여백 추가 */
-  border-bottom: 0px solid white;
-  /* 흰색 선 추가 */
-  box-sizing: border-box;
-  /* padding 포함하도록 box-sizing 설정 */
+  margin-left: 5%;
+  font-weight: 800;
 }
 
 .nav-user-font {
@@ -191,6 +199,8 @@ img {
 
 
 
+
+
 @media only screen and (max-width: 500px) {
 
   /* 핸드폰 크기에 맞게 스타일을 조정합니다. */
@@ -245,7 +255,7 @@ img {
   }
 
   .nav-menu-font {
-    font-size: 22px;
+    font-size: 32px;
 
   }
 

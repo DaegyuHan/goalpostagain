@@ -17,6 +17,10 @@ function clearInput() {
 
 }
 
+function gotoLogin(){
+  window.location.href = '/login'
+}
+
 
 
 function gotoPhoto() {

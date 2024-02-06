@@ -2,6 +2,13 @@
 <div class="flex-row top-area">
   <img class="top-area-logo" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80LOGO(%EC%8A%A4%ED%8A%B8%EB%A1%9D%EC%A0%9C%EA%B1%B0).png?updatedAt=1707219499928"
     onclick="gotoHome()">
+    <% if (typeof 유저 !=='undefined' ) { %>
+      <img class="nav-myprofileBt" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/login.png?updatedAt=1707221589727" alt="login">
+      <% } else { %>
+        <img class="nav-myprofileBt" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/login.png?updatedAt=1707221589727" alt="login"
+    onclick="gotoLogin()">
+        <%}%>
+    
 </div>
 <nav class="side-menu">
   <div class="menu-bar" onclick="toggleMenu()">
@@ -12,23 +19,16 @@
   <ul>
     <img onclick="gotoHome()" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80LOGO(%EC%8A%A4%ED%8A%B8%EB%A1%9D%EC%A0%9C%EA%B1%B0).png?updatedAt=1707219499928" alt="logo">
 
-    <% if (typeof 유저 !=='undefined' ) { %>
-      <li><div class="nav-user-font">
-          <%=유저%> 님
-      </div></li>
-      <% } else { %>
-        <li><a class="nav-user-font" href="/login">로그인하기</a></li>
-        <%}%>
-          <li><a class="nav-menu-font" href="/introduce">팀소개</a></li>
-          <li><a class="nav-menu-font" href="/photo">사진&영상</a></li>
-          <li><a class="nav-menu-font" href="/match-result">경기결과</a></li>
-          <li><a class="nav-menu-font" href="/notice/1">공지사항</a></li>
-          <li><a class="nav-menu-font" href="/gamezone">승부차기</a></li>
+    
+          <a class="nav-menu-font" href="/introduce">팀소개</a>
+          <a class="nav-menu-font" href="/photo">사진&영상</a>
+          <a class="nav-menu-font" href="/match-result">경기결과</a>
+          <a class="nav-menu-font" href="/notice/1">공지사항</a>
+          <a class="nav-menu-font" href="/gamezone">승부차기</a>
           <% if (typeof 유저 !=='undefined' ) { %>
             <% if (유저 == '한대규'||유저 == '관리자') {%>
-              <li><a class="nav-menu-font" href="/management">운영관리</a></li>
+              <a class="nav-menu-font" href="/management">운영관리</a>
               <%}%>
-              <li><a class="nav-menu-font" href="/logout">로그아웃</a></li>
             <% } %>
           
   </ul>

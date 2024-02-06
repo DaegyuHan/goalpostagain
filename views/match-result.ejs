@@ -87,7 +87,7 @@
           <div class="lastmatch-result-teamarea2">
             <div>
               <img class="lastmatch-result-scorebox-teamlogo2"
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
+                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0_%EC%83%89,%EC%82%AC%EC%9D%B4%EC%A6%88%EB%B3%80%ED%99%98.png?updatedAt=1707219500095"
                 alt="상대팀로고">
             </div>
 
@@ -101,7 +101,7 @@
           23.<%=result[0].month%>.<%=result[0].day%>, 금요일, <%=result[0].time%>
         </div>
         <% if (typeof 유저 !=='undefined' ) { %>
-          <% if (유저=='test' ) { %>
+          <% if (유저=='관리자' ) { %>
             <div class="match-result-delete">
               <a href="#" data-last-result-id="<%=result[0]._id%>" onclick="confirmDeleteLastResult(event)">삭제</a>
             </div>
@@ -148,7 +148,7 @@
             <div class="match-result-teamarea2">
               <div>
                 <img class="match-result-scorebox-teamlogo2"
-                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704523553"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0_%EC%83%89,%EC%82%AC%EC%9D%B4%EC%A6%88%EB%B3%80%ED%99%98.png?updatedAt=1707219500095"
                   alt="상대팀로고">
               </div>
 
@@ -163,7 +163,7 @@
             <%-result[i].resultlogo%>
           </div>
           <% if (typeof 유저 !=='undefined' ) { %>
-            <% if (유저=='test' ) { %>
+            <% if (유저=='관리자' ) { %>
               <div class="match-result-delete">
                 <a href="#" data-result-id="<%=result[i]._id%>" onclick="confirmDeleteResult(event)">삭제</a>
               </div>

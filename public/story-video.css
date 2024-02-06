@@ -4,21 +4,21 @@
 .story-change-photo-bt {
     width: 47%;
     height: 6vh;
-    padding-top: 1vh;
     background-color: #02313d;
     color: white;
     font-size: 130%;
-    cursor: pointer;
+    border: 0px solid transparent;
+
 }
 
 .story-change-video-bt {
     width: 47%;
     height: 6vh;
-    padding-top: 1vh;
     background-color: #ff3ca0;
     color: white;
     font-size: 130%;
-    cursor: pointer;
+    border: 0px solid transparent;
+
 }
 
 .story-change-photo-bt:hover {

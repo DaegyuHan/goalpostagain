@@ -111,10 +111,10 @@
 
         <div class="story-main">
 
-
+            <div class="notice-title">사진&영상</div>
             <div class="story-bt-area">
-                <div onclick="gotoPhoto()" class="story-photo-bt">PHOTO</div>
-                <div onclick="gotoVideo()" class="story-video-bt">VIDEO</div>
+                <button onclick="gotoPhoto()" class="story-photo-bt">PHOTO</button>
+                <button onclick="gotoVideo()" class="story-video-bt">VIDEO</button>
             </div>
             <div class="story-photo-post"><a href="/photo-post">작성하기</a></div>
             <hr>
@@ -126,9 +126,10 @@
 
                     <div id="carouselExampleIndicators<%= i %>" class="carousel slide">
                         <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#carouselExampleIndicators<%= i %>"
-                                data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            
                             <% if (포토[i].img[1] !=undefined) { %>
+                                <button type="button" data-bs-target="#carouselExampleIndicators<%= i %>"
+                                    data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                                 <% for (j=1; j < 포토[i].img.length; j++) { %>
                                     <button type="button" data-bs-target="#carouselExampleIndicators<%= i %>"
                                         data-bs-slide-to="<%= j %>" aria-label="Slide <%= j + 1 %>"></button>

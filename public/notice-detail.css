@@ -115,3 +115,17 @@ button:hover {
     font-size: 85%;
   }
 }
+
+@media only screen and (min-width: 200px) and (max-width: 276px) {
+
+  .comment-input {
+    width: 80%;
+  }
+  
+  
+  .comment-button {
+    width: 15%;
+    font-size: 65%;
+  }
+
+}

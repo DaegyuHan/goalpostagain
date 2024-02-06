@@ -1,12 +1,11 @@
 .story-main {
     width: 500px;
     background-color: #002832;
-    margin: 10% auto 0px auto;
+    margin: 0px auto 0px auto;
     color: white;
     text-align: center;
     align-items: center;
     justify-content: center;
-    padding-top: 100px;
 }
 
 .story-bt-area {
