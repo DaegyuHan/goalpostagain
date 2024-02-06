@@ -1,8 +1,11 @@
+.story-bt-area {
+    margin-bottom: 10px;
+}
 .story-change-photo-bt {
     width: 47%;
     height: 6vh;
     padding-top: 1vh;
-    background-color: #002832;
+    background-color: #02313d;
     color: white;
     font-size: 130%;
     cursor: pointer;
@@ -20,4 +23,29 @@
 
 .story-change-photo-bt:hover {
     background-color: #ff3ca0;
+}
+
+.story-photo-area {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+
+.story-photo-area iframe {
+    width: 94%;
+    height: 200px;
+}
+
+
+
+@media only screen and (max-width: 1000px) {
+
+.story-photo-area iframe {
+    width: 94%;
+    height: auto;
+    
+}
+
 }

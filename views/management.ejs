@@ -168,6 +168,25 @@
       alert("등록되었습니다.")
     }
 
+    function UploadYoutube() {
+    // 입력된 YouTube URL 가져오기
+    var fullURL = document.getElementById('inputYoutubeURL').value;
+
+    // "v=" 이후의 부분 추출
+    var videoIdStartIndex = fullURL.indexOf('v=') + 2; // 'v=' 다음부터 시작
+
+
+    var videoId = fullURL.substring(videoIdStartIndex);
+
+    // 중간에 나오는 &를 ?로 바꿔서 출력
+    var modifiedVideoId = videoId.replace(/&/g, '?');
+
+    location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
+}
+
+
+
+
 
 
   </script>
@@ -360,6 +379,16 @@
 
 
       </div>
+
+
+      <div style="padding-bottom: 100px;">
+        <h4>동영상 업로드</h4>
+        <div> youtube 영상 링크 입력</div>
+        <input id="inputYoutubeURL" type="text">
+        <button onclick="UploadYoutube()">등록</button>
+      </div>
+
+
     </div>
 </body>
 

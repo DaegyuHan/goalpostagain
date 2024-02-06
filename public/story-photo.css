@@ -77,10 +77,12 @@ p {
 
 .story-photo-info {
     display: flex;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     width: 65%;
     font-size: 70%;
-    margin-left: 2%;
+    margin-top: 2px;
+    margin-left: 3%;
+    color: #e6e6e6ce;
 }
 
 .story-photo-edit {
@@ -111,7 +113,6 @@ p {
 .story-photo-content-writer {
     width: 15%;
     margin-left: 3%;
-    margin-top: 6px;
     font-size: 80%;
     font-weight: 600;
 }

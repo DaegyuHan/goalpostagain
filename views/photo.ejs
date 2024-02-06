@@ -83,18 +83,7 @@
             }
         }
 
-        function PostPhotoComment(event) {
-            event.preventDefault();
-            var commentInput = document.getElementById('story-photo-add-comment-input');
-            var commentId = commentInput.value;
 
-            if (commentId == '') {
-                alert('댓글을 입력하세요')
-            } else {
-                var form = commentInput.closest('form');
-                form.submit();
-            }
-        }
 
         document.addEventListener('DOMContentLoaded', function () {
             // 모든 캐러셀 요소를 가져와서 반복
@@ -107,7 +96,7 @@
             });
         });
 
-        
+
 
 
     </script>
@@ -133,19 +122,7 @@
             <%for (i=0; i<포토.length; i++) {%>
 
                 <div class="story-photo-area">
-                    <div class="story-photo-info-area">
-                        <div class="story-photo-info">
-                            <%=포토[i].time%>
-                                <%=포토[i].username%>
-                        </div>
-                        <% if (유저==포토[i].username || 유저=='관리자' ) {%>
-                            <div class="story-photo-edit">
-                                <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="EditPhoto(event)"
-                                    style="margin-right: 5px; cursor: pointer;">수정</a>
-                                <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="confirmDeletePhoto(event)">삭제</a>
-                            </div>
-                            <%}%>
-                    </div>
+
 
                     <div id="carouselExampleIndicators<%= i %>" class="carousel slide">
                         <div class="carousel-indicators">
@@ -188,6 +165,18 @@
                             </button>
                             <% } %>
                     </div>
+                    <div class="story-photo-info-area">
+                        <div class="story-photo-info">
+                            <%=포토[i].time%>
+                        </div>
+                        <% if (유저==포토[i].username || 유저=='관리자' ) {%>
+                            <div class="story-photo-edit">
+                                <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="EditPhoto(event)"
+                                    style="margin-right: 5px; cursor: pointer;">수정</a>
+                                <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="confirmDeletePhoto(event)">삭제</a>
+                            </div>
+                            <%}%>
+                    </div>
 
                     <div style="text-align: left;">
                         <div class="story-photo-content">
@@ -204,23 +193,41 @@
                         </div>
 
 
+
                         <div onclick="openInputComment('<%= i %>')" class="story-photo-add-comment">
                             댓글달기...
                         </div>
 
+                        <script>
+                            function PostPhotoComment<%= i %>(event) {
+                                event.preventDefault();
+                                var commentInput = document.getElementById('story-photo-add-comment-input<%= i %>');
+                                var commentId = commentInput.value;
+
+                                if (commentId == '') {
+                                    alert('댓글을 입력하세요')
+                                } else {
+                                    var form = commentInput.closest('form');
+                                    form.submit();
+                                }
+                            }
+                        </script>
 
                         <form action="/photo-comment" method="POST">
                             <input name="parentId" value="<%= 포토[i]._id%>" style="display: none;">
 
                             <div id="story-photo-add-comment-input-area0<%= i %>" style="display: none;">
                                 <div id="story-photo-add-comment-input-area" class="story-photo-add-comment-input-area">
-                                    <input id="story-photo-add-comment-input" name="content"
+                                    <input id="story-photo-add-comment-input<%= i %>" name="content"
                                         class="story-photo-add-comment-input" type="text" autocomplete="off">
                                     <button type="submit" class="story-photo-add-comment-inputBt"
-                                        onclick="PostPhotoComment(event)">게시</button>
+                                        onclick="PostPhotoComment<%= i %>(event)">게시</button>
                                 </div>
                             </div>
                         </form>
+
+
+
                         <% if (typeof 포토[i].comments !=='undefined' ) {%>
                             <% for (let comment of 포토[i].comments) { %>
                                 <div style="display: flex; align-items: baseline;">

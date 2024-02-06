@@ -4,6 +4,7 @@ const app = express()
 const { MongoClient, ObjectId } = require('mongodb')
 const methodOverride = require('method-override')
 const bcrypt = require('bcrypt')
+const ytdl = require('ytdl-core');
 require('dotenv').config()
 
 app.use(methodOverride('_method'))
@@ -569,6 +570,24 @@ app.get('/photo-comment-delete/:id', async (req, res) => {
 })
 
 app.get('/video', async (req, res) => {
-
-  res.render('video.ejs');
+  let URL = await db.collection('youtubeURL').find().sort({ _id: -1 }).toArray();
+  res.render('video.ejs', {URL : URL});
 });
+
+
+
+
+app.get('/UploadURL', async (req, res) => {
+
+  let result = await db.collection('youtubeURL').insertOne({
+    URL: req.query.URL
+  })
+  res.redirect('/video')
+})
+
+app.get('/video-delete/:id', async (req, res) => {
+  let result = await db.collection('youtubeURL').deleteOne({
+    _id: new ObjectId(req.params.id)
+  })
+  res.redirect('/video')
+})
