@@ -17,7 +17,7 @@
   <div class="menu-bar-text">
 
   <ul>
-    <img onclick="gotoHome()" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80LOGO(%EC%8A%A4%ED%8A%B8%EB%A1%9D%EC%A0%9C%EA%B1%B0).png?updatedAt=1707219499928" alt="logo">
+    <img class="nav-menu-img" onclick="gotoHome()" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80LOGO(%EC%8A%A4%ED%8A%B8%EB%A1%9D%EC%A0%9C%EA%B1%B0).png?updatedAt=1707219499928" alt="logo">
 
     
           <a class="nav-menu-font" href="/introduce">팀소개</a>
@@ -26,12 +26,25 @@
           <a class="nav-menu-font" href="/notice/1">공지사항</a>
           <a class="nav-menu-font" href="/gamezone">승부차기</a>
           <% if (typeof 유저 !=='undefined' ) { %>
-            <% if (유저 == '한대규'||유저 == '관리자') {%>
+            <% if (유저 == '한대규'||유저 == '관리자'||유저 == '양철진') {%>
               <a class="nav-menu-font" href="/management">운영관리</a>
               <%}%>
             <% } %>
           
   </ul>
 </div>
+<div class="nav-login">
+  <% if (typeof 유저 !=='undefined' ) { %>
+    <div class="nav-login-img-area" onclick="gotoLogout()">
+    <img class="nav-login-img" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/login.png?updatedAt=1707221589727" alt="login"> 로그아웃
+  </div>
+    <% } else { %>
+      <div class="nav-login-img-area" onclick="gotoLogin()">
+      <img class="nav-login-img" src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/login.png?updatedAt=1707221589727" alt="login" > 로그인
+    </div>
+      <%}%>
+
+</div>
+
 </nav>
 </div>

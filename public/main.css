@@ -70,14 +70,14 @@ a:hover {
   width: 30px;
   height: 30px;
   position: fixed;
-  top: 3%;
+  top: 20px;
   right: 10px;
   cursor: pointer;
 }
 
 .menu-bar {
   position: fixed;
-  top: 20px;
+  top: 16px;
   left: 20px;
   font-size: 24px;
   cursor: pointer;
@@ -105,10 +105,11 @@ a:hover {
   background-position: -250px -100px;
 }
 
-.side-menu img {
-  width: 35%;
+.nav-menu-img {
+  width: 30%;
   height: 28%;
   margin-left: 30px;
+  margin-bottom: 20px;
   cursor: pointer;
 }
 
@@ -124,19 +125,40 @@ a:hover {
   /* border-bottom: 1px solid white; */
 }
 
+
 .nav-menu-font {
   text-decoration: none;
   color: white;
-  font-size: 25px;
+  font-size: 35px;
   display: block;
   margin-left: 5%;
   font-weight: 800;
 }
 
-.nav-user-font {
-  font-size: 29px;
-  border-bottom: 1px solid white;
+.nav-login {
+  width: 100%;
+  height: 12%;
+  background-color: #002832;
+  top: 100%;
   color: white;
+  font-size: 130%;
+  font-weight: 500;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+}
+
+.nav-login-img-area {
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding-top: 5%;
+}
+
+.nav-login-img {
+  width: 5%;
+  height: auto;
 }
 
 .home-main {
@@ -196,8 +218,22 @@ img {
 }
 
 
+@media only screen and (max-width: 1024px) {
+.side-menu {
 
-
+  left: -100%;
+  /* 메뉴 영역을 왼쪽으로 숨김 */
+  width: 100%;
+  height: 100%;
+  background-color: #ff3ca0;
+  transition: left 0.3s ease;
+  /* left 속성에 트랜지션 적용 */
+  z-index: 100;
+  background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo/%EC%83%81%EC%96%B4(opacity5_).png?updatedAt=1707219499837');
+  background-repeat: no-repeat;
+  background-position: -250px -100px;
+}
+}
 
 
 
@@ -219,8 +255,8 @@ img {
   }
 
   .top-area-logo {
-    width: 80px;
-    height: 60px;
+    width: 72px;
+    height: 54px;
     align-items: center;
     cursor: pointer;
   }
@@ -254,10 +290,6 @@ img {
     left: 35%;
   }
 
-  .nav-menu-font {
-    font-size: 32px;
-
-  }
 
 }
 

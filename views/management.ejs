@@ -75,6 +75,11 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EA%B9%80%EC%A0%95%ED%9B%88MVP.png?updatedAt=1705229241209">
           </div>`
           break
+          case '민대식':
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%AF%BC%EB%8C%80%EC%8B%9DMVP.png?updatedAt=1707658379920">
+          </div>`
+          break
           case '이찬웅':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276">
@@ -92,7 +97,7 @@
           break
           case '유성진':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1705229239545">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1707658378921">
           </div>`
           break
         default:
@@ -157,13 +162,14 @@
       var num7 = document.getElementById("management-mvpboard-score7").value;
       var num9 = document.getElementById("management-mvpboard-score9").value;
       var num10 = document.getElementById("management-mvpboard-score10").value;
+      var num11 = document.getElementById("management-mvpboard-score11").value;
       var num14 = document.getElementById("management-mvpboard-score14").value;
       var num23 = document.getElementById("management-mvpboard-score23").value;
       var num33 = document.getElementById("management-mvpboard-score33").value;
       var num96 = document.getElementById("management-mvpboard-score96").value;
 
 
-      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}&num2=${encodeURIComponent(num2)}&num4=${encodeURIComponent(num4)}&num5=${encodeURIComponent(num5)}&num6=${encodeURIComponent(num6)}&num7=${encodeURIComponent(num7)}&num9=${encodeURIComponent(num9)}&num10=${encodeURIComponent(num10)}&num14=${encodeURIComponent(num14)}&num23=${encodeURIComponent(num23)}&num33=${encodeURIComponent(num33)}&num96=${encodeURIComponent(num96)}`;
+      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}&num2=${encodeURIComponent(num2)}&num4=${encodeURIComponent(num4)}&num5=${encodeURIComponent(num5)}&num6=${encodeURIComponent(num6)}&num7=${encodeURIComponent(num7)}&num9=${encodeURIComponent(num9)}&num10=${encodeURIComponent(num10)}&num11=${encodeURIComponent(num11)}&num14=${encodeURIComponent(num14)}&num23=${encodeURIComponent(num23)}&num33=${encodeURIComponent(num33)}&num96=${encodeURIComponent(num96)}`;
 
       alert("등록되었습니다.")
     }
@@ -244,6 +250,7 @@
               <option value="노용준">노용준</option>
               <option value="안태훈">안태훈</option>
               <option value="김정훈">김정훈</option>
+              <option value="민대식">민대식</option>
               <option value="이찬웅">이찬웅</option>
               <option value="나현수">나현수</option>
               <option value="한대규">한대규</option>
@@ -343,11 +350,19 @@
           </div>
         </div>
         <div style="display: flex;">
+          <div class="management-mvpboard-num">11</div>
+          <div id="management-mvpboard-name11" style="margin-left: 10px;">민대식</div>
+          <div>
+            <input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
+            value="<%=Object.values(mvpboard)[8]%>">
+          </div>
+        </div>
+        <div style="display: flex;">
           <div class="management-mvpboard-num">14</div>
           <div id="management-mvpboard-name14" style="margin-left: 10px;">이찬웅</div>
           <div>
             <input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[8]%>">
+            value="<%=Object.values(mvpboard)[9]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -355,7 +370,7 @@
           <div id="management-mvpboard-name23" style="margin-left: 10px;">나현수</div>
           <div>
             <input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[9]%>">
+            value="<%=Object.values(mvpboard)[10]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -363,7 +378,7 @@
           <div id="management-mvpboard-name33" style="margin-left: 10px;">한대규</div>
           <div>
             <input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[10]%>">
+            value="<%=Object.values(mvpboard)[11]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -371,7 +386,7 @@
           <div id="management-mvpboard-name96" style="margin-left: 10px;">유성진</div>
           <div>
             <input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[11]%>">
+            value="<%=Object.values(mvpboard)[12]%>">
           </div>
         </div>
 
@@ -387,10 +402,6 @@
         <input id="inputYoutubeURL" type="text">
         <button onclick="UploadYoutube()">등록</button>
       </div>
-
-
-      <li><a class="management-logout" href="/logout">로그아웃</a></li>
-
 
     </div>
 </body>

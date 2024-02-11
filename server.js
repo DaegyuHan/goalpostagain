@@ -131,6 +131,7 @@ app.get('/mvpboard', async (req, res) => {
     노용준: req.query.num7,
     안태훈: req.query.num9,
     김정훈: req.query.num10,
+    민대식: req.query.num11,
     이찬웅: req.query.num14,
     나현수: req.query.num23,
     한대규: req.query.num33,
@@ -216,12 +217,23 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser(async (user, done) => {
-  let result = await db.collection('user').findOne({ _id: new ObjectId(user.id) })
-  delete result.password
-  process.nextTick(() => {
-    done(null, result)
-  })
-})
+  try {
+    let result = await db.collection('user').findOne({ _id: new ObjectId(user.id) });
+
+    // Check if result exists before attempting to delete password
+    if (result) {
+      delete result.password;
+    }
+
+    process.nextTick(() => {
+      done(null, result);
+    });
+  } catch (error) {
+    // Handle any errors that might occur during database operation
+    done(error);
+  }
+});
+
 
 exports.isLoggedIn = (req, res, next) => {
   // isAuthenticated()로 검사해 로그인이 되어있으면
@@ -284,7 +296,7 @@ app.post('/register', async (req, res) => {
   let Time =  new Date().toLocaleString('ko-KR', { timeZone });
   let 해시 = await bcrypt.hash(req.body.password, 10)
 
-  if (req.body.memberCode == 'bigstarhan') {
+  if (req.body.memberCode == 'hdg0822') {
     await db.collection('user').insertOne({
       userID: req.body.userID,
       username: req.body.username,

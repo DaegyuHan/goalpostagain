@@ -1,7 +1,7 @@
 
 function toggleMenu() {
     const sideMenu = document.querySelector('.side-menu');
-    sideMenu.style.left = sideMenu.style.left === '0px' ? '-300px' : '0px';
+    sideMenu.style.left = sideMenu.style.left === '0px' ? '-100%' : '0px';
   }
   
 function gotoHome(){
@@ -21,6 +21,10 @@ function gotoLogin(){
   window.location.href = '/login'
 }
 
+function gotoLogout(){
+  window.location.href = '/logout'
+  alert('로그아웃되었습니다.')
+}
 
 
 function gotoPhoto() {
