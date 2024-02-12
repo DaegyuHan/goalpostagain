@@ -8,9 +8,9 @@
 }
 
 .gamezone-area {
-    display: none;
-    width: 96%;
-    height: 500px;
+    display: block;
+    width: 100%;
+    height: 400px;
     background-color: white;
 }
 
@@ -20,14 +20,15 @@
 }
 
 .gaolpost-area {
+    position: relative;  /* 위치를 relative로 설정 */
     background-color: white;
     height: 60%;
     padding-top: 35px;
 }
 
 .goalpost {
-    width: 50%;
-    height: 50%;
+    width: 250px;
+    height: 120px;
     border: 5px solid black;
     border-bottom: white;
     margin: 0px auto 0px auto;
@@ -47,11 +48,24 @@
     width: 33%;
 }
 
+.gamezone-ball-area {
+    width: 100px;
+    height: 100px;
+    margin: 0px auto 10px auto;
+    background-color: white;
+    
+}
+.gamezone-ball-area img {
+    width: 100%;
+    height: auto;
+}
+
 .shoot-way-bt-area {
     display: flex;
     height: 30%;
     text-align: center;
     justify-content: center;
+    background-color: white;
 }
 
 .shoot-way-bt {
@@ -63,10 +77,13 @@
     justify-content: center;
     align-items: center;
     margin: 0px 10px 0px 10px;
-    cursor: pointer;
     border: 1px transparent;
     border-radius: 8px;
     display: flex;
+}
+
+.shoot-way-bt :hover {
+    color: deeppink;
 }
 
 .gamezone-scorearea {
@@ -74,12 +91,33 @@
     background-color: white;
     color: black;
     font-size: 400%;
+    margin-bottom: 400px;
 }
 
+.selected {
+
+    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EA%B3%B5.png?updatedAt=1707713736048');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    z-index: 1;  
+}
+
+.keeper {
+    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%A0%95%EB%A9%B4.png?updatedAt=1707713731747');
+    background-repeat: no-repeat;
+    background-size: 170%;
+    background-position: 50% 2px;
+    z-index: 0;  /* 다른 요소 뒤에 나오도록 낮은 z-index 설정 */
+}
+
+.red {
+    background-color: red;
+}
 
 @media only screen and (max-width: 1000px) {
     .gamezone-main {
         width: 100%;
     }
+
 
 }

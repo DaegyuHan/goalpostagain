@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>오늘도골대FC</title>
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+    <link rel="icon" type="image/png" sizes="192x192"
+        href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+    <link rel="icon" type="image/png" sizes="512x512"
+        href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="/main.css" rel="stylesheet">
+    <link href="/main-mvpboard.css" rel="stylesheet">
+    <link href="/gamezone-shooting.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="/main.js"></script>
+    <script>
+        function GameStart() {
+            var gamezoneArea = document.getElementById('gamezone-area');
+            gamezoneArea.style.display = 'block';
+            var gamezoneStartButton = document.getElementById('gamezone-start-button');
+            gamezoneStartButton.style.display = 'none';
+        }
+
+        function shoot(choice) {
+            var start_ball = document.getElementById('gamezone-ball')
+            start_ball.style.display = 'none';
+
+            var areas = document.querySelectorAll('.goalpost-area');
+            areas.forEach(function (area) {
+                area.classList.remove('selected', 'red');
+            });
+
+            var selectedArea = document.getElementById('goalpost-1');
+            if (choice === 2) {
+                selectedArea = document.getElementById('goalpost-2');
+            } else if (choice === 3) {
+                selectedArea = document.getElementById('goalpost-3');
+            }
+
+
+            selectedArea.classList.add('selected');
+
+            var randomIndex = Math.floor(Math.random() * 3) + 1; // 1부터 3까지의 랜덤한 숫자
+            var randomArea = document.getElementById('goalpost-' + randomIndex);
+            var scoreArea = document.getElementById('gamezone-scorearea');
+            var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+
+            if (randomArea.classList.contains('selected')) {
+                randomArea.classList.add('red');
+                setTimeout(function () {
+                    alert('막힘.');
+
+                    location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
+                    setTimeout(function () {
+                        var scoreArea = document.getElementById('gamezone-scorearea');
+                        scoreArea.textContent = '골 : 0';
+                    }, 100);
+                }, 100);
+
+
+            } else {
+                randomArea.classList.add('red');
+
+                var scoreArea = document.getElementById('gamezone-scorearea');
+                var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+                var newScore = currentScore + 1;
+                scoreArea.textContent = '골 : ' + newScore;
+            }
+
+
+        }
+    </script>
+
+</head>
+
+<body>
+    <%- include('nav.ejs') %>
+
+        <div class="gamezone-main">
+            <!-- <button id="gamezone-start-button" class="gamezone-start-button" onclick="GameStart()">시작하기</button> -->
+            <div id="gamezone-area" class="gamezone-area">
+                <div class="gaolpost-area">
+                    <div class="goalpost">
+                        <div id="goalpost-1" class="goalpost-area goalpost-left"></div>
+                        <div id="goalpost-2" class="goalpost-area goalpost-center"></div>
+                        <div id="goalpost-3" class="goalpost-area goalpost-right"></div>
+                    </div>
+                </div>
+                <div class="gamezone-ball-area">
+                    <img id="gamezone-ball"
+                        src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EA%B3%B5.png?updatedAt=1707713736048"
+                        alt="ball">
+                </div>
+                <div class="shoot-way-bt-area">
+                    <button onclick="shoot(1)" id="shoot-way-bt-left" class="shoot-way-bt">왼쪽</button>
+                    <button onclick="shoot(2)" id="shoot-way-bt-center" class="shoot-way-bt">중앙</button>
+                    <button onclick="shoot(3)" id="shoot-way-bt-right" class="shoot-way-bt">오른쪽</button>
+                </div>
+                <div id="gamezone-scorearea" class="gamezone-scorearea">골 : 0</div>
+            </div>
+
+            <div style="margin-top: 200px;" class="MvpBoard-Container">
+                <div class="MvpBoard-title">
+                    BOARD
+                </div>
+                <div class="MvpBoard-menu">
+                    <div style="width: 20%; text-align: center;">RANK</div>
+                    <div class="MvpBoard-bar"></div>
+                    <div style="width: 60%; text-align: center;">NAME</div>
+                    <div class="MvpBoard-bar"></div>
+                    <div style="width: 20%; text-align: center;">SCORE</div>
+                </div>
+                <%
+                const shootingScoreArray = Object.entries(ShootingScore);
+                shootingScoreArray.sort((a, b) => b[1].top_score - a[1].top_score);
+                for (let i = 0; i < shootingScoreArray.length; i++) {
+                %>
+                  <div class="MvpBoard-area">
+                    <div class="MvpBoard-area-rank">
+                      <%= i + 1 %>
+                    </div>
+                    <div class="MvpBoard-area-name">
+                      <%= shootingScoreArray[i][1].name %>
+                    </div>
+                    <div class="MvpBoard-area-rank">
+                      <%= shootingScoreArray[i][1].top_score %>
+                    </div>
+                  </div>
+                <% } %>
+
+
+            </div>
+        </div>
+</body>
+
+</html>

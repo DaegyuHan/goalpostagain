@@ -451,21 +451,48 @@ app.get('/match-result', async (req, res) => {
   res.render('match-result.ejs', {result : result});
 });
 
-app.get('/gamezone', async (req, res) => {
+app.get('/gamezone-shooting',  this.isLoggedIn, async (req, res, next) => {
+  let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
+  let mvpboard = mvpboardDic[0].member_score;
+  let ShootingScore = await db.collection('gamezone_shooting').find().toArray();
+console.log(ShootingScore)
 
-  res.render('gamezone.ejs');
+  res.render('gamezone-shooting.ejs', {mvpboard : mvpboard, ShootingScore : ShootingScore });
+});
+
+app.get('/gamezone-shooting-scoreboard', async (req, res) => {
+  let score = req.query.score;
+  let username = req.user.username;
+
+  // Find the user in the collection
+  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
+
+  if (existingUser) {
+    // If the user exists in the collection, check if the new score is higher
+    if (score > existingUser.top_score) {
+      // Update the top_score if the new score is higher
+      await db.collection('gamezone_shooting').updateOne(
+        { name: username },
+        { $set: { top_score: score } }
+      );
+      console.log(`${username}'s top_score updated to ${score}`);
+    } else {
+      console.log(`${username}'s score is not higher than the existing top_score`);
+    }
+  } else {
+    // If the user does not exist in the collection, insert a new record
+    await db.collection('gamezone_shooting').insertOne({
+      name: username,
+      top_score: score
+    });
+    console.log(`${username}'s record inserted with top_score ${score}`);
+  }
+
+  res.redirect('back');
 });
 
 
-// app.get('/photo', this.isLoggedIn, async (req, res, next) => {
-//   let photo = await db.collection('photo').find().sort({ _id: -1 }).toArray()
-//   let comment = await db.collection('photo-comment').find().sort({ _id: -1 }).toArray()
 
-//   console.log(photo)
-//   console.log(comment)
-//   res.render('photo.ejs', { 포토: photo, 댓글: comment})
-
-// })
 
 app.get('/photo', this.isLoggedIn, async (req, res, next) => {
   try {
