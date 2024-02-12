@@ -455,16 +455,15 @@ app.get('/gamezone-shooting',  this.isLoggedIn, async (req, res, next) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
   let ShootingScore = await db.collection('gamezone_shooting').find().toArray();
-console.log(ShootingScore)
 
   res.render('gamezone-shooting.ejs', {mvpboard : mvpboard, ShootingScore : ShootingScore });
 });
 
 app.get('/gamezone-shooting-scoreboard', async (req, res) => {
-  let score = req.query.score;
+  let score = parseInt(req.query.score);
   let username = req.user.username;
 
-  // Find the user in the collection
+  // Check if the user exists in the collection
   let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
 
   if (existingUser) {
@@ -490,6 +489,19 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
 
   res.redirect('back');
 });
+
+app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
+  let username = req.user.username;
+  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
+
+  if (existingUser) {
+    res.json({ top_score: existingUser.top_score });
+  } else {
+    res.json({ top_score: 0 }); // or any default value if the user doesn't exist
+  }
+});
+
+
 
 
 

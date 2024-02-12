@@ -147,6 +147,7 @@ a:hover {
   justify-content: center;
   align-items: center;
   position: sticky;
+  cursor: pointer;
 }
 
 .nav-login-img-area {
@@ -154,11 +155,13 @@ a:hover {
   text-align: center;
   justify-content: center;
   padding-top: 5%;
+  cursor: pointer;
 }
 
 .nav-login-img {
   width: 5%;
   height: auto;
+  cursor: pointer;
 }
 
 .home-main {

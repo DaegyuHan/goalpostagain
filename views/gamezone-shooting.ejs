@@ -31,56 +31,64 @@
             gamezoneArea.style.display = 'block';
             var gamezoneStartButton = document.getElementById('gamezone-start-button');
             gamezoneStartButton.style.display = 'none';
+            var gamezoneExplanation = document.getElementById('gamezone-explanation');
+            gamezoneExplanation.style.display = 'none';
         }
 
         function shoot(choice) {
-            var start_ball = document.getElementById('gamezone-ball')
-            start_ball.style.display = 'none';
+    var start_ball = document.getElementById('gamezone-ball')
+    start_ball.style.display = 'none';
 
-            var areas = document.querySelectorAll('.goalpost-area');
-            areas.forEach(function (area) {
-                area.classList.remove('selected', 'red');
-            });
+    var areas = document.querySelectorAll('.goalpost-area');
+    areas.forEach(function (area) {
+        area.classList.remove('selected', 'red');
+    });
 
-            var selectedArea = document.getElementById('goalpost-1');
-            if (choice === 2) {
-                selectedArea = document.getElementById('goalpost-2');
-            } else if (choice === 3) {
-                selectedArea = document.getElementById('goalpost-3');
-            }
+    var selectedArea = document.getElementById('goalpost-1');
+    if (choice === 2) {
+        selectedArea = document.getElementById('goalpost-2');
+    } else if (choice === 3) {
+        selectedArea = document.getElementById('goalpost-3');
+    }
 
+    selectedArea.classList.add('selected');
 
-            selectedArea.classList.add('selected');
+    var randomIndex = Math.floor(Math.random() * 3) + 1;
+    var randomArea = document.getElementById('goalpost-' + randomIndex);
+    var scoreArea = document.getElementById('gamezone-scorearea');
+    var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
 
-            var randomIndex = Math.floor(Math.random() * 3) + 1; // 1부터 3까지의 랜덤한 숫자
-            var randomArea = document.getElementById('goalpost-' + randomIndex);
-            var scoreArea = document.getElementById('gamezone-scorearea');
-            var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+    if (randomArea.classList.contains('selected')) {
+        randomArea.classList.add('red');
+        setTimeout(function () {
+            alert('막힘');
 
-            if (randomArea.classList.contains('selected')) {
-                randomArea.classList.add('red');
-                setTimeout(function () {
-                    alert('막힘.');
+            // Compare currentScore with top_score on the server before sending data
+            fetch('/gamezone-shooting-scoreboard-check')
+                .then(response => response.json())
+                .then(data => {
+                    if (currentScore > data.top_score) {
+                        // If currentScore is greater than top_score, send data to the server
+                        location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
+                    }
+                })
+                .catch(error => console.error('Error checking top_score:', error));
 
-                    location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
-                    setTimeout(function () {
-                        var scoreArea = document.getElementById('gamezone-scorearea');
-                        scoreArea.textContent = '골 : 0';
-                    }, 100);
-                }, 100);
-
-
-            } else {
-                randomArea.classList.add('red');
-
+            setTimeout(function () {
                 var scoreArea = document.getElementById('gamezone-scorearea');
-                var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
-                var newScore = currentScore + 1;
-                scoreArea.textContent = '골 : ' + newScore;
-            }
+                scoreArea.textContent = '골 : 0';
+            }, 100);
+        }, 100);
+    } else {
+        randomArea.classList.add('red');
 
+        var scoreArea = document.getElementById('gamezone-scorearea');
+        var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+        var newScore = currentScore + 1;
+        scoreArea.textContent = '골 : ' + newScore;
+    }
+}
 
-        }
     </script>
 
 </head>
@@ -89,7 +97,21 @@
     <%- include('nav.ejs') %>
 
         <div class="gamezone-main">
-            <!-- <button id="gamezone-start-button" class="gamezone-start-button" onclick="GameStart()">시작하기</button> -->
+            <button id="gamezone-start-button" class="gamezone-start-button" onclick="GameStart()">시작하기</button>
+            <div id="gamezone-explanation">
+                <h3>게임 설명</h3>
+                <div>
+                    ＊ 도전 가능 횟수 무제한 (추후 변경 가능)
+                    <br>
+                    ＊ 매 달 1일 초기화
+                    <br>
+                    ＊ 마지막 날 23:00 ~ 00:00 기준 (랜덤)  
+                    <br>
+                    1,2위 다음 달 ★회비 5,000원★ 할인
+                    <br>
+                    ＊ 순위표 캡처 후 할인자 공지 예정
+                </div>
+            </div>
             <div id="gamezone-area" class="gamezone-area">
                 <div class="gaolpost-area">
                     <div class="goalpost">
@@ -112,7 +134,7 @@
             </div>
 
             <div style="margin-top: 200px;" class="MvpBoard-Container">
-                <div class="MvpBoard-title">
+                <div class="MvpBoard-ti tle">
                     BOARD
                 </div>
                 <div class="MvpBoard-menu">
