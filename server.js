@@ -28,7 +28,7 @@ app.use(session({
   secret: '암호화에 쓸 비번',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 60 * 60 * 1000 },
+  cookie: { maxAge: 240 * 60 * 1000 },
   store: MongoStore.create({
     mongoUrl: 'mongodb+srv://sparta:test@cluster0.edvfknb.mongodb.net/?retryWrites=true&w=majority',
     dbName: 'goalpostagain'
@@ -467,17 +467,12 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
 
   if (existingUser) {
-    // If the user exists in the collection, check if the new score is higher
-    if (score > existingUser.top_score) {
-      // Update the top_score if the new score is higher
-      await db.collection('gamezone_shooting').updateOne(
-        { name: username },
-        { $set: { top_score: score } }
-      );
-      console.log(`${username}'s top_score updated to ${score}`);
-    } else {
-      console.log(`${username}'s score is not higher than the existing top_score`);
-    }
+    // Update the top_score with the provided score
+    await db.collection('gamezone_shooting').updateOne(
+      { name: username },
+      { $set: { top_score: score } }
+    );
+    console.log(`${username}'s top_score updated to ${score}`);
   } else {
     // If the user does not exist in the collection, insert a new record
     await db.collection('gamezone_shooting').insertOne({
@@ -488,17 +483,6 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   }
 
   res.redirect('back');
-});
-
-app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
-  let username = req.user.username;
-  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
-
-  if (existingUser) {
-    res.json({ top_score: existingUser.top_score });
-  } else {
-    res.json({ top_score: 0 }); // or any default value if the user doesn't exist
-  }
 });
 
 

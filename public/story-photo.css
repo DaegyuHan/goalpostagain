@@ -12,9 +12,9 @@ p {
 }
 
 .carousel-item img {
-    max-width: 100%;
-    max-height: 450px;
-    width: auto;
+    max-width: 360px;
+    max-height: 100%;
+    width: 360px;
     height: auto;
     margin: auto; 
 }
@@ -22,7 +22,10 @@ p {
 .carousel-inner {
     display: flex;
     align-items: center;
-    height: 100%; /* 부모 요소인 .carousel의 높이에 맞춤 */
+    height: 100%;
+    background-color: black;
+    margin-top: 12px;
+
 }
 
 
@@ -58,15 +61,15 @@ p {
 
 .story-photo-post {
     justify-content: right;
-    font-size: 90%;
+    font-size: 75%;
     width: 25%;
     margin-top: 10px;
-    margin-left: 75%;
+    margin-left: 80%;
     padding-top: 3px;
 }
 
 .story-photo-post a {
-    color: white;
+    color: #e6e6e6ce;
 }
 
 .story-photo-info-area {
@@ -76,12 +79,17 @@ p {
 
 .story-photo-info {
     display: flex;
-    padding-bottom: 5px;
+    padding-bottom: 6px;
     width: 65%;
-    font-size: 70%;
-    margin-top: 2px;
+    font-size: 85%;
     margin-left: 3%;
-    color: #e6e6e6ce;
+    color: white
+}
+
+.story-photo-info img {
+    width: 27px;
+    height: auto;
+    margin-right: 9px;
 }
 
 .story-photo-edit {
@@ -91,11 +99,15 @@ p {
     width: 35%;
     font-size: 70%;
     margin-right: 3%;
-    color: white;
+    color: #e6e6e6ce;
 }
 
 .story-photo-edit a {
-    color: white;
+    color: #e6e6e6ce;
+    margin-right: 1px; 
+    cursor: pointer;
+    position: relative;
+    top: 4px;
 }
 
 
@@ -107,6 +119,7 @@ p {
 .story-photo-content {
     display: flex;
     align-items: baseline;
+    margin-top: 15px;
 }
 
 .story-photo-content-writer {
@@ -191,6 +204,18 @@ p {
 }
 
 
+@media only screen and (max-width: 360px) {
+    .story-main {
+        width: 100%;
+    }
 
+    .carousel-item img {
+        max-width: 360px;
+        max-height: 100%;
+        width: 100%;
+        height: auto;
+        margin: auto; 
+    }
+}
 
 

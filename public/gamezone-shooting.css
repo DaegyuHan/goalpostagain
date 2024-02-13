@@ -105,6 +105,7 @@
     background-repeat: no-repeat;
     background-size: 100%;
     z-index: 1;  
+    
 }
 
 .keeper {
@@ -115,8 +116,22 @@
     z-index: 0;  /* 다른 요소 뒤에 나오도록 낮은 z-index 설정 */
 }
 
-.red {
-    background-color: red;
+.keeper-left {
+    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%98%A4%EB%A5%B8%EC%AA%BD.png?updatedAt=1707713731567');
+    background-repeat: no-repeat;
+    background-size: 170%;
+    background-position: 62% -22px;
+    z-index: 2; 
+ 
+}
+
+.keeper-right {
+    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%99%BC%EC%AA%BD.png?updatedAt=1707713732190');
+    background-repeat: no-repeat;
+    background-size: 170%;
+    background-position: 60% -17px;
+    z-index: 2; 
+ 
 }
 
 @media only screen and (max-width: 1000px) {
