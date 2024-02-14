@@ -117,6 +117,7 @@
     function upload_match() {
       var month = document.getElementById("match-result-month").value;
       var day = document.getElementById("match-result-day").value;
+      var day2 = document.getElementById("match-result-day2").value;
       var time = document.getElementById("match-result-time").value;
       var place = document.getElementById("match-result-place").value;
       var homescore = parseInt(document.getElementById("match-result-homescore").value, 10);
@@ -148,7 +149,7 @@
             alt="win">`
       }
 
-      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}&resultlogo=${encodeURIComponent(resultlogo)}&home_resultlogo=${encodeURIComponent(home_resultlogo)}`;
+      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&day2=${encodeURIComponent(day2)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}&resultlogo=${encodeURIComponent(resultlogo)}&home_resultlogo=${encodeURIComponent(home_resultlogo)}`;
 
       alert("등록되었습니다.")
     }
@@ -214,6 +215,7 @@
             24년
             <input class="management-input" type="text" name="planmonth" placeholder="00">월
             <input class="management-input" type="text" name="plandate" placeholder="00">일
+            <input class="management-input" type="text" name="planday" value="금">요일
             <br>
             시간 : <input class="management-input2" name="plantime" type="text" placeholder="00:00"> - <input
               class="management-input2" name="plantimeto" type="text" placeholder="00:00">
@@ -267,6 +269,7 @@
             24년
             <input class="management-input" type="text" id="match-result-month" value="<%=매치일정[0].month %>">월
             <input class="management-input" type="text" id="match-result-day" value="<%=매치일정[0].date %>">일
+            <input class="management-input" type="text" id="match-result-day2" value="<%=매치일정[0].day %>">요일
             <br>
             시작시간 : <input class="management-input2" type="text" id="match-result-time" value="<%=매치일정[0].time %>">
             <br>

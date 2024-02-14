@@ -5,7 +5,7 @@
     color: white;
     font-size: 25px;
     margin: 100px auto 0px auto;
-    padding-top: 1%;
+    padding-top: 0%;
 }
 
 .home-lastmatch-area-font {
@@ -78,7 +78,7 @@
         width: 95%;
         height: 30px;
         font-size: 90%;
-
+        padding-top: 1%;
     }
 
     .home-lastmatch-matcharea {
@@ -115,6 +115,8 @@
         font-size: 180%;
     }
 
+
+    
 
 
 

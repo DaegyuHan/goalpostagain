@@ -157,6 +157,7 @@ app.post('/match-plan', async (req, res) => {
   let result = db.collection('matchplan').insertOne({
     month: req.body.planmonth,
     date : req.body.plandate,
+    day : req.body.planday,
     time : req.body.plantime,
     timeto : req.body.plantimeto,
     awayteam : req.body.planawayteam,
@@ -170,6 +171,7 @@ app.get('/result', async (req, res) => {
   let result = db.collection('result').insertOne({
     month: req.query.month,
     day : req.query.day,
+    day2 : req.query.day2,
     time : req.query.time,
     place : req.query.place,
     homescore : req.query.homescore,
@@ -455,6 +457,7 @@ app.get('/gamezone-shooting',  this.isLoggedIn, async (req, res, next) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
   let ShootingScore = await db.collection('gamezone_shooting').find().toArray();
+
 
   res.render('gamezone-shooting.ejs', {mvpboard : mvpboard, ShootingScore : ShootingScore });
 });

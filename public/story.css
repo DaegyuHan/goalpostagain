@@ -14,14 +14,14 @@
     align-items: center;
 }
 
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: 460px) {
     .story-main {
         width: 100%;
     }
 }
 
-@media only screen and (min-width: 361px) {
+@media only screen and (min-width: 461px) {
     .story-main {
-        width: 360px;        
+        width: 460px;        
     }
 }
