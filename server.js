@@ -462,6 +462,18 @@ app.get('/gamezone-shooting',  this.isLoggedIn, async (req, res, next) => {
   res.render('gamezone-shooting.ejs', {mvpboard : mvpboard, ShootingScore : ShootingScore });
 });
 
+app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
+  let username = req.user.username;
+  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
+
+  if (existingUser) {
+    res.json({ top_score: existingUser.top_score });
+  } else {
+    res.json({ top_score: 0 }); // or any default value if the user doesn't exist
+  }
+});
+
+
 app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   let score = parseInt(req.query.score);
   let username = req.user.username;
