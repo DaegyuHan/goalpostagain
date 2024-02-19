@@ -198,14 +198,14 @@ app.get('/management/notice-post', async (req, res) => {
 passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
   let result = await db.collection('user').findOne({ userID: 입력한아이디 })
   if (!result) {
-    return cb(null, false, { message: '아이디 DB에 없음' })
+    return cb(null, false, { message: '아이디잘못침' })
   }
 
 
   if (await bcrypt.compare(입력한비번, result.password)) {
     return cb(null, result)
   } else {
-    return cb(null, false, { message: '비번불일치' });
+    return cb(null, false, { message: '비번잘못침' });
   }
 }))
 

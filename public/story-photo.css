@@ -62,7 +62,7 @@ p {
 .story-photo-post {
     justify-content: right;
     font-size: 75%;
-    width: 25%;
+    /* width: 25%; */
     margin-top: 10px;
     margin-left: 80%;
     padding-top: 3px;
