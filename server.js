@@ -261,19 +261,31 @@ app.get('/login', this.isNotLoggedIn, async (req, res, next) => {
   res.render('login.ejs')
 })
 
+// app.post('/login', async (req, res, next) => {
+//   passport.authenticate('local', (error, user, info) => {
+//     if (error) return res.status(500).json(error)
+//     if (!user) return res.status(401).json(info.message)
+//     req.logIn(user, (err) => {
+//       if (err) return next(err)
+//       res.redirect('back')
+//     })
+
+//   })(req, res, next)
+
+// })
+
 app.post('/login', async (req, res, next) => {
   passport.authenticate('local', (error, user, info) => {
-    if (error) return res.status(500).json(error)
-    if (!user) return res.status(401).json(info.message)
+    if (error) return res.status(500).json({ success: false, message: '서버 에러' });
+    if (!user) return res.status(401).json({ success: false, message: info.message });
+    
     req.logIn(user, (err) => {
-      if (err) return next(err)
-      res.redirect('back')
-    })
+      if (err) return next(err);
+      return res.json({ success: true, redirectURL: '/' });
+    });
 
-  })(req, res, next)
-
-})
-
+  })(req, res, next);
+});
 
 
 app.get('/logout', (req, res, next) => {
