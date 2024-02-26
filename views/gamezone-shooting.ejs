@@ -210,6 +210,7 @@
                     <div style="width: 20%; text-align: center;">SCORE</div>
                 </div>
                 <%
+                if (typeof ShootingScore !=='undefined' ) {
                 const shootingScoreArray = Object.entries(ShootingScore);
                 shootingScoreArray.sort((a, b) => b[1].top_score - a[1].top_score);
                 for (let i = 0; i < shootingScoreArray.length; i++) {
@@ -225,6 +226,7 @@
                       <%= shootingScoreArray[i][1].top_score %>
                     </div>
                   </div>
+                <% } %>
                 <% } %>
 
 

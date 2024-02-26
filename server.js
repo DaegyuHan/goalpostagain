@@ -80,7 +80,7 @@ connectDB.then((client) => {
 
 app.use((req, res, next) => {
   if (req.user) {
-    res.locals.유저 = req.user.username; 
+    res.locals.유저 = req.user.username;
   }
   next();
 })
@@ -96,7 +96,7 @@ app.get('/', async (req, res) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
 
-  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result : match_result, mvpboard : mvpboard });
+  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result: match_result, mvpboard: mvpboard });
 })
 
 
@@ -107,14 +107,14 @@ app.get('/management', async (req, res) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard : mvpboard });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard });
 });
 
 app.get('/mvp', async (req, res) => {
   let result = await db.collection('mvp').insertOne({
     mvp: req.query.val,
-    month : req.query.month,
-    day : req.query.day
+    month: req.query.month,
+    day: req.query.day
   })
   res.redirect('/')
 })
@@ -156,13 +156,13 @@ app.post('/match-plan', async (req, res) => {
 
   let result = db.collection('matchplan').insertOne({
     month: req.body.planmonth,
-    date : req.body.plandate,
-    day : req.body.planday,
-    time : req.body.plantime,
-    timeto : req.body.plantimeto,
-    awayteam : req.body.planawayteam,
-    place : req.body.planplace,
-    address : previousAddress
+    date: req.body.plandate,
+    day: req.body.planday,
+    time: req.body.plantime,
+    timeto: req.body.plantimeto,
+    awayteam: req.body.planawayteam,
+    place: req.body.planplace,
+    address: previousAddress
   })
   res.redirect('/')
 })
@@ -170,15 +170,15 @@ app.post('/match-plan', async (req, res) => {
 app.get('/result', async (req, res) => {
   let result = db.collection('result').insertOne({
     month: req.query.month,
-    day : req.query.day,
-    day2 : req.query.day2,
-    time : req.query.time,
-    place : req.query.place,
-    homescore : req.query.homescore,
-    awayscore : req.query.awayscore,
-    awayname : req.query.awayname,
-    resultlogo : req.query.resultlogo,
-    home_resultlogo : req.query.home_resultlogo
+    day: req.query.day,
+    day2: req.query.day2,
+    time: req.query.time,
+    place: req.query.place,
+    homescore: req.query.homescore,
+    awayscore: req.query.awayscore,
+    awayname: req.query.awayname,
+    resultlogo: req.query.resultlogo,
+    home_resultlogo: req.query.home_resultlogo
   })
   res.redirect('/match-result')
 })
@@ -278,7 +278,7 @@ app.post('/login', async (req, res, next) => {
   passport.authenticate('local', (error, user, info) => {
     if (error) return res.status(500).json({ success: false, message: '서버 에러' });
     if (!user) return res.status(401).json({ success: false, message: info.message });
-    
+
     req.logIn(user, (err) => {
       if (err) return next(err);
       return res.json({ success: true, redirectURL: '/' });
@@ -307,7 +307,7 @@ app.get('/register', async (req, res) => {
 
 app.post('/register', async (req, res) => {
   const timeZone = 'Asia/Seoul';
-  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
+  let Time = new Date().toLocaleString('ko-KR', { timeZone });
   let 해시 = await bcrypt.hash(req.body.password, 10)
 
   if (req.body.memberCode == 'hdg0822') {
@@ -315,7 +315,7 @@ app.post('/register', async (req, res) => {
       userID: req.body.userID,
       username: req.body.username,
       password: 해시,
-      time : Time
+      time: Time
     })
     res.render('login', { Register_Message: '회원가입이 완료되었습니다.' });
   }
@@ -329,15 +329,15 @@ app.post('/register', async (req, res) => {
 app.get('/notice', async (req, res) => {
   let result = await db.collection('notice').find().sort({ _id: -1 }).toArray();
 
-  res.render('notice.ejs', { 글목록: result});
+  res.render('notice.ejs', { 글목록: result });
 });
 
 
 app.get('/notice/:number', async (req, res) => {
   // let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray()
-  let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number -1 ) * 10).limit(10).toArray();
+  let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray();
   let result2 = await db.collection('notice').find().sort({ _id: -1 }).toArray();
-  res.render('notice.ejs', { 글목록: result, 글전체: result2})
+  res.render('notice.ejs', { 글목록: result, 글전체: result2 })
 })
 
 
@@ -350,7 +350,7 @@ app.get('/notice-search', async (req, res) => {
       ]
     }).toArray()
 
-  res.render('notice-search.ejs', { 글목록: result})
+  res.render('notice-search.ejs', { 글목록: result })
 })
 
 
@@ -359,22 +359,22 @@ app.post('/notice-post', async (req, res) => {
   const timeZone = 'Asia/Seoul';
 
   let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
-  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
-  upload.array('img1',5)(req, res, async (err) => {
+  let Time = new Date().toLocaleString('ko-KR', { timeZone });
+  upload.array('img1', 5)(req, res, async (err) => {
     if (err) return res.send('업로드에러')
     try {
       if (req.body.title == '') {
         res.send('제목입력안했음')
       } else {
         const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
-        
+
         await db.collection('notice').insertOne(
           {
             today: Today,
-            time : Time,
+            time: Time,
             title: req.body.title,
             content: req.body.content,
-            img : imageArray,
+            img: imageArray,
             user: req.user._id,
             username: req.user.username
           }
@@ -393,7 +393,7 @@ app.get('/notice/notice-detail/:id', this.isLoggedIn, async (req, res, next) => 
   let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
   let comment = await db.collection('comment').find({ parentId: new ObjectId(req.params.id) }).toArray()
 
-  res.render('notice-detail.ejs', { 글: postID, 댓글: comment})
+  res.render('notice-detail.ejs', { 글: postID, 댓글: comment })
 
 })
 
@@ -429,18 +429,18 @@ app.post('/comment', async (req, res) => {
   // if (!req.body.content) {
   //   return res.status(400).json({ error: '댓글을 입력하세요.' });
   // } else if (req.body.content) {
-    await db.collection('comment').insertOne({
-      content: req.body.content,
-      writerId: new ObjectId(req.user._id),
-      writer: req.user.username,
-      parentId: new ObjectId(req.body.parentId)
-    })
-    res.redirect('back')
-  }
+  await db.collection('comment').insertOne({
+    content: req.body.content,
+    writerId: new ObjectId(req.user._id),
+    writer: req.user.username,
+    parentId: new ObjectId(req.body.parentId)
+  })
+  res.redirect('back')
+}
 
 
 
-// }
+  // }
 )
 
 
@@ -462,16 +462,16 @@ app.get('/introduce', async (req, res) => {
 
 app.get('/match-result', async (req, res) => {
   let result = await db.collection('result').find().sort({ _id: -1 }).toArray();
-  res.render('match-result.ejs', {result : result});
+  res.render('match-result.ejs', { result: result });
 });
 
-app.get('/gamezone-shooting',  this.isLoggedIn, async (req, res, next) => {
+app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
   let ShootingScore = await db.collection('gamezone_shooting').find().toArray();
 
 
-  res.render('gamezone-shooting.ejs', {mvpboard : mvpboard, ShootingScore : ShootingScore });
+  res.render('gamezone-shooting.ejs', { mvpboard: mvpboard, ShootingScore: ShootingScore });
 });
 
 app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
@@ -512,6 +512,14 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   res.redirect('back');
 });
 
+
+app.get('/reset-shootinggame', async (req, res) => {
+  const collectionName = 'gamezone_shooting';
+
+  const collection =  db.collection(collectionName);
+  await collection.deleteMany({});
+  res.redirect('/')
+})
 
 
 
@@ -555,21 +563,21 @@ app.post('/photo-post', async (req, res) => {
   const timeZone = 'Asia/Seoul';
 
   let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
-  let Time =  new Date().toLocaleString('ko-KR', { timeZone });
-  upload.array('img1',10)(req, res, async (err) => {
+  let Time = new Date().toLocaleString('ko-KR', { timeZone });
+  upload.array('img1', 10)(req, res, async (err) => {
     if (err) return res.send('업로드에러')
     try {
       if (req.body.title == '') {
         res.send('제목입력안했음')
       } else {
         const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
-        
+
         await db.collection('photo').insertOne(
           {
             today: Today,
-            time : Time,
+            time: Time,
             content: req.body.content,
-            img : imageArray,
+            img: imageArray,
             user: req.user._id,
             username: req.user.username
           }
@@ -613,14 +621,14 @@ app.get('/photo-delete/:id', async (req, res) => {
 app.post('/photo-comment', async (req, res) => {
 
 
-    await db.collection('photo-comment').insertOne({
-      content: req.body.content,
-      writerId: new ObjectId(req.user._id),
-      writer: req.user.username,
-      parentId: new ObjectId(req.body.parentId)
-    })
-    res.redirect('back')
-  }
+  await db.collection('photo-comment').insertOne({
+    content: req.body.content,
+    writerId: new ObjectId(req.user._id),
+    writer: req.user.username,
+    parentId: new ObjectId(req.body.parentId)
+  })
+  res.redirect('back')
+}
 
 )
 
@@ -633,7 +641,7 @@ app.get('/photo-comment-delete/:id', async (req, res) => {
 
 app.get('/video', async (req, res) => {
   let URL = await db.collection('youtubeURL').find().sort({ _id: -1 }).toArray();
-  res.render('video.ejs', {URL : URL});
+  res.render('video.ejs', { URL: URL });
 });
 
 

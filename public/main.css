@@ -303,4 +303,10 @@ img {
     width: 480px;
     border-radius: 0px;
   }
+  .top-area-logo {
+    width: 90px;
+    height: auto;
+    align-items: center;
+    cursor: pointer;
+  }
 }

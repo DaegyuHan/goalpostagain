@@ -264,9 +264,7 @@
                                 </strong>
                             </p>
                             <span class="story-photo-content-text">
-                                <%=포토[i].content.replace(/\d/g, function(match) {
-                                    return '&#' + match.charCodeAt(0) + ';';
-                                })%>
+                                <%=포토[i].content%>
                             </span>
 
                         </div>
@@ -316,9 +314,9 @@
                                             <%=comment.writer%>
                                         </strong>
                                     </div>
-                                    <span class="story-photo-comment-text">
+                                    <p class="story-photo-comment-text">
                                         <%=comment.content%>
-                                    </span>
+                                    </p>
                                     <% if (유저==comment.writer || 유저=='관리자' ) {%>
                                         <a href="#" class="story-photo-comment-deleteBt"
                                             data-comment-id="<%= comment._id%>"

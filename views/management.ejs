@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light only"/>
-	<meta name="supported-color-schemes" content="light"/>
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
   <title>오늘도골대FC</title>
   <link rel="apple-touch-icon" sizes="180x180"
     href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
@@ -55,47 +55,47 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%84%9D%EB%B2%94%EC%88%98MVP.png?updatedAt=1705229367311">
           </div>`
           break
-          case '장희승':
+        case '장희승':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9E%A5%ED%9D%AC%EC%8A%B9MVP.png?updatedAt=1705229367278">
           </div>`
           break
-          case '노용준':
+        case '노용준':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%85%B8%EC%9A%A9%EC%A4%80MVP.png?updatedAt=1705229241093">
           </div>`
           break
-          case '안태훈':
+        case '안태훈':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%95%88%ED%83%9C%ED%9B%88MVP.png?updatedAt=1705229241071">
           </div>`
           break
-          case '김정훈':
+        case '김정훈':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EA%B9%80%EC%A0%95%ED%9B%88MVP.png?updatedAt=1705229241209">
           </div>`
           break
-          case '민대식':
+        case '민대식':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%AF%BC%EB%8C%80%EC%8B%9DMVP.png?updatedAt=1707658379920">
           </div>`
           break
-          case '이찬웅':
+        case '이찬웅':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276">
           </div>`
           break
-          case '나현수':
+        case '나현수':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%82%98%ED%98%84%EC%88%98MVP.png?updatedAt=1705229241083">
           </div>`
           break
-          case '한대규':
+        case '한대규':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%ED%95%9C%EB%8C%80%EA%B7%9CMVP.png?updatedAt=1705229240781">
           </div>`
           break
-          case '유성진':
+        case '유성진':
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1707658378921">
           </div>`
@@ -176,21 +176,28 @@
     }
 
     function UploadYoutube() {
-    // 입력된 YouTube URL 가져오기
-    var fullURL = document.getElementById('inputYoutubeURL').value;
+      // 입력된 YouTube URL 가져오기
+      var fullURL = document.getElementById('inputYoutubeURL').value;
 
-    // "v=" 이후의 부분 추출
-    var videoIdStartIndex = fullURL.indexOf('v=') + 2; // 'v=' 다음부터 시작
+      // "v=" 이후의 부분 추출
+      var videoIdStartIndex = fullURL.indexOf('v=') + 2; // 'v=' 다음부터 시작
 
 
-    var videoId = fullURL.substring(videoIdStartIndex);
+      var videoId = fullURL.substring(videoIdStartIndex);
 
-    // 중간에 나오는 &를 ?로 바꿔서 출력
-    var modifiedVideoId = videoId.replace(/&/g, '?');
+      // 중간에 나오는 &를 ?로 바꿔서 출력
+      var modifiedVideoId = videoId.replace(/&/g, '?');
 
-    location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
-}
+      location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
+    }
 
+    function reset_ShootingGame() {
+      var confirmDelete = confirm('정말 초기화하시겠습니까?');
+
+      if (confirmDelete) {
+        window.location.href = '/reset-shootinggame'
+      }
+    }
 
 
 
@@ -301,7 +308,7 @@
           <div id="management-mvpboard-name2" style="margin-left: 10px;">오연택</div>
           <div>
             <input id="management-mvpboard-score2" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[1]%>">
+              value="<%=Object.values(mvpboard)[1]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -309,7 +316,7 @@
           <div id="management-mvpboard-name4" style="margin-left: 10px;">양철진</div>
           <div>
             <input id="management-mvpboard-score4" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[2]%>">
+              value="<%=Object.values(mvpboard)[2]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -317,7 +324,7 @@
           <div id="management-mvpboard-name5" style="margin-left: 10px;">석범수</div>
           <div>
             <input id="management-mvpboard-score5" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[3]%>">
+              value="<%=Object.values(mvpboard)[3]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -325,7 +332,7 @@
           <div id="management-mvpboard-name6" style="margin-left: 10px;">장희승</div>
           <div>
             <input id="management-mvpboard-score6" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[4]%>">
+              value="<%=Object.values(mvpboard)[4]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -333,7 +340,7 @@
           <div id="management-mvpboard-name7" style="margin-left: 10px;">노용준</div>
           <div>
             <input id="management-mvpboard-score7" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[5]%>">
+              value="<%=Object.values(mvpboard)[5]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -341,7 +348,7 @@
           <div id="management-mvpboard-name9" style="margin-left: 10px;">안태훈</div>
           <div>
             <input id="management-mvpboard-score9" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[6]%>">
+              value="<%=Object.values(mvpboard)[6]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -349,7 +356,7 @@
           <div id="management-mvpboard-name10" style="margin-left: 10px;">김정훈</div>
           <div>
             <input id="management-mvpboard-score10" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[7]%>">
+              value="<%=Object.values(mvpboard)[7]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -357,7 +364,7 @@
           <div id="management-mvpboard-name11" style="margin-left: 10px;">민대식</div>
           <div>
             <input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[8]%>">
+              value="<%=Object.values(mvpboard)[8]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -365,7 +372,7 @@
           <div id="management-mvpboard-name14" style="margin-left: 10px;">이찬웅</div>
           <div>
             <input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[9]%>">
+              value="<%=Object.values(mvpboard)[9]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -373,7 +380,7 @@
           <div id="management-mvpboard-name23" style="margin-left: 10px;">나현수</div>
           <div>
             <input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[10]%>">
+              value="<%=Object.values(mvpboard)[10]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -381,7 +388,7 @@
           <div id="management-mvpboard-name33" style="margin-left: 10px;">한대규</div>
           <div>
             <input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[11]%>">
+              value="<%=Object.values(mvpboard)[11]%>">
           </div>
         </div>
         <div style="display: flex;">
@@ -389,7 +396,7 @@
           <div id="management-mvpboard-name96" style="margin-left: 10px;">유성진</div>
           <div>
             <input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
-            value="<%=Object.values(mvpboard)[12]%>">
+              value="<%=Object.values(mvpboard)[12]%>">
           </div>
         </div>
 
@@ -405,6 +412,16 @@
         <input id="inputYoutubeURL" type="text">
         <button onclick="UploadYoutube()">등록</button>
       </div>
+
+      <% if (typeof 유저 !=='undefined' ) { %>
+        <% if (유저=='한대규' ) { %>
+          <div style="padding-bottom: 50px;"></div>
+          <h4>승부차기 초기화</h4>
+          <button onclick="reset_ShootingGame()">초기화</button>
+
+          <%}%>
+            <%}%>
+
 
     </div>
 </body>
