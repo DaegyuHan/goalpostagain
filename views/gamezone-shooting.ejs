@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
+    <meta name="viewport" content=>
     <title>오늘도골대FC</title>
     <link rel="apple-touch-icon" sizes="180x180"
         href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
@@ -69,7 +70,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (currentScore > data.top_score) {
-                        // If currentScore is greater than top_score, send data to the server
+                        alert('신기록갱신!')
                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                     }
                 })
@@ -100,6 +101,7 @@
                 .then(data => {
                     if (currentScore > data.top_score) {
                         // If currentScore is greater than top_score, send data to the server
+                        alert('신기록갱신!')
                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                     }
                 })
@@ -133,6 +135,7 @@
                 .then(data => {
                     if (currentScore > data.top_score) {
                         // If currentScore is greater than top_score, send data to the server
+                        alert('신기록갱신!')
                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                     }
                 })
