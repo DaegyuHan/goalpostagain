@@ -71,10 +71,8 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // 로그인이 성공하면 성공 페이지로 리디렉션하거나 다른 작업을 수행합니다.
                 window.location.href = '/';
             } else {
-                // 로그인에 실패하면 알림을 표시합니다.
                 alert('아이디 또는 비밀번호를 확인해주세요.');
             }
         })

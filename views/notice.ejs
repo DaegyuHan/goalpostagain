@@ -50,6 +50,23 @@
     </form>
       <div class="notice-title-underline"></div>
 
+      <div class="list-box">
+        <div class="notice-userinfo">
+          <span>
+            2024. 3. 23.
+          </span>
+          <span>
+            한대규
+          </span>
+        </div>
+        <div class="notice-title-text">
+          <a href="">
+            개발자 공지노트
+          </a>
+        </div>
+
+      </div>
+
 
       <% for (let i=0; i<글목록.length; i++){ %>
         <div class="list-box">
@@ -63,7 +80,7 @@
           </div>
           <div class="notice-title-text">
             <a href="notice-detail/<%=글목록[i]._id%>">
-              <%=글목록[i].title%>
+              <%=글목록[i].title%> [<%= 댓글개수[i] %>]
             </a>
           </div>
 

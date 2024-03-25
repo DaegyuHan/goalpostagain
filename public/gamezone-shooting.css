@@ -25,7 +25,8 @@
 }
 
 .gaolpost-area {
-    position: relative;  /* 위치를 relative로 설정 */
+    position: relative;
+    /* 위치를 relative로 설정 */
     background-color: white;
     height: 60%;
     padding-top: 35px;
@@ -44,10 +45,12 @@
     background-color: #eaeff1;
     width: 33%;
 }
+
 .goalpost-center {
     background-color: #eaeff1;
     width: 34%;
 }
+
 .goalpost-right {
     background-color: #eaeff1;
     width: 33%;
@@ -58,8 +61,9 @@
     height: 100px;
     margin: 0px auto 10px auto;
     background-color: white;
-    
+
 }
+
 .gamezone-ball-area img {
     width: 100%;
     height: auto;
@@ -91,6 +95,12 @@
     background-color: #ff3ca0;
 }
 
+.gamezone-extrachance-area {
+    background-color: white;
+    color: black;
+    font-weight: 500;
+}
+
 .gamezone-scorearea {
     padding-top: 0px;
     background-color: white;
@@ -104,8 +114,8 @@
     background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EA%B3%B5.png?updatedAt=1707713736048');
     background-repeat: no-repeat;
     background-size: 100%;
-    z-index: 1;  
-    
+    z-index: 1;
+
 }
 
 .keeper {
@@ -113,7 +123,8 @@
     background-repeat: no-repeat;
     background-size: 170%;
     background-position: 50% 2px;
-    z-index: 0;  /* 다른 요소 뒤에 나오도록 낮은 z-index 설정 */
+    z-index: 0;
+    /* 다른 요소 뒤에 나오도록 낮은 z-index 설정 */
 }
 
 .keeper-left {
@@ -121,8 +132,8 @@
     background-repeat: no-repeat;
     background-size: 170%;
     background-position: 62% -22px;
-    z-index: 2; 
- 
+    z-index: 2;
+
 }
 
 .keeper-right {
@@ -130,8 +141,15 @@
     background-repeat: no-repeat;
     background-size: 170%;
     background-position: 60% -17px;
-    z-index: 2; 
- 
+    z-index: 2;
+
+}
+
+button[disabled] {
+    opacity: 0.5;
+    /* 비활성화된 상태의 투명도를 조절할 수 있습니다. */
+    cursor: not-allowed;
+    /* 비활성화된 상태에서 마우스 커서를 변경할 수 있습니다. */
 }
 
 @media only screen and (max-width: 1000px) {
@@ -140,10 +158,10 @@
     }
 }
 
-    @media only screen and (max-width: 354px) {
-        .shoot-way-bt {
-            font-size: 80%;
-        }
+@media only screen and (max-width: 354px) {
+    .shoot-way-bt {
+        font-size: 80%;
+    }
 
 
 }

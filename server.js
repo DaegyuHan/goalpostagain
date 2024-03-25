@@ -80,7 +80,7 @@ connectDB.then((client) => {
 
 app.use((req, res, next) => {
   if (req.user) {
-    res.locals.유저 = req.user.username;
+    res.locals.유저 = req.user;
   }
   next();
 })
@@ -225,7 +225,21 @@ passport.deserializeUser(async (user, done) => {
     // Check if result exists before attempting to delete password
     if (result) {
       delete result.password;
+      let today = new Date();
+      let recentLogin = result.recent_login;
+      if (recentLogin != today.getDate()) {
+        await db.collection('user').updateOne(
+          { _id: new ObjectId(user.id) },
+          { $set: { shooting_count: 20 } }
+        );
+      }
+      await db.collection('user').updateOne(
+        { _id: new ObjectId(user.id) },
+        { $set: { recent_login: today.getDate() } }
+      );
+      
     }
+
 
     process.nextTick(() => {
       done(null, result);
@@ -238,41 +252,26 @@ passport.deserializeUser(async (user, done) => {
 
 
 exports.isLoggedIn = (req, res, next) => {
-  // isAuthenticated()로 검사해 로그인이 되어있으면
   if (req.isAuthenticated()) {
-    next(); // 다음 미들웨어
+    next();
   } else {
     res.render('login', { Needlogin_Message: '로그인이 필요합니다.' });
   }
+  delete req.session.returnTo;
 };
 
 exports.isNotLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
-    next(); // 로그인 안되어있으면 다음 미들웨어
+    next();
   } else {
     const message = encodeURIComponent('로그인한 상태입니다.');
-    // res.redirect(`/?error=${message}`);
     res.redirect('/');
   }
 };
 
-app.get('/login', this.isNotLoggedIn, async (req, res, next) => {
-
-  res.render('login.ejs')
-})
-
-// app.post('/login', async (req, res, next) => {
-//   passport.authenticate('local', (error, user, info) => {
-//     if (error) return res.status(500).json(error)
-//     if (!user) return res.status(401).json(info.message)
-//     req.logIn(user, (err) => {
-//       if (err) return next(err)
-//       res.redirect('back')
-//     })
-
-//   })(req, res, next)
-
-// })
+app.get('/login', exports.isNotLoggedIn, async (req, res, next) => {
+  res.render('login.ejs');
+});
 
 app.post('/login', async (req, res, next) => {
   passport.authenticate('local', (error, user, info) => {
@@ -281,11 +280,12 @@ app.post('/login', async (req, res, next) => {
 
     req.logIn(user, (err) => {
       if (err) return next(err);
-      return res.json({ success: true, redirectURL: '/' });
+            return res.json({ success: true, redirectURL: '/' });
     });
 
   })(req, res, next);
 });
+
 
 
 app.get('/logout', (req, res, next) => {
@@ -308,14 +308,16 @@ app.get('/register', async (req, res) => {
 app.post('/register', async (req, res) => {
   const timeZone = 'Asia/Seoul';
   let Time = new Date().toLocaleString('ko-KR', { timeZone });
-  let 해시 = await bcrypt.hash(req.body.password, 10)
-
+  let 해시 = await bcrypt.hash(req.body.password, 10);
+  let shooting_count = 20;
+  
   if (req.body.memberCode == 'hdg0822') {
     await db.collection('user').insertOne({
       userID: req.body.userID,
       username: req.body.username,
       password: 해시,
-      time: Time
+      time: Time,
+      shooting_count : shooting_count
     })
     res.render('login', { Register_Message: '회원가입이 완료되었습니다.' });
   }
@@ -337,7 +339,14 @@ app.get('/notice/:number', async (req, res) => {
   // let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray()
   let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray();
   let result2 = await db.collection('notice').find().sort({ _id: -1 }).toArray();
-  res.render('notice.ejs', { 글목록: result, 글전체: result2 })
+
+  let commentCounts = [];
+  for (let i = 0; i < result.length; i++) {
+    let commentCount = await db.collection('comment').countDocuments({ parentId: result[i]._id });
+    commentCounts.push(commentCount);
+  }
+
+  res.render('notice.ejs', { 글목록: result, 글전체: result2, 댓글개수: commentCounts})
 })
 
 
@@ -472,6 +481,16 @@ app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
 
 
   res.render('gamezone-shooting.ejs', { mvpboard: mvpboard, ShootingScore: ShootingScore });
+});
+
+app.post('/gamezone-shooting-extrachance', async (req, res) => {
+  let username = req.user.username;
+  let userShootingCount = req.body.userShootingCount;
+
+  await db.collection('user').updateOne(
+    { username: username },
+    { $set: { shooting_count: userShootingCount } }
+  );
 });
 
 app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
