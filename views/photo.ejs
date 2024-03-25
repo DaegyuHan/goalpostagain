@@ -197,7 +197,7 @@
                                                                                                                                     </div>
 
                         </div>
-                        <% if (유저==포토[i].username || 유저=='관리자' ) {%>
+                        <% if (유저.username==포토[i].username || 유저.username=='관리자' ) {%>
                             <div class="story-photo-edit">
                                 <a href="#" data-photo-id="<%= 포토[i]._id%>" onclick="EditPhoto(event)"
                                     style="margin-right: 8px;">수정</a>
@@ -317,7 +317,7 @@
                                     <p class="story-photo-comment-text">
                                         <%=comment.content%>
                                     </p>
-                                    <% if (유저==comment.writer || 유저=='관리자' ) {%>
+                                    <% if (유저.username==comment.writer || 유저.username=='관리자' ) {%>
                                         <a href="#" class="story-photo-comment-deleteBt"
                                             data-comment-id="<%= comment._id%>"
                                             onclick="confirmDeletePhotoComment(event)">X</a>

@@ -108,7 +108,7 @@
                 </div>
 
 
-                <% if (유저==글.username || 유저=='관리자' ) {%>
+                <% if (유저.username==글.username || 유저.username=='관리자' ) {%>
                     <div style="text-align: right; font-size: 14px;">
                         <a href="/notice-edit/<%= 글._id%>">수정</a>
                         <a href="#" class="delete-notice-button" data-notice-id="<%= 글._id%>"
@@ -134,7 +134,7 @@
                                 <span class="notice-comment-content">
                                     <%= 댓글[i].content%>
                                 </span>
-                                <% if (유저==댓글[i].writer) { %>
+                                <% if (유저.username==댓글[i].writer) { %>
                                     <a href="#" class="delete-comment-button" data-comment-id="<%= 댓글[i]._id%>"
                                         style="width: 10%; font-size: 10px; text-align: right;"
                                         onclick="confirmDeleteComment(event)">X</a>

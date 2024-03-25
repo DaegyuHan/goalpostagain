@@ -101,7 +101,7 @@
           23.<%=result[0].month%>.<%=result[0].day%>, <%=result[0].day2%>요일, <%=result[0].time%>
         </div>
         <% if (typeof 유저 !=='undefined' ) { %>
-          <% if (유저=='관리자') { %>
+          <% if (유저.username=='관리자') { %>
             <div class="match-result-delete">
               <a href="#" data-last-result-id="<%=result[0]._id%>" onclick="confirmDeleteLastResult(event)">삭제</a>
             </div>
@@ -163,7 +163,7 @@
             <%-result[i].resultlogo%>
           </div>
           <% if (typeof 유저 !=='undefined' ) { %>
-            <% if (유저=='관리자' ) { %>
+            <% if (유저.username=='관리자' ) { %>
               <div class="match-result-delete">
                 <a href="#" data-result-id="<%=result[i]._id%>" onclick="confirmDeleteResult(event)">삭제</a>
               </div>

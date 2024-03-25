@@ -62,7 +62,7 @@
                 <div class="story-photo-area">
                     <iframe src="https://www.youtube.com/embed/<%=URL[i].URL%>" frameborder="0"
                         allowfullscreen></iframe>
-                        <% if (유저 == '관리자') {%>
+                        <% if (유저.username == '관리자') {%>
                     <div><a style="color: white;" href="#" onclick="confirmDeleteVideo(event)" data-video-id="<%=URL[i]._id%>">삭제</a></div>
                             <%}%>
                 </div>
