@@ -40,9 +40,14 @@
             gamezoneExplanation.style.display = 'none';
         }
 
+        var isClickDelayed = false;
+
         function shoot(choice) {
+            if (isClickDelayed) return;
+
             var userShootingCountElement = document.getElementById('gamezone-extrachance');
             var userShootingCount = parseInt(userShootingCountElement.textContent);
+            var isButtonLocked = false;
             var start_ball = document.getElementById('gamezone-ball')
             start_ball.style.display = 'none';
 
@@ -64,11 +69,19 @@
             var randomArea = document.getElementById('goalpost-' + randomIndex);
             var scoreArea = document.getElementById('gamezone-scorearea');
             var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+
             if (userShootingCount > 0) {
-                if (randomIndex == 1) {
-                    if (randomArea.classList.contains('selected')) {
-                        randomArea.classList.add('keeper-left');
-                        setTimeout(function () {
+                isClickDelayed = true;
+
+                setTimeout(function () {
+                    isClickDelayed = false;
+                }, 800);
+
+                if (userShootingCount > 0) {
+                    if (randomIndex == 1) {
+                        if (randomArea.classList.contains('selected')) {
+                            randomArea.classList.add('keeper-left');
+
                             alert('막힘');
 
                             userShootingCount -= 1;
@@ -100,73 +113,81 @@
                                 })
                                 .catch(error => console.error('Error checking top_score:', error));
 
-                            setTimeout(function () {
-                                var scoreArea = document.getElementById('gamezone-scorearea');
-                                scoreArea.textContent = '골 : 0';
-                            }, 100);
-                        }, 100);
-                    } else {
-                        randomArea.classList.add('keeper-left');
 
-                        var scoreArea = document.getElementById('gamezone-scorearea');
-                        var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
-                        var newScore = currentScore + 1;
-                        scoreArea.textContent = '골 : ' + newScore;
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            scoreArea.textContent = '골 : 0';
+
+                            setTimeout(function () {
+                            isClickDelayed = false;
+                        }, 500);
+
+
+                        } else {
+                            randomArea.classList.add('keeper-left');
+
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+                            var newScore = currentScore + 1;
+                            scoreArea.textContent = '골 : ' + newScore;
+                        }
+
+                    } else if (randomIndex == 2) {
+                        if (randomArea.classList.contains('selected')) {
+                            randomArea.classList.add('keeper');
+
+                            alert('막힘');
+                            userShootingCount -= 1;
+                            userShootingCountElement.textContent = userShootingCount;
+
+                            fetch('/gamezone-shooting-extrachance', {
+                                method: 'POST', // POST 요청으로 변경
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ userShootingCount: userShootingCount }) // 데이터를 JSON 형식으로 전송
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // 이후의 로직 작성
+                                })
+                                .catch(error => console.error('Error checking extrachance:', error));
+
+
+                            // Compare currentScore with top_score on the server before sending data
+                            fetch('/gamezone-shooting-scoreboard-check')
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (currentScore > data.top_score) {
+                                        // If currentScore is greater than top_score, send data to the server
+                                        alert('신기록갱신!')
+                                        location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
+                                    }
+                                })
+                                .catch(error => console.error('Error checking top_score:', error));
+
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            scoreArea.textContent = '골 : 0';
+
+                            setTimeout(function () {
+                            isClickDelayed = false;
+                        }, 500);
+
+
+                        } else {
+                            randomArea.classList.add('keeper');
+
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+                            var newScore = currentScore + 1;
+                            scoreArea.textContent = '골 : ' + newScore;
+                        }
                     }
-                } else if (randomIndex == 2) {
-                    if (randomArea.classList.contains('selected')) {
-                        randomArea.classList.add('keeper');
-                        setTimeout(function () {
-                            alert('막힘');
-                            userShootingCount -= 1;
-                            userShootingCountElement.textContent = userShootingCount;
+                    
 
-                            fetch('/gamezone-shooting-extrachance', {
-                                method: 'POST', // POST 요청으로 변경
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ userShootingCount: userShootingCount }) // 데이터를 JSON 형식으로 전송
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    // 이후의 로직 작성
-                                })
-                                .catch(error => console.error('Error checking extrachance:', error));
+                    else if (randomIndex == 3) {
+                        if (randomArea.classList.contains('selected')) {
+                            randomArea.classList.add('keeper-right');
 
-
-                            // Compare currentScore with top_score on the server before sending data
-                            fetch('/gamezone-shooting-scoreboard-check')
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (currentScore > data.top_score) {
-                                        // If currentScore is greater than top_score, send data to the server
-                                        alert('신기록갱신!')
-                                        location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
-                                    }
-                                })
-                                .catch(error => console.error('Error checking top_score:', error));
-
-                            setTimeout(function () {
-                                var scoreArea = document.getElementById('gamezone-scorearea');
-                                scoreArea.textContent = '골 : 0';
-                            }, 100);
-                        }, 100);
-                    } else {
-                        randomArea.classList.add('keeper');
-
-                        var scoreArea = document.getElementById('gamezone-scorearea');
-                        var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
-                        var newScore = currentScore + 1;
-                        scoreArea.textContent = '골 : ' + newScore;
-                    }
-                }
-
-                else {
-
-                    if (randomArea.classList.contains('selected')) {
-                        randomArea.classList.add('keeper-right');
-                        setTimeout(function () {
                             alert('막힘');
                             userShootingCount -= 1;
                             userShootingCountElement.textContent = userShootingCount;
@@ -199,24 +220,29 @@
                                 })
                                 .catch(error => console.error('Error checking top_score:', error));
 
-                            setTimeout(function () {
-                                var scoreArea = document.getElementById('gamezone-scorearea');
-                                scoreArea.textContent = '골 : 0';
-                            }, 100);
-                        }, 100);
-                    } else {
-                        randomArea.classList.add('keeper-right');
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            scoreArea.textContent = '골 : 0';
 
-                        var scoreArea = document.getElementById('gamezone-scorearea');
-                        var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
-                        var newScore = currentScore + 1;
-                        scoreArea.textContent = '골 : ' + newScore;
+                            setTimeout(function () {
+                            isClickDelayed = false;
+                        }, 500);
+
+                        } else {
+                            randomArea.classList.add('keeper-right');
+
+                            var scoreArea = document.getElementById('gamezone-scorearea');
+                            var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
+                            var newScore = currentScore + 1;
+                            scoreArea.textContent = '골 : ' + newScore;
+                        }
+                        
                     }
                 }
             } else {
                 alert('오늘 기회 끝')
             }
         }
+
 
     </script>
 

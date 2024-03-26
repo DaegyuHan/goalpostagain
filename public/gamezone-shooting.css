@@ -30,6 +30,12 @@
     background-color: white;
     height: 60%;
     padding-top: 35px;
+
+
+}
+
+.gaolpost-area.selected {
+    opacity: 1; 
 }
 
 .goalpost {

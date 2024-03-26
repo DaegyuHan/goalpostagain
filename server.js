@@ -225,7 +225,8 @@ passport.deserializeUser(async (user, done) => {
     // Check if result exists before attempting to delete password
     if (result) {
       delete result.password;
-      let today = new Date();
+      const timeZone = 'Asia/Seoul';
+      let today = new Date( new Date().toLocaleDateString('ko-KR', { timeZone }));
       let recentLogin = result.recent_login;
       if (recentLogin != today.getDate()) {
         await db.collection('user').updateOne(
@@ -486,6 +487,7 @@ app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
 app.post('/gamezone-shooting-extrachance', async (req, res) => {
   let username = req.user.username;
   let userShootingCount = req.body.userShootingCount;
+  console.log(userShootingCount)
 
   await db.collection('user').updateOne(
     { username: username },
