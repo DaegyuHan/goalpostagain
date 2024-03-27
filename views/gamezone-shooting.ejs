@@ -26,6 +26,7 @@
         rel="stylesheet">
     <script src="/main.js"></script>
     <script>
+        var buttonClickable = true;
 
         document.addEventListener('gesturestart', function (e) {
             e.preventDefault();
@@ -40,14 +41,14 @@
             gamezoneExplanation.style.display = 'none';
         }
 
-        var isClickDelayed = false;
 
         function shoot(choice) {
-            if (isClickDelayed) return;
+            if (!buttonClickable) return;
+
+            buttonClickable = false;
 
             var userShootingCountElement = document.getElementById('gamezone-extrachance');
             var userShootingCount = parseInt(userShootingCountElement.textContent);
-            var isButtonLocked = false;
             var start_ball = document.getElementById('gamezone-ball')
             start_ball.style.display = 'none';
 
@@ -71,11 +72,6 @@
             var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
 
             if (userShootingCount > 0) {
-                isClickDelayed = true;
-
-                setTimeout(function () {
-                    isClickDelayed = false;
-                }, 800);
 
                 if (userShootingCount > 0) {
                     if (randomIndex == 1) {
@@ -98,8 +94,13 @@
                                 .then(response => response.json())
                                 .then(data => {
                                     // 이후의 로직 작성
+                                    buttonClickable = true;
                                 })
-                                .catch(error => console.error('Error checking extrachance:', error));
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    // 에러가 발생하더라도 버튼을 활성화
+                                    buttonClickable = true;
+                                });
 
                             // Compare currentScore with top_score on the server before sending data
                             fetch('/gamezone-shooting-scoreboard-check')
@@ -116,10 +117,6 @@
 
                             var scoreArea = document.getElementById('gamezone-scorearea');
                             scoreArea.textContent = '골 : 0';
-
-                            setTimeout(function () {
-                            isClickDelayed = false;
-                        }, 500);
 
 
                         } else {
@@ -146,11 +143,16 @@
                                 },
                                 body: JSON.stringify({ userShootingCount: userShootingCount }) // 데이터를 JSON 형식으로 전송
                             })
-                                .then(response => response.json())
+                            .then(response => response.json())
                                 .then(data => {
                                     // 이후의 로직 작성
+                                    buttonClickable = true;
                                 })
-                                .catch(error => console.error('Error checking extrachance:', error));
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    // 에러가 발생하더라도 버튼을 활성화
+                                    buttonClickable = true;
+                                });
 
 
                             // Compare currentScore with top_score on the server before sending data
@@ -168,9 +170,6 @@
                             var scoreArea = document.getElementById('gamezone-scorearea');
                             scoreArea.textContent = '골 : 0';
 
-                            setTimeout(function () {
-                            isClickDelayed = false;
-                        }, 500);
 
 
                         } else {
@@ -182,7 +181,7 @@
                             scoreArea.textContent = '골 : ' + newScore;
                         }
                     }
-                    
+
 
                     else if (randomIndex == 3) {
                         if (randomArea.classList.contains('selected')) {
@@ -200,11 +199,16 @@
                                 },
                                 body: JSON.stringify({ userShootingCount: userShootingCount }) // 데이터를 JSON 형식으로 전송
                             })
-                                .then(response => response.json())
+                            .then(response => response.json())
                                 .then(data => {
                                     // 이후의 로직 작성
+                                    buttonClickable = true;
                                 })
-                                .catch(error => console.error('Error checking extrachance:', error));
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    // 에러가 발생하더라도 버튼을 활성화
+                                    buttonClickable = true;
+                                });
 
 
 
@@ -223,9 +227,6 @@
                             var scoreArea = document.getElementById('gamezone-scorearea');
                             scoreArea.textContent = '골 : 0';
 
-                            setTimeout(function () {
-                            isClickDelayed = false;
-                        }, 500);
 
                         } else {
                             randomArea.classList.add('keeper-right');
@@ -235,12 +236,13 @@
                             var newScore = currentScore + 1;
                             scoreArea.textContent = '골 : ' + newScore;
                         }
-                        
+
                     }
                 }
             } else {
                 alert('오늘 기회 끝')
             }
+            buttonClickable = true;
         }
 
 

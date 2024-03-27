@@ -493,6 +493,7 @@ app.post('/gamezone-shooting-extrachance', async (req, res) => {
     { username: username },
     { $set: { shooting_count: userShootingCount } }
   );
+  res.json({ success: true });
 });
 
 app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
