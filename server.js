@@ -256,9 +256,9 @@ exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
+    req.session.returnTo = req.originalUrl;
     res.render('login', { Needlogin_Message: '로그인이 필요합니다.' });
   }
-  delete req.session.returnTo;
 };
 
 exports.isNotLoggedIn = (req, res, next) => {

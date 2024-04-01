@@ -39,6 +39,11 @@ button:hover {
   font-size: 20px;
 }
 
+.notice-title-text-developer a {
+  color: #bdbcbc;
+  font-size: 16px;
+}
+
 .notice-userinfo {
   color: #8f8f8f;
   padding-left: 10px;
@@ -194,6 +199,11 @@ button:hover {
     margin-bottom: 3%;
     font-size: 17px;
   }
+
+  .notice-title-text-developer a {
+    font-size: 16px;
+  }
+
 
   .notice-userinfo {
     color: #8f8f8f;
