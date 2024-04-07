@@ -38,3 +38,11 @@ function gotoVideo() {
 function gotoUpdate() {
   window.location.href = '/update-note'
 }
+
+function gotoNoticePost() {
+  window.location.href = '/management/notice-post'
+}
+
+function gotoUpdatePost() {
+  window.location.href = '/management/update-note-post'
+}

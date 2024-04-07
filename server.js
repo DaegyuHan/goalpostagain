@@ -559,7 +559,25 @@ app.get('/update-note-delete/:id', async (req, res) => {
   res.redirect('/update-note')
 })
 
+app.get('/update-note-edit/:id', async (req, res) => {
+  let postID = await db.collection('update-note').findOne({ _id: new ObjectId(req.params.id) })
 
+  res.render('update-note-edit.ejs', { 글: postID })
+})
+
+app.put('/update-note-edit', async (req, res) => {
+
+  let result = await db.collection('update-note').updateOne({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        title: req.body.title,
+        content: req.body.content
+      }
+    })
+
+  res.redirect('/update-note/update-note-detail/' + req.body.id)
+
+})
 
 
 

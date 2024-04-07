@@ -210,13 +210,14 @@
   <%- include('nav.ejs') %>
     <div class="notice-title">관리</div>
     <div class="white-main">
-      <div>
+      <div class="management-container" style="margin-bottom: 50px;">
         <h4>공지사항 작성</h4>
-        <div style="height: 100px;"><a href="/management/notice-post">공지사항 작성하기</a></div>
+        <button onclick="gotoNoticePost()" class="btn btn-primary">작성하기</button>
+
       </div>
 
       <form class="form-box" action="/match-plan" method="POST">
-        <div>
+        <div class="management-container">
           <h4>이번 주 매치</h4>
           <div>
             24년
@@ -232,19 +233,19 @@
             장소 : <input class="management-input3" type="text" name="planplace" placeholder="풋살구장 이름">
           </div>
         </div>
-        <div>
+        <div class="management-container">
           <div style="height: 160px;">
             주소 : <input id="navi_address" style="width: 200px;" name="planaddress" type="text" placeholder="주소">
             <div>현재 저장된 주소 : <%=매치일정[0].address%>
             </div>
-            <button type="submit">등록</button>
+            <button class="btn btn-primary" type="submit">등록</button>
           </div>
         </div>
       </form>
 
 
 
-      <div>
+      <div class="management-container">
         <h4>MVP</h4>
         <div style="height: 150px;">
           <input class="mvp-date" type="text" id="mvp-date-month" value="<%=매치일정[0].month %>">월
@@ -265,11 +266,11 @@
               <option value="한대규">한대규</option>
               <option value="유성진">유성진</option>
             </select>
-            <button onclick="showMVP()">선정</button>
+            <button class="btn btn-primary" onclick="showMVP()">선정</button>
           </div>
         </div>
       </div>
-      <div>
+      <div class="management-container">
         <h4>경기결과</h4>
         <div style="height: 250px;">
           <div>
@@ -288,142 +289,127 @@
             <input class="management-input3" type="text" id="match-result-awayname" value="<%=매치일정[0].awayteam %>">
           </div>
           <div>
-            <button onclick="upload_match()">등록</button>
+            <button class="btn btn-primary" onclick="upload_match()">등록</button>
           </div>
         </div>
       </div>
 
-      <div>
-        <h4>MVP BOARD</h4>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">1</div>
-          <div id="management-mvpboard-name1" style="margin-left: 10px;">박승룡</div>
-          <div>
-            <input id="management-mvpboard-score1" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[0]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">2</div>
-          <div id="management-mvpboard-name2" style="margin-left: 10px;">오연택</div>
-          <div>
-            <input id="management-mvpboard-score2" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[1]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">4</div>
-          <div id="management-mvpboard-name4" style="margin-left: 10px;">양철진</div>
-          <div>
-            <input id="management-mvpboard-score4" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[2]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">5</div>
-          <div id="management-mvpboard-name5" style="margin-left: 10px;">석범수</div>
-          <div>
-            <input id="management-mvpboard-score5" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[3]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">6</div>
-          <div id="management-mvpboard-name6" style="margin-left: 10px;">장희승</div>
-          <div>
-            <input id="management-mvpboard-score6" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[4]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">7</div>
-          <div id="management-mvpboard-name7" style="margin-left: 10px;">노용준</div>
-          <div>
-            <input id="management-mvpboard-score7" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[5]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">9</div>
-          <div id="management-mvpboard-name9" style="margin-left: 10px;">안태훈</div>
-          <div>
-            <input id="management-mvpboard-score9" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[6]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">10</div>
-          <div id="management-mvpboard-name10" style="margin-left: 10px;">김정훈</div>
-          <div>
-            <input id="management-mvpboard-score10" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[7]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">11</div>
-          <div id="management-mvpboard-name11" style="margin-left: 10px;">민대식</div>
-          <div>
-            <input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[8]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">14</div>
-          <div id="management-mvpboard-name14" style="margin-left: 10px;">이찬웅</div>
-          <div>
-            <input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[9]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">23</div>
-          <div id="management-mvpboard-name23" style="margin-left: 10px;">나현수</div>
-          <div>
-            <input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[10]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">33</div>
-          <div id="management-mvpboard-name33" style="margin-left: 10px;">한대규</div>
-          <div>
-            <input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[11]%>">
-          </div>
-        </div>
-        <div style="display: flex;">
-          <div class="management-mvpboard-num">96</div>
-          <div id="management-mvpboard-name96" style="margin-left: 10px;">유성진</div>
-          <div>
-            <input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
-              value="<%=Object.values(mvpboard)[12]%>">
-          </div>
-        </div>
 
-        <button onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
+      <table class="table" style="margin-top: 50px;">
+        <thead>
+          <tr>
+            <th scope="col">Number</th>
+            <th scope="col">Name</th>
+            <th scope="col">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>박승룡</td>
+            <td><input id="management-mvpboard-score1" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[0]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>오연택</td>
+            <td><input id="management-mvpboard-score2" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[1]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">4</th>
+            <td>양철진</td>
+            <td><input id="management-mvpboard-score4" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[2]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">5</th>
+            <td>석범수</td>
+            <td><input id="management-mvpboard-score5" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[3]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">6</th>
+            <td>장희승</td>
+            <td><input id="management-mvpboard-score6" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[4]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">7</th>
+            <td>노용준</td>
+            <td><input id="management-mvpboard-score7" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[5]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">9</th>
+            <td>안태훈</td>
+            <td><input id="management-mvpboard-score9" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[6]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">10</th>
+            <td>김정훈</td>
+            <td><input id="management-mvpboard-score10" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[7]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">11</th>
+            <td>민대식</td>
+            <td><input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[8]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">14</th>
+            <td>이찬웅</td>
+            <td><input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[9]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">23</th>
+            <td>나현수</td>
+            <td><input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[10]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">33</th>
+            <td>한대규</td>
+            <td><input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[11]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">96</th>
+            <td>유성진</td>
+            <td><input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[12]%>"></td>
+          </tr>
+        </tbody>
+      </table>
 
-
+      <div class="management-container">
+        <button class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
       </div>
 
 
-      <div style="padding-bottom: 100px;">
+
+      <div style="padding-top: 100px; padding-bottom: 100px;" class="management-container">
         <h4>동영상 업로드</h4>
         <div> youtube 영상 링크 입력</div>
         <input id="inputYoutubeURL" type="text">
-        <button onclick="UploadYoutube()">등록</button>
+        <button class="btn btn-primary" onclick="UploadYoutube()">등록</button>
       </div>
 
       <% if (typeof 유저 !=='undefined' ) { %>
         <% if (유저.username=='한대규' ) { %>
-          <div style="padding-bottom: 50px;"></div>
-          <h4>승부차기 초기화</h4>
-          <button onclick="reset_ShootingGame()">초기화</button>
-          <div style="padding-bottom: 50px;"></div>
-          <div>
-            <h4>업데이트공지 작성</h4>
-            <div style="height: 100px;"><a href="/management/update-note-post">업데이트공지 작성하기</a></div>
+          <div class="management-container" style="padding-bottom: 50px;">
+            <h4>승부차기 초기화</h4>
+            <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
+            <div style="padding-bottom: 50px;"></div>
           </div>
-          
+          <div class="management-container">
+            <h4>업데이트공지 작성</h4>
+            <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
+          </div>
+
 
           <%}%>
             <%}%>

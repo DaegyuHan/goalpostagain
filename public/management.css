@@ -27,3 +27,14 @@
     width: 20px;
     margin-left: 10px;
 }
+
+.management-container {
+    width: 80%;
+    margin: 0px auto 0px auto;
+    align-items: center;
+    text-align: center;
+}
+
+.btn-primary {
+    width: 100px;
+}
