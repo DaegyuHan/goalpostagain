@@ -119,12 +119,12 @@ button:hover {
 @media only screen and (min-width: 200px) and (max-width: 276px) {
 
   .comment-input {
-    width: 80%;
+    width: 75%;
   }
   
   
   .comment-button {
-    width: 15%;
+    width: 18%;
     font-size: 65%;
   }
 

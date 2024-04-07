@@ -34,3 +34,7 @@ function gotoPhoto() {
 function gotoVideo() {
   window.location.href = '/video'
 }
+
+function gotoUpdate() {
+  window.location.href = '/update-note'
+}

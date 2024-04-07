@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light only"/>
-	<meta name="supported-color-schemes" content="light"/>
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
   <title>오늘도골대FC</title>
   <link rel="apple-touch-icon" sizes="180x180"
     href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
@@ -17,6 +17,8 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="/main.css" rel="stylesheet">
   <link href="/notice.css" rel="stylesheet">
+  <link href="/notice-detail.css" rel="stylesheet">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,63 +33,55 @@
 <body>
   <%- include('nav.ejs') %>
     <div class="white-notice-title">
-      <div class="white-notice-title-text">공지사항</div>
+      <div class="white-notice-title-text">업데이트</div>
     </div>
 
     <div class="whole-white-main">
       <form action="/notice-search" method="GET">
-      <div class="search-area">
-        <div class="search-container">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EA%B2%80%EC%83%89.png?updatedAt=1702379922187"
-            alt="search" class="search-icon">
-          <input type="text" name="search" class="search-input" id="search-input" placeholder="검색어입력" autocomplete="off">
-          <img
-            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EB%8B%AB%EA%B8%B0%EC%B0%BD.png?updatedAt=1702379922132"
-            alt="clear" class="clear-icon" onclick="clearInput()">
+        <div class="search-area">
+          <div class="search-container">
+            <img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EA%B2%80%EC%83%89.png?updatedAt=1702379922187"
+              alt="search" class="search-icon">
+            <input type="text" name="search" class="search-input" id="search-input" placeholder="검색어입력"
+              autocomplete="off">
+            <img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/notice/%EB%8B%AB%EA%B8%B0%EC%B0%BD.png?updatedAt=1702379922132"
+              alt="clear" class="clear-icon" onclick="clearInput()">
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
       <div class="notice-title-underline"></div>
 
-      <div class="list-box" style="padding: 0px 0px 3px 2%;">
-        <div class="notice-userinfo">
-        </div>
-        <div class="notice-title-text-developer">
-          <a href="/update-note">
-          <%=업데이트글제목[0].title%>
-          </a>
-        </div>
-
-      </div>
 
 
-      <% for (let i=0; i<글목록.length; i++){ %>
+      <% for (let i=0; i<업데이트글목록.length; i++){ %>
         <div class="list-box">
           <div class="notice-userinfo">
             <span>
-              <%=글목록[i].today%>
+              <%=업데이트글목록[i].today%>
             </span>
             <span>
-              <%=글목록[i].username%>
+              <%=업데이트글목록[i].username%>
             </span>
           </div>
           <div class="notice-title-text">
-            <a href="notice-detail/<%=글목록[i]._id%>">
-              <%=글목록[i].title%> [<%= 댓글개수[i] %>]
+            <a href="update-note-detail/<%=업데이트글목록[i]._id%>">
+              <%=업데이트글목록[i].title%>
             </a>
           </div>
 
         </div>
         <%}%>
-          <div class="list-box" style="text-align: center; font-size: 18px;">
-            <% for (let i=0; i<( Math.ceil((글전체.length) /10 )); i++ ) {%>
-              <a href="/notice/<%=(i+1)%>" style="padding: 0px 3px 0px 3px;">
-                <%=(i+1)%>
-              </a>
-              <%}%>
-          </div>
+
           <div class="list-box" style="height: 50px;">
+          </div>
+
+          <hr>
+
+
+          <div class="flex-row" style="margin-top: 10px;">
+            <button class="detail-bt-list" style=" margin-bottom: 10px;" onclick="gotoNotice()">이전</button>
           </div>
 
     </div>

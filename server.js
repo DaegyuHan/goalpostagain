@@ -190,10 +190,7 @@ app.get('/match-result-delete/:id', async (req, res) => {
   res.redirect('back')
 })
 
-app.get('/management/notice-post', async (req, res) => {
 
-  res.render('notice-post.ejs');
-});
 
 passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
   let result = await db.collection('user').findOne({ userID: 입력한아이디 })
@@ -340,6 +337,8 @@ app.get('/notice/:number', async (req, res) => {
   // let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray()
   let result = await db.collection('notice').find().sort({ _id: -1 }).skip((req.params.number - 1) * 10).limit(10).toArray();
   let result2 = await db.collection('notice').find().sort({ _id: -1 }).toArray();
+  let result3 = await db.collection('update-note').find().sort({ _id: -1 }).toArray();
+
 
   let commentCounts = [];
   for (let i = 0; i < result.length; i++) {
@@ -347,7 +346,7 @@ app.get('/notice/:number', async (req, res) => {
     commentCounts.push(commentCount);
   }
 
-  res.render('notice.ejs', { 글목록: result, 글전체: result2, 댓글개수: commentCounts})
+  res.render('notice.ejs', { 글목록: result, 글전체: result2,업데이트글제목: result3, 댓글개수: commentCounts})
 })
 
 
@@ -362,6 +361,11 @@ app.get('/notice-search', async (req, res) => {
 
   res.render('notice-search.ejs', { 글목록: result })
 })
+
+app.get('/management/notice-post', async (req, res) => {
+
+  res.render('notice-post.ejs');
+});
 
 
 app.post('/notice-post', async (req, res) => {
@@ -459,6 +463,100 @@ app.get('/notice-comment-delete/:id', async (req, res) => {
     _id: new ObjectId(req.params.id)
   })
   res.redirect('back')
+})
+
+app.get('/update-note', async (req, res) => {
+  let result = await db.collection('update-note').find().sort({ _id: -1 }).toArray();
+
+  res.render('update-note.ejs', { 업데이트글목록: result });
+});
+
+
+app.get('/update-note-search', async (req, res) => {
+  let result = await db.collection('update-note')
+    .find({
+      $or: [
+        { title: { $regex: req.query.search } },
+        { content: { $regex: req.query.search } }
+      ]
+    }).toArray()
+
+  res.render('update-note-search.ejs', { 업데이트글목록: result })
+})
+
+app.get('/management/update-note-post', async (req, res) => {
+
+  res.render('update-note-post.ejs');
+});
+
+
+app.post('/update-note-post', async (req, res) => {
+
+  const timeZone = 'Asia/Seoul';
+
+  let Today = new Date().toLocaleDateString('ko-KR', { timeZone });
+  let Time = new Date().toLocaleString('ko-KR', { timeZone });
+  upload.array('img1', 5)(req, res, async (err) => {
+    if (err) return res.send('업로드에러')
+    try {
+      if (req.body.title == '') {
+        res.send('제목입력안했음')
+      } else {
+        const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
+
+        await db.collection('update-note').insertOne(
+          {
+            today: Today,
+            time: Time,
+            title: req.body.title,
+            content: req.body.content,
+            img: imageArray,
+            user: req.user._id,
+            username: req.user.username
+          }
+        )
+        res.redirect('/update-note')
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).send('서버에러남')
+    }
+  })
+
+})
+
+app.get('/update-note-detail/:id', async (req, res, next) => {
+  let postID = await db.collection('update-note').findOne({ _id: new ObjectId(req.params.id) })
+
+  res.render('update-note-detail.ejs', { 글: postID })
+
+})
+
+app.get('/update-note-edit/:id', async (req, res) => {
+  let postID = await db.collection('update-note').findOne({ _id: new ObjectId(req.params.id) })
+
+  res.render('update-note-edit.ejs', { 글: postID })
+})
+
+app.put('/update-note-edit', async (req, res) => {
+
+  let result = await db.collection('update-note').updateOne({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        title: req.body.title,
+        content: req.body.content
+      }
+    })
+
+  res.redirect('/update-note/update-note-detail/' + req.body.id)
+
+})
+
+app.get('/update-note-delete/:id', async (req, res) => {
+  let result = await db.collection('update-note').deleteOne({
+    _id: new ObjectId(req.params.id)
+  })
+  res.redirect('/update-note')
 })
 
 
