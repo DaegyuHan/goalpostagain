@@ -799,3 +799,19 @@ app.get('/video-delete/:id', async (req, res) => {
   })
   res.redirect('/video')
 })
+
+
+// 사용자 정보를 제공하는 엔드포인트
+app.get('/user', async (req, res) => {
+  // 세션에서 유저 정보 가져오기 (여기서는 더미 데이터로 대체)
+  const userData = {
+    userId: req.user.userID 
+  };
+  
+  res.json(userData);
+});
+
+app.get('/mypage/:userId', async (req, res) => {
+  
+  res.render('mypage.ejs')
+});

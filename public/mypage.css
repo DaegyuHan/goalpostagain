@@ -1,0 +1,22 @@
+.mypage-main {
+    width: 800px;
+    height: 90%;
+    background-color: #002832;
+    margin: 10% auto 0px auto;
+    color: white;
+    padding-top: 50px;
+}
+
+
+
+
+
+
+@media only screen and (max-width: 1000px) {
+    .mypage-main {
+        width: 100%;
+    }
+
+
+
+}

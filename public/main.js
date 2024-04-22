@@ -46,3 +46,20 @@ function gotoNoticePost() {
 function gotoUpdatePost() {
   window.location.href = '/management/update-note-post'
 }
+
+
+
+function gotoMypage() {
+  fetch('/user')
+  .then(response => response.json())
+  .then(data => {
+    // 받은 데이터에서 유저 ID를 가져와서 변수에 저장
+    const userId = data.userId;
+    
+    // 이후에 userId를 사용하여 필요한 작업을 수행
+    window.location.href = '/mypage/' + userId;
+  })
+  .catch(error => console.error('Error fetching user data:', error));
+
+
+}
