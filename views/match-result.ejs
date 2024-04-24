@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light only"/>
-	<meta name="supported-color-schemes" content="light"/>
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
   <title>오늘도골대FC</title>
   <link rel="apple-touch-icon" sizes="180x180"
     href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
@@ -13,9 +13,11 @@
     href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
   <link rel="icon" type="image/png" sizes="512x512"
     href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <link href="/main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <link href="/main.css" rel="stylesheet">
   <link href="/match-result.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +26,7 @@
     href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="/main.js"></script>
+
   <script>
     function confirmDeleteResult(event) {
       event.preventDefault();
@@ -46,6 +49,7 @@
         window.location.href = '/match-result-delete/' + commentId;
       }
     }
+
   </script>
 
 </head>
@@ -58,7 +62,7 @@
       <div class="match-result-lastmatch-font">
         LAST MATCH
       </div>
-      <div class="lastmatch-result-resultlogo">
+      <div class="lastmatch-result-resultlogo ">
         <%-result[0].resultlogo%>
       </div>
 
@@ -101,7 +105,7 @@
           23.<%=result[0].month%>.<%=result[0].day%>, <%=result[0].day2%>요일, <%=result[0].time%>
         </div>
         <% if (typeof 유저 !=='undefined' ) { %>
-          <% if (유저.username=='관리자') { %>
+          <% if (유저.username=='관리자' ) { %>
             <div class="match-result-delete">
               <a href="#" data-last-result-id="<%=result[0]._id%>" onclick="confirmDeleteLastResult(event)">삭제</a>
             </div>
@@ -159,9 +163,15 @@
           </div>
 
 
-          <div class="match-result-resultlogo">
+          <div class="match-result-resultlogo match-result-tooltip">
             <%-result[i].resultlogo%>
+            <div class="match-result-tooltip-content">
+              <%=result[i].mvp_name%>
+            </div>
           </div>
+          
+
+
           <% if (typeof 유저 !=='undefined' ) { %>
             <% if (유저.username=='관리자' ) { %>
               <div class="match-result-delete">

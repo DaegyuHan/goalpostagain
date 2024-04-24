@@ -50,6 +50,7 @@
     width: 30%;
     margin-left: 2%;
     margin-top: 20px;
+    cursor: pointer;
   }
 
   .player-profile-name {

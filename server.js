@@ -110,16 +110,28 @@ app.get('/management', async (req, res) => {
   res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard });
 });
 
+
 app.get('/mvp', async (req, res) => {
+  // MVP 추가
   let result = await db.collection('mvp').insertOne({
     mvp: req.query.val,
     month: req.query.month,
-    day: req.query.day
-  })
-  res.redirect('/')
-})
+    day: req.query.day,
+    mvp_name : req.query.MVP_Name
+  });
 
+    let query = { month: req.query.month, day: req.query.day };
 
+    let updateResult = await db.collection('result').updateOne(query, { $set: { mvp_name: req.query.MVP_Name } });
+
+    if(updateResult.modifiedCount === 1) {
+      console.log("Result collection 업데이트 성공");
+    } else {
+      console.log("업데이트된 문서가 없습니다.");
+    }
+ 
+  res.redirect('/');
+});
 
 app.get('/mvpboard', async (req, res) => {
   let member_score = {
@@ -178,7 +190,8 @@ app.get('/result', async (req, res) => {
     awayscore: req.query.awayscore,
     awayname: req.query.awayname,
     resultlogo: req.query.resultlogo,
-    home_resultlogo: req.query.home_resultlogo
+    home_resultlogo: req.query.home_resultlogo,
+    mvp_name : '미정'
   })
   res.redirect('/match-result')
 })

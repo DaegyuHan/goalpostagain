@@ -26,7 +26,9 @@
         href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Noto+Sans+KR:wght@200;300;400;500;600&display=swap"
         rel="stylesheet">
     <script src="/main.js"></script>
-
+    <script>
+        document.getElementById("update-textarea").value = "초기 텍스트";
+    </script>
 
 </head>
 
@@ -38,7 +40,7 @@
                 <h4>업데이트 공지 작성</h4>
                 <input name="title" autocomplete="off" placeholder="title">
                 <input type="file" name="img1" accept="image/*" multiple>
-                <div style="margin-left: 1px;"><textarea class="textarea-notice" name="content" placeholder="이미지 최대 5장 등록 가능"></textarea></div>
+                <div style="margin-left: 1px;"><textarea id="update-textarea" class="textarea-notice" name="content" placeholder="이미지 최대 5장 등록 가능"></textarea></div>
                 <div style="text-align: center;">
                     <button type="submit">등록</button>
                 </div>
