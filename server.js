@@ -28,7 +28,8 @@ app.use(session({
   secret: '암호화에 쓸 비번',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 240 * 60 * 1000 },
+  cookie: { maxAge: 480 * 60 * 1000 },
+  // 480분 / 60분 = 8 시간
   store: MongoStore.create({
     mongoUrl: 'mongodb+srv://sparta:test@cluster0.edvfknb.mongodb.net/?retryWrites=true&w=majority',
     dbName: 'goalpostagain'
@@ -267,7 +268,8 @@ exports.isLoggedIn = (req, res, next) => {
     next();
   } else {
     req.session.returnTo = req.originalUrl;
-    res.render('login', { Needlogin_Message: '로그인이 필요합니다.' });
+  
+    res.render('login', { Needlogin_Message: '로그인이 필요합니다.', send_url:req.session.returnTo });
   }
 };
 
@@ -280,7 +282,9 @@ exports.isNotLoggedIn = (req, res, next) => {
   }
 };
 
+
 app.get('/login', exports.isNotLoggedIn, async (req, res, next) => {
+  // 세션에 원래 요청한 페이지 정보 저장
   res.render('login.ejs');
 });
 
@@ -291,7 +295,9 @@ app.post('/login', async (req, res, next) => {
 
     req.logIn(user, (err) => {
       if (err) return next(err);
-            return res.json({ success: true, redirectURL: '/' });
+      // 로그인 성공 시 원래 요청한 페이지로 리디렉션
+      delete req.session.returnTo;
+      return res.json({ success: true});
     });
 
   })(req, res, next);
