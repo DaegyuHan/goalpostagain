@@ -118,19 +118,19 @@ app.get('/mvp', async (req, res) => {
     mvp: req.query.val,
     month: req.query.month,
     day: req.query.day,
-    mvp_name : req.query.MVP_Name
+    mvp_name: req.query.MVP_Name
   });
 
-    let query = { month: req.query.month, day: req.query.day };
+  let query = { month: req.query.month, day: req.query.day };
 
-    let updateResult = await db.collection('result').updateOne(query, { $set: { mvp_name: req.query.MVP_Name } });
+  let updateResult = await db.collection('result').updateOne(query, { $set: { mvp_name: req.query.MVP_Name } });
 
-    if(updateResult.modifiedCount === 1) {
-      console.log("Result collection 업데이트 성공");
-    } else {
-      console.log("업데이트된 문서가 없습니다.");
-    }
- 
+  if (updateResult.modifiedCount === 1) {
+    console.log("Result collection 업데이트 성공");
+  } else {
+    console.log("업데이트된 문서가 없습니다.");
+  }
+
   res.redirect('/');
 });
 
@@ -192,7 +192,7 @@ app.get('/result', async (req, res) => {
     awayname: req.query.awayname,
     resultlogo: req.query.resultlogo,
     home_resultlogo: req.query.home_resultlogo,
-    mvp_name : '미정'
+    mvp_name: '미정'
   })
   res.redirect('/match-result')
 })
@@ -237,7 +237,7 @@ passport.deserializeUser(async (user, done) => {
     if (result) {
       delete result.password;
       const timeZone = 'Asia/Seoul';
-      let today = new Date( new Date().toLocaleDateString('ko-KR', { timeZone }));
+      let today = new Date(new Date().toLocaleDateString('ko-KR', { timeZone }));
       let recentLogin = result.recent_login;
       if (recentLogin != today.getDate()) {
         await db.collection('user').updateOne(
@@ -249,7 +249,7 @@ passport.deserializeUser(async (user, done) => {
         { _id: new ObjectId(user.id) },
         { $set: { recent_login: today.getDate() } }
       );
-      
+
     }
 
 
@@ -268,8 +268,8 @@ exports.isLoggedIn = (req, res, next) => {
     next();
   } else {
     req.session.returnTo = req.originalUrl;
-  
-    res.render('login', { Needlogin_Message: '로그인이 필요합니다.', send_url:req.session.returnTo });
+    var send_url = req.session.returnTo;
+    res.render('login', { Needlogin_Message: '로그인이 필요합니다.', send_url });
   }
 };
 
@@ -284,8 +284,8 @@ exports.isNotLoggedIn = (req, res, next) => {
 
 
 app.get('/login', exports.isNotLoggedIn, async (req, res, next) => {
-  // 세션에 원래 요청한 페이지 정보 저장
-  res.render('login.ejs');
+  var send_url = '/'
+  res.render('login', {send_url});
 });
 
 app.post('/login', async (req, res, next) => {
@@ -295,9 +295,8 @@ app.post('/login', async (req, res, next) => {
 
     req.logIn(user, (err) => {
       if (err) return next(err);
-      // 로그인 성공 시 원래 요청한 페이지로 리디렉션
       delete req.session.returnTo;
-      return res.json({ success: true});
+      return res.json({ success: true });
     });
 
   })(req, res, next);
@@ -327,14 +326,14 @@ app.post('/register', async (req, res) => {
   let Time = new Date().toLocaleString('ko-KR', { timeZone });
   let 해시 = await bcrypt.hash(req.body.password, 10);
   let shooting_count = 20;
-  
+
   if (req.body.memberCode == 'hdg0822') {
     await db.collection('user').insertOne({
       userID: req.body.userID,
       username: req.body.username,
       password: 해시,
       time: Time,
-      shooting_count : shooting_count
+      shooting_count: shooting_count
     })
     res.render('login', { Register_Message: '회원가입이 완료되었습니다.' });
   }
@@ -365,7 +364,7 @@ app.get('/notice/:number', async (req, res) => {
     commentCounts.push(commentCount);
   }
 
-  res.render('notice.ejs', { 글목록: result, 글전체: result2,업데이트글제목: result3, 댓글개수: commentCounts})
+  res.render('notice.ejs', { 글목록: result, 글전체: result2, 업데이트글제목: result3, 댓글개수: commentCounts })
 })
 
 
@@ -673,7 +672,7 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
 app.get('/reset-shootinggame', async (req, res) => {
   const collectionName = 'gamezone_shooting';
 
-  const collection =  db.collection(collectionName);
+  const collection = db.collection(collectionName);
   await collection.deleteMany({});
   res.redirect('/')
 })
@@ -824,13 +823,13 @@ app.get('/video-delete/:id', async (req, res) => {
 app.get('/user', async (req, res) => {
   // 세션에서 유저 정보 가져오기 (여기서는 더미 데이터로 대체)
   const userData = {
-    userId: req.user.userID 
+    userId: req.user.userID
   };
-  
+
   res.json(userData);
 });
 
 app.get('/mypage/:userId', async (req, res) => {
-  
+
   res.render('mypage.ejs')
 });

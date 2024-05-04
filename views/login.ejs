@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light only"/>
-	<meta name="supported-color-schemes" content="light"/>
+    <meta name="color-scheme" content="light only" />
+    <meta name="supported-color-schemes" content="light" />
     <title>오늘도골대FC</title>
     <link rel="apple-touch-icon" sizes="180x180"
         href="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437">
@@ -55,35 +55,38 @@
             }
         }
 
-        var send_url = '<%= send_url %>'
+
+
 
         function handleLoginFormSubmit() {
-            
-        fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: document.getElementById('id-input').value,
-                password: document.getElementById('password-input').value,
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = send_url;
-            } else {
-                alert('아이디 또는 비밀번호를 확인해주세요.');
-            }
-        })
-        .catch(error => {
-            console.error('에러:', error);
-        });
+                var send_url2 = '<%=send_url%>';
 
-        // 전통적인 방식으로 폼 제출을 방지합니다.
-        return false;
-    }
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('id-input').value,
+                    password: document.getElementById('password-input').value,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        window.location.href = send_url2;
+                    } else {
+                        alert('아이디 또는 비밀번호를 확인해주세요.');
+                    }
+                })
+                .catch(error => {
+                    console.error('에러:', error);
+                });
+
+            return false;
+        }
 
     </script>
 
@@ -94,50 +97,50 @@
         <script>
             alert('<%= Needlogin_Message %>');
         </script>
-    <% } %>
+        <% } %>
 
-                            <%- include('nav.ejs') %>
+            <%- include('nav.ejs') %>
 
-                                <div class="home-main">
-                                    <div class="login-main">
-                                        <form class="form-box" action="/login" method="POST" onsubmit="return handleLoginFormSubmit()">
-                                            <div class="login-title-area">
-                                                <div class="login-first-title">
-                                                    환영합니다!
-                                                </div>
-                                                <div class="login-second-title">
-                                                    오늘도골대 홈페이지 입니다.
-                                                </div>
-                                            </div>
-                                            <div class="login-second-container">
-                                                <div>
-                                                    <div class="login-input-font">
-                                                        아이디
-                                                    </div>
-                                                    <input id="id-input" class="login-input" name="username">
-                                                </div>
-                                                <div>
-                                                    <div class="login-input-font">
-                                                        패스워드
-                                                    </div>
-                                                    <input id="password-input" class="login-input" name="password" type="password">
-                                                </div>
-
-                                                <button class="login-button" type="submit">로그인</button>
-
-                                                <div class="separator">
-                                                    <div class="line"></div>
-                                                    <div class="text">OR</div>
-                                                </div>
-
-
-                                            </div>
-                                        </form>
-                                        <div class="login-bottom-margin">
-                                            <button class="register-button" onclick="gotoRegister()">회원가입</button>
-                                        </div>
-                                    </div>
+                <div class="home-main">
+                    <div class="login-main">
+                        <form class="form-box" action="/login" method="POST" onsubmit="return handleLoginFormSubmit()">
+                            <div class="login-title-area">
+                                <div class="login-first-title">
+                                    환영합니다!
                                 </div>
+                                <div class="login-second-title">
+                                    오늘도골대 홈페이지 입니다.
+                                </div>
+                            </div>
+                            <div class="login-second-container">
+                                <div>
+                                    <div class="login-input-font">
+                                        아이디
+                                    </div>
+                                    <input id="id-input" class="login-input" name="username" autocomplete="on">
+                                </div>
+                                <div>
+                                    <div class="login-input-font">
+                                        패스워드
+                                    </div>
+                                    <input id="password-input" class="login-input" name="password" type="password">
+                                </div>
+
+                                <button class="login-button" type="submit">로그인</button>
+
+                                <div class="separator">
+                                    <div class="line"></div>
+                                    <div class="text">OR</div>
+                                </div>
+
+
+                            </div>
+                        </form>
+                        <div class="login-bottom-margin">
+                            <button class="register-button" onclick="gotoRegister()">회원가입</button>
+                        </div>
+                    </div>
+                </div>
 
 </body>
 
