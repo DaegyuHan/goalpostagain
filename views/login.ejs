@@ -98,6 +98,11 @@
             alert('<%= Needlogin_Message %>');
         </script>
         <% } %>
+    <% if (typeof Register_Message !=='undefined' ) { %>
+        <script>
+            alert('<%= Register_Message %>');
+        </script>
+        <% } %>       
 
             <%- include('nav.ejs') %>
 

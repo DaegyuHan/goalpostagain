@@ -189,12 +189,19 @@
                                                                                                                                 <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/backnumber/96.png?updatedAt=1707830967145"
                                                                                                                                     alt="96">
                                                                                                                                 <%}%>
+                                                                                                                                    <% if
+                                                                                                                                        (포토[i].username=='황덕현'
+                                                                                                                                        )
+                                                                                                                                        {%>
+                                                                                                                                        <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/backnumber/%EB%93%B1%EB%B2%88%ED%98%B8%20%EB%B3%B5%EC%82%AC.png?updatedAt=1715491114843"
+                                                                                                                                            alt="99">
+                                                                                                                                        <%}%>
 
-                                                                                                                                    <div
-                                                                                                                                        style="bottom: -1px; position: relative;">
-                                                                                                                                        <%=포토[i].username%>
-                                                                                                                                            <%=포토[i].today%>
-                                                                                                                                    </div>
+                                                                                                                                            <div
+                                                                                                                                                style="bottom: -1px; position: relative;">
+                                                                                                                                                <%=포토[i].username%>
+                                                                                                                                                    <%=포토[i].today%>
+                                                                                                                                            </div>
 
                         </div>
                         <% if (유저.username==포토[i].username || 유저.username=='관리자' ) {%>

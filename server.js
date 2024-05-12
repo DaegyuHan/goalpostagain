@@ -148,7 +148,8 @@ app.get('/mvpboard', async (req, res) => {
     이찬웅: req.query.num14,
     나현수: req.query.num23,
     한대규: req.query.num33,
-    유성진: req.query.num96
+    유성진: req.query.num96,
+    황덕현: req.query.num99
   }
   let result = await db.collection('mvpboard').insertOne({
     member_score
@@ -168,6 +169,7 @@ app.post('/match-plan', async (req, res) => {
   }
 
   let result = db.collection('matchplan').insertOne({
+    year: req.body.planyear,
     month: req.body.planmonth,
     date: req.body.plandate,
     day: req.body.planday,
@@ -326,6 +328,7 @@ app.post('/register', async (req, res) => {
   let Time = new Date().toLocaleString('ko-KR', { timeZone });
   let 해시 = await bcrypt.hash(req.body.password, 10);
   let shooting_count = 20;
+  var send_url = '/'
 
   if (req.body.memberCode == 'hdg0822') {
     await db.collection('user').insertOne({
@@ -335,7 +338,7 @@ app.post('/register', async (req, res) => {
       time: Time,
       shooting_count: shooting_count
     })
-    res.render('login', { Register_Message: '회원가입이 완료되었습니다.' });
+    res.render('login', { Register_Message: '회원가입이 완료되었습니다.', send_url });
   }
   else {
     res.render('register', { Member_Message: '멤버코드가 일치하지 않습니다.' });
@@ -566,7 +569,7 @@ app.put('/update-note-edit', async (req, res) => {
       }
     })
 
-  res.redirect('/update-note/update-note-detail/' + req.body.id)
+  res.redirect('/update-note-detail/' + req.body.id)
 
 })
 
@@ -795,7 +798,7 @@ app.get('/photo-comment-delete/:id', async (req, res) => {
   res.redirect('back')
 })
 
-app.get('/video', async (req, res) => {
+app.get('/video', this.isLoggedIn, async (req, res) => {
   let URL = await db.collection('youtubeURL').find().sort({ _id: -1 }).toArray();
   res.render('video.ejs', { URL: URL });
 });

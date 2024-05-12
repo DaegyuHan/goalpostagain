@@ -102,7 +102,7 @@
         </div>
 
         <div class="lastmatch-result-time">
-          24.<%=result[0].month%>.<%=result[0].day%>, <%=result[0].day2%>요일, <%=result[0].time%>
+          <%=result[0].year%>.<%=result[0].month%>.<%=result[0].day%>, <%=result[0].day2%>요일, <%=result[0].time%>
         </div>
         <% if (typeof 유저 !=='undefined' ) { %>
           <% if (유저.username=='관리자' ) { %>
@@ -128,7 +128,7 @@
       <% for (let i=1; i<result.length; i++ ){ %>
         <div class="match-result-area">
           <div class="match-result-info">
-            <span>24.<%=result[i].month%>.<%=result[i].day%>(<%=result[i].day2%>) <%=result[i].time%> |</span>
+            <span><%=result[i].year%>.<%=result[i].month%>.<%=result[i].day%>(<%=result[i].day2%>) <%=result[i].time%> |</span>
             <span>
               <%=result[i].place%>
             </span>

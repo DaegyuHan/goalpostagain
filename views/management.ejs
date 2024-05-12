@@ -38,7 +38,7 @@
         case '박승룡':
           var MVP_Name = '박승룡'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%B0%95%EC%8A%B9%EB%A3%A1MVP.png?updatedAt=1705229239655">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_02.png?updatedAt=1715401360961">
           </div>`
           break
         case '오연택':
@@ -87,7 +87,7 @@
         case '민대식':
           var MVP_Name = '민대식'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%AF%BC%EB%8C%80%EC%8B%9DMVP.png?updatedAt=1707658379920">
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_03.png?updatedAt=1715401360873">
           </div>`
           break
         case '이찬웅':
@@ -110,6 +110,12 @@
           break
         case '유성진':
           var MVP_Name = '유성진'
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1707658378921">
+          </div>`
+          break
+          case '황덕현':
+          var MVP_Name = '황덕현'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9C%A0%EC%84%B1%EC%A7%84MVP.png?updatedAt=1707658378921">
           </div>`
@@ -182,9 +188,10 @@
       var num23 = document.getElementById("management-mvpboard-score23").value;
       var num33 = document.getElementById("management-mvpboard-score33").value;
       var num96 = document.getElementById("management-mvpboard-score96").value;
+      var num99 = document.getElementById("management-mvpboard-score99").value;
 
 
-      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}&num2=${encodeURIComponent(num2)}&num4=${encodeURIComponent(num4)}&num5=${encodeURIComponent(num5)}&num6=${encodeURIComponent(num6)}&num7=${encodeURIComponent(num7)}&num9=${encodeURIComponent(num9)}&num10=${encodeURIComponent(num10)}&num11=${encodeURIComponent(num11)}&num14=${encodeURIComponent(num14)}&num23=${encodeURIComponent(num23)}&num33=${encodeURIComponent(num33)}&num96=${encodeURIComponent(num96)}`;
+      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}&num2=${encodeURIComponent(num2)}&num4=${encodeURIComponent(num4)}&num5=${encodeURIComponent(num5)}&num6=${encodeURIComponent(num6)}&num7=${encodeURIComponent(num7)}&num9=${encodeURIComponent(num9)}&num10=${encodeURIComponent(num10)}&num11=${encodeURIComponent(num11)}&num14=${encodeURIComponent(num14)}&num23=${encodeURIComponent(num23)}&num33=${encodeURIComponent(num33)}&num96=${encodeURIComponent(num96)}&num99=${encodeURIComponent(num99)}`;
 
       alert("등록되었습니다.")
     }
@@ -234,8 +241,8 @@
         <div class="management-container">
           <h4>이번 주 매치</h4>
           <div>
-            24년
-            <input class="management-input" type="text" name="planmonth" placeholder="00">월
+            <input class="management-input" type="text" name="planyear" value="<%=매치일정[0].year %>">년
+            <input class="management-input" type="text" name="planmonth" value="<%=매치일정[0].month %>">월
             <input class="management-input" type="text" name="plandate" placeholder="00">일
             <input class="management-input" type="text" name="planday" value="금">요일
             <br>
@@ -279,6 +286,7 @@
               <option value="나현수">나현수</option>
               <option value="한대규">한대규</option>
               <option value="유성진">유성진</option>
+              <option value="황덕현">황덕현</option>
             </select>
             <button class="btn btn-primary" onclick="showMVP()">선정</button>
           </div>
@@ -288,7 +296,7 @@
         <h4>경기결과</h4>
         <div style="height: 250px;">
           <div>
-            24년
+            <input class="management-input" type="text" id="match-result-year" value="<%=매치일정[0].year %>">년
             <input class="management-input" type="text" id="match-result-month" value="<%=매치일정[0].month %>">월
             <input class="management-input" type="text" id="match-result-day" value="<%=매치일정[0].date %>">일
             <input class="management-input" type="text" id="match-result-day2" value="<%=매치일정[0].day %>">요일
@@ -395,6 +403,12 @@
             <td>유성진</td>
             <td><input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[12]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">99</th>
+            <td>황덕현</td>
+            <td><input id="management-mvpboard-score99" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[13]%>"></td>
           </tr>
         </tbody>
       </table>
