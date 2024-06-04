@@ -58,6 +58,70 @@
     width: 80%;
   }
 
+  tbody tr, th, td {
+    border: none;
+  }
+
+  tbody img {
+    align-items: center;
+    margin: 0px 0px 0px 0px;
+    justify-content: center;
+  }
+
+  .table td {
+    padding: 7px;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .table th {
+    padding: 10px 0px 0px 0px;
+
+  }
+  
+  .table {
+    width: 100%;
+    margin-left: 8%;
+  }
+
+  .table th.introduce-stat-subtitle, .table td {
+    width: 25%; 
+  }
+
+  .player-stat-profile {
+    width: 77%;
+    margin-left: 2%;
+  }
+
+  .introduce-stat-maintitle {
+    float: left;
+    width: 40%;
+    margin-left: 10%;
+  }
+
+  .introduce-stat-subtitle {
+    font-size: 27px;
+    font-weight: 800;
+  }
+
+  .introduce-stat-logo {
+    width: 80%;
+  }
+
+  .introduce-stat-smallfont {
+    font-size: 80% !important;
+  }
+
+  .introduce-stat-smallfont2 {
+    font-size: 85% !important;
+  }
+
+  .introduce-stat-line {
+    width: 100%; 
+    height: 1px; 
+    background-color: rgb(235, 235, 235);
+    float: left;
+  }
 
 
 
@@ -79,4 +143,16 @@
       }
 
 
+}
+
+@media only screen and (min-width: 327px) and (max-width: 341) { 
+  .introduce-stat-smallfont {
+    font-size: 60%;
+  }
+}
+
+@media only screen and (min-width: 200px) and (max-width: 327) { 
+  .introduce-stat-smallfont2 {
+    font-size: 70%;
+  }
 }

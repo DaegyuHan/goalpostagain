@@ -294,12 +294,18 @@
 
 @media only screen and (max-width: 351px) {
     .planmatch-time {
-        font-size: 190%;
+        font-size: 180%;
         transform: translate(0%, 30%);
     }
 
 }
+@media only screen and (max-width: 316px) {
+    .planmatch-time {
+        font-size: 150%;
+        transform: translate(0%, 30%);
+    }
 
+}
 
 @media only screen and (min-width: 400px) and (max-width: 500px) {
     .planmatch-place {

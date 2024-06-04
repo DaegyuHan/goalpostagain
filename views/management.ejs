@@ -197,16 +197,13 @@
     }
 
     function UploadYoutube() {
-      // 입력된 YouTube URL 가져오기
       var fullURL = document.getElementById('inputYoutubeURL').value;
 
-      // "v=" 이후의 부분 추출
       var videoIdStartIndex = fullURL.indexOf('v=') + 2; // 'v=' 다음부터 시작
 
 
       var videoId = fullURL.substring(videoIdStartIndex);
 
-      // 중간에 나오는 &를 ?로 바꿔서 출력
       var modifiedVideoId = videoId.replace(/&/g, '?');
 
       location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
