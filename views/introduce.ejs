@@ -33,6 +33,155 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
+  <script>
+
+
+
+    // 스탯 부여하기 버튼을 클릭했을 때의 동작
+    function handleStatAllocation() {
+      var statNumElements = document.querySelectorAll('.introduce-stat-num');
+      var inputAreaElements = document.querySelectorAll('.introduce-stat-inputarea');
+      var cancleElements = document.querySelectorAll('.introduce-stat-canclebt');
+      var inputbtElements = document.querySelectorAll('.introduce-stat-inputstatbt');
+      var savebtElements = document.querySelectorAll('.introduce-stat-savebt');
+
+
+      statNumElements.forEach(function (element) {
+        element.style.display = 'none';
+      });
+
+      inputAreaElements.forEach(function (element) {
+        element.style.display = 'block';
+      });
+
+      cancleElements.forEach(function (element) {
+        element.style.display = 'inline-block';
+      });
+
+      inputbtElements.forEach(function (element) {
+        element.style.display = 'none';
+      });
+
+      savebtElements.forEach(function (element) {
+        element.style.display = 'block';
+      });
+    }
+
+    // 취소하기 버튼을 클릭했을 때의 동작
+    function handleCancelAllocation() {
+      var statNumElements = document.querySelectorAll('.introduce-stat-num');
+      var inputAreaElements = document.querySelectorAll('.introduce-stat-inputarea');
+      var cancleElements = document.querySelectorAll('.introduce-stat-canclebt');
+      var inputbtElements = document.querySelectorAll('.introduce-stat-inputstatbt');
+      var savebtElements = document.querySelectorAll('.introduce-stat-savebt');
+
+      statNumElements.forEach(function (element) {
+        element.style.display = 'block';
+      });
+
+      inputAreaElements.forEach(function (element) {
+        element.style.display = 'none';
+      });
+
+      cancleElements.forEach(function (element) {
+        element.style.display = 'none';
+      });
+
+      inputbtElements.forEach(function (element) {
+        element.style.display = 'inline-block';
+      });
+
+      savebtElements.forEach(function (element) {
+        element.style.display = 'none';
+      });
+    }
+
+
+    function sendPlayerInfo(playerInfo) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/statinfo", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var responseData = JSON.parse(xhr.responseText);
+            var name = responseData.username;
+            var num_plus_name = responseData.backnumber + ' ' + responseData.username;
+            // 이미지 요소 가져오기
+            var playerImage = document.querySelector('.player-stat-profile');
+
+            // 받은 이미지 URL을 이미지 요소의 src 속성에 설정
+            playerImage.src = responseData.profileImage;
+            var modalLabel = document.getElementById('exampleModalLabel');
+
+            // 서버에서 전달된 stats 데이터에서 stat1 값을 가져와 input 요소에 설정
+            const stats = responseData.stats;
+            if (stats.length > 0) {
+
+              for (let i=1; i<=18; i++) {
+                document.getElementById('stat'+i).value = stats[0]['stat'+i];
+              }
+              
+            } else {
+              for (let i=1; i<=18; i++) {
+                document.getElementById('stat'+i).value = '0';
+              }
+            }
+
+        <% if (typeof 유저 !== 'undefined') { %>
+
+              modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
+        <%} else {%>
+              modalLabel.innerHTML = num_plus_name;
+        <%}%>
+      } else {
+            console.error("서버 요청 중 오류 발생:", xhr.status);
+          }
+        }
+      };
+      xhr.send(JSON.stringify({ playerInfo: playerInfo }));
+    }
+
+    function SaveStat() {
+      var stat1 = parseInt(document.getElementById("stat1").value);
+      var stat2 = parseInt(document.getElementById("stat2").value);
+      var stat3 = parseInt(document.getElementById("stat3").value);
+      var stat4 = parseInt(document.getElementById("stat4").value);
+      var stat5 = parseInt(document.getElementById("stat5").value);
+      var stat6 = parseInt(document.getElementById("stat6").value);
+      var stat7 = parseInt(document.getElementById("stat7").value);
+      var stat8 = parseInt(document.getElementById("stat8").value);
+      var stat9 = parseInt(document.getElementById("stat9").value);
+      var stat10 = parseInt(document.getElementById("stat10").value);
+      var stat11 = parseInt(document.getElementById("stat11").value);
+      var stat12 = parseInt(document.getElementById("stat12").value);
+      var stat13 = parseInt(document.getElementById("stat13").value);
+      var stat14 = parseInt(document.getElementById("stat14").value);
+      var stat15 = parseInt(document.getElementById("stat15").value);
+      var stat16 = parseInt(document.getElementById("stat16").value);
+      var stat17 = parseInt(document.getElementById("stat17").value);
+      var stat18 = parseInt(document.getElementById("stat18").value);
+
+      // stat 변수들을 배열에 넣어 일괄 검사
+      var stats = [stat1, stat2, stat3, stat4, stat5, stat6, stat7, stat8, stat9, stat10, stat11, stat12, stat13, stat14, stat15, stat16, stat17, stat18];
+
+      // 모든 stat 값이 0초과 10이하의 정수인지 검사
+      var isValid = stats.every(function (stat) {
+        return Number.isInteger(stat) && stat > 0 && stat <= 10;
+      });
+
+      if (isValid) {
+        location.href = `/savestat?stat1=${encodeURIComponent(stat1)}&stat2=${encodeURIComponent(stat2)}&stat3=${encodeURIComponent(stat3)}&stat4=${encodeURIComponent(stat4)}&stat5=${encodeURIComponent(stat5)}&stat6=${encodeURIComponent(stat6)}&stat7=${encodeURIComponent(stat7)}&stat8=${encodeURIComponent(stat8)}&stat9=${encodeURIComponent(stat9)}&stat10=${encodeURIComponent(stat10)}&stat11=${encodeURIComponent(stat11)}&stat12=${encodeURIComponent(stat12)}&stat13=${encodeURIComponent(stat13)}&stat14=${encodeURIComponent(stat14)}&stat15=${encodeURIComponent(stat15)}&stat16=${encodeURIComponent(stat16)}&stat17=${encodeURIComponent(stat17)}&stat18=${encodeURIComponent(stat18)}`;
+
+        alert("저장되었습니다.");
+      } else {
+        alert("올바른 값을 입력하세요. ( 0초과 10이하 )");
+      }
+    }
+
+
+  </script>
+
 
 </head>
 
@@ -57,219 +206,50 @@
         <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/FIXO.png?updatedAt=1702387179359" alt="FIXO">
       </div>
       <div>
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%84%9D%EB%B2%94%EC%88%98_1.png?updatedAt=1705229644663"
-          alt="5석범수">
+          alt="5석범수" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="tjrqjatn97">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EB%85%B8%EC%9A%A9%EC%A4%80_1.png?updatedAt=1705228825011"
-          alt="7노용준">
+          alt="7노용준" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="saaq45">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%ED%95%9C%EB%8C%80%EA%B7%9C_1.png?updatedAt=1707829275463"
-          alt="33한대규" data-bs-toggle="modal" data-bs-target="#Modal33">
-        <!-- Modal -->
-        <div class="modal fade" id="Modal33" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-          style="color: black;">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">33 한대규</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div style="overflow: hidden;" class="modal-body">
-                <!-- <div>
-                  <img class="player-profile"
-                    src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%ED%95%9C%EB%8C%80%EA%B7%9C_1.png?updatedAt=1707829275463"
-                    alt="33한대규">
-                </div> -->
-                <div style="float: left; width: 40%; height: 55%; background-color: white;">
-                  <img class="player-stat-profile"
-                    src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%ED%95%9C%EB%8C%80%EA%B7%9C_1.png?updatedAt=1707829275463"
-                    alt="33한대규">
-                </div>
-                <div style="float: left; width: 60%; height: 55%; background-color: white; padding-bottom: 30px;">
-
-                  <div style="float: left; width: 25%; height: 30%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 25%; height: 30%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 25%; height: 30%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 25%; height: 30%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
-                      alt="33한대규"></div>
-
-
-
-                  <div style="width: 100%; background-color: white;"> </div>
-                  <div style="float: left; width: 50%; height: 35%; background-color: white;"><img
-                      style="width: 56%; margin-left: 33%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001%20%EC%A0%95%EC%82%AC%EA%B0%81%ED%98%95.png?updatedAt=1717412232980"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 50%; height: 35%; background-color: white;"><img style="width: 56%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001%20%EC%A0%95%EC%82%AC%EA%B0%81%ED%98%95.png?updatedAt=1717412232980"
-                      alt="33한대규"></div>
-
-
-                  <div style="float: left; width: 33%; height: 35%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 34%; height: 35%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
-                      alt="33한대규"></div>
-                  <div style="float: left; width: 33%; height: 35%; background-color: white;"><img style="width: 85%;"
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
-                      alt="33한대규"></div>
-
-                </div>
-
-
-                <div>
-                  <div class="introduce-stat-line"></div>
-                  <div class="introduce-stat-maintitle">
-                    <img
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/ON%20THE%20BALL%2020.png?updatedAt=1717413419629"
-                      alt="">
-                  </div>
-                  <div class="introduce-stat-maintitle">
-                    <img
-                      src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/OFF%20THE%20BALL%2020.png?updatedAt=1717413419696"
-                      alt="">
-                  </div>
-                </div>
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">킥</th>
-                      <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">신체능력</th>
-                    </tr>
-
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>킥파워</td>
-                      <td>06</td>
-                      <td>밸런스</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td class="introduce-stat-smallfont2">킥정확도</td>
-                      <td>06</td>
-                      <td>체력</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td>원터치</td>
-                      <td>06</td>
-                      <td>속도</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td>민첩성</td>
-                      <td>06</td>
-                    </tr>
-                  </tbody>
-                  <thead>
-                    <tr>
-                      <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">드리블</th>
-                      <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">지능</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>돌파력</td>
-                      <td>06</td>
-                      <td>시야</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td class="introduce-stat-smallfont">드리블속도</td>
-                      <td>06</td>
-                      <td class="introduce-stat-smallfont2">위치선정</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td>컨트롤</td>
-                      <td>06</td>
-                      <td>판단력</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td>볼키핑</td>
-                      <td>06</td>
-                      <td>적극성</td>
-                      <td>06</td>
-                    </tr>
-                  </tbody>
-
-                  <tbody>
-                    <tr>
-                      <td rowspan="4" colspan="2">
-                        <img style="margin-top: 40px;" class="introduce-stat-logo"
-                        src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%98%A4%EB%8A%98%EB%8F%84%20%EA%B3%A8%EB%8C%80%20%ED%88%AC%EB%AA%85%EB%8F%84%20%EB%A7%88%ED%81%AC.png?updatedAt=1717504141627"
-                        alt="logotrans">
-                      </td>
-                      <td style="font-size: 27px; font-weight: 800;" colspan="2">수비</td>
-                    </tr>
-                    <tr>
-                      <td class="introduce-stat-smallfont2">대인방어</td>
-                      <td>06</td>
-                    </tr><tr>
-                      <td>커버력</td>
-                      <td>06</td>
-                    </tr>
-                    <tr>
-                      <td>태클</td>
-                      <td>06</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-              </div>
-              <div class="modal-footer">
-              </div>
-            </div>
-          </div>
-        </div>
+          alt="33한대규" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="bigstarhan33">
       </div>
 
       <div class="player-profile-name">
         <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/ALA.png?updatedAt=1702387180038" alt="ALA">
       </div>
       <div>
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%98%A4%EC%97%B0%ED%83%9D_1.png?updatedAt=1705228822215"
-          alt="2오연택">
+          alt="2오연택" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="oyt001">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%96%91%EC%B2%A0%EC%A7%84_1.png?updatedAt=1705228824707"
-          alt="4양철진">
+          alt="4양철진" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="cjfwls34">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%9E%A5%ED%9D%AC%EC%8A%B9_1.png?updatedAt=1705229644930"
-          alt="6장희승">
+          alt="6장희승" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="qkrwjd24568">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EA%B9%80%EC%A0%95%ED%9B%88_1.png?updatedAt=1705228824733"
-          alt="10김정훈">
+          alt="10김정훈" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="rere4581">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/KakaoTalk_20240507_175656083.png?updatedAt=1715401219116"
-          alt="11민대식">
+          alt="11민대식" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="als123eotlr">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%9D%B4%EC%B0%AC%EC%9B%85_1.png?updatedAt=1707829274664"
-          alt="14이찬웅">
+          alt="14이찬웅" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="chw7244">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EB%82%98%ED%98%84%EC%88%98_1.png?updatedAt=1705228825019"
-          alt="23나현수">
+          alt="23나현수" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="hsn972">
       </div>
 
 
@@ -277,17 +257,17 @@
         <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/PIVO.png?updatedAt=1702387180104" alt="PIVO">
       </div>
       <div>
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/KakaoTalk_20240507_175656083_01.png?updatedAt=1715401218955"
-          alt="1박승룡">
+          alt="1박승룡" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="박승룡">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%95%88%ED%83%9C%ED%9B%88_1.png?updatedAt=1705228825138"
-          alt="9안태훈">
+          alt="9안태훈" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="taehoon9908">
 
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%9C%A0%EC%84%B1%EC%A7%84_1.png?updatedAt=1707658153905"
-          alt="96유성진">
+          alt="96유성진" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="yusjin96">
       </div>
 
       <div class="player-profile-name">
@@ -295,13 +275,238 @@
           alt="GOLEIRO">
       </div>
       <div>
-        <img class="player-profile"
+        <img onclick="sendPlayerInfo(this.dataset.playerInfo)" class="player-profile"
           src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%ED%99%A9%EB%8D%95%ED%98%84_1.png?updatedAt=1715491303805"
-          alt="99황덕현">
+          alt="99황덕현" data-bs-toggle="modal" data-bs-target="#Modal" data-player-info="ks9071">
       </div>
 
 
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+      style="color: black;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title fs-5" id="exampleModalLabel">33 한대규 <span onclick="handleStatAllocation()"
+                class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()"
+                class="introduce-stat-canclebt">취소하기</span>
+            </div>
+            <button onclick="handleCancelAllocation()" type="button" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div style="overflow: hidden;" class="modal-body">
+            <div style="float: left; width: 40%; height: 55%;">
+              <img class="player-stat-profile"
+                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/introduce/%EC%98%A4%EC%97%B0%ED%83%9D_1.png?updatedAt=1705228822215"
+                alt="33한대규">
+            </div>
+            <div style="float: left; width: 60%; height: 55%; padding-bottom: 30px;">
+
+              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%84%A0%ED%98%B8%20%ED%8F%AC%EC%A7%80%EC%85%98%20%EA%B3%A0%EC%A7%91%20%EC%88%98%EC%A0%953.png?updatedAt=1717414395664"
+                  alt="33한대규"></div>
+
+
+
+              <div style="float: left; width: 50%; height: 35%;"><img style="width: 56%; margin-left: 33%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001%20%EC%A0%95%EC%82%AC%EA%B0%81%ED%98%95.png?updatedAt=1717412232980"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 50%; height: 35%;"><img style="width: 56%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001%20%EC%A0%95%EC%82%AC%EA%B0%81%ED%98%95.png?updatedAt=1717412232980"
+                  alt="33한대규"></div>
+
+
+              <div style="float: left; width: 33%; height: 35%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 34%; height: 35%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
+                  alt="33한대규"></div>
+              <div style="float: left; width: 33%; height: 35%;"><img style="width: 85%;"
+                  src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/INTELLIGENCE%2001_2.png?updatedAt=1717411935013"
+                  alt="33한대규"></div>
+
+            </div>
+            <% if (typeof stats !=='undefined' ) { %>
+              <%=stats%>
+                <%}%>
+                  <div>
+                    <div class="introduce-stat-line"></div>
+                    <div class="introduce-stat-maintitle">
+                      <img
+                        src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/ON%20THE%20BALL%2020.png?updatedAt=1717413419629"
+                        alt="온더볼">
+                    </div>
+                    <div class="introduce-stat-maintitle">
+                      <img
+                        src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/OFF%20THE%20BALL%2020.png?updatedAt=1717413419696"
+                        alt="오프더볼">
+                    </div>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">킥</th>
+                        <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">피지컬</th>
+                      </tr>
+
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="introduce-stat-category">킥파워</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat1" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-category">밸런스</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat2" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-smallfont2">킥정확도</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat3" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-category">체력</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat4" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-category">원터치</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat5" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td>속도</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat6" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="introduce-stat-category">민첩성</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat7" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                    </tbody>
+                    <thead>
+                      <tr>
+                        <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">드리블</th>
+                        <th style="padding-left: 1%;" class="introduce-stat-subtitle" scope="col" colspan="2">지능</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="introduce-stat-category">돌파력</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat8" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-category">시야</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat9" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-smallfont">드리블속도</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat10" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-smallfont2">위치선정</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat11" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-category">컨트롤</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat12" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-category">판단력</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat13" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-category">볼키핑</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat14" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                        <td class="introduce-stat-category">적극성</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat15" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                    </tbody>
+
+                    <tbody>
+                      <tr>
+                        <td rowspan="4" colspan="2">
+                          <img style="margin-top: 40px;" class="introduce-stat-logo"
+                            src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%EC%98%A4%EB%8A%98%EB%8F%84%20%EA%B3%A8%EB%8C%80%20%ED%88%AC%EB%AA%85%EB%8F%84%20%EB%A7%88%ED%81%AC.png?updatedAt=1717504141627"
+                            alt="logotrans">
+                        </td>
+                        <td style="font-size: 27px; font-weight: 800;" colspan="2">수비</td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-smallfont2">대인방어</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat16" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-category">커버력</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat17" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="introduce-stat-category">태클</td>
+                        <td>
+                          <div class="introduce-stat-num">00</div>
+                          <input id="stat18" class="introduce-stat-inputarea" type="text" value="0">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+          </div>
+          <div class="modal-footer">
+            <button id="stat_saveButton" onclick="SaveStat()" class="introduce-stat-savebt">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </body>
 
 </html>

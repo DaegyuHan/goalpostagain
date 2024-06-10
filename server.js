@@ -81,7 +81,7 @@ connectDB.then((client) => {
 
 app.use((req, res, next) => {
   if (req.user) {
-    res.locals.유저 = req.user;
+    res.locals.유저 = req.user || {};
   }
   next();
 })
@@ -606,6 +606,198 @@ app.get('/introduce', async (req, res) => {
 
   res.render('introduce.ejs');
 });
+// app.get('/introduce', async (req, res) => {
+//   const playerInfo = req.session.playerInfo;
+
+//   if (req.user && req.user.userID) {
+//     try {
+//       const userID = req.user.userID;
+//       const stats = await db.collection('stats').find({ userID: userID, 'stat.to_userID': playerInfo}).toArray();
+
+//       // stats 변수를 introduce.ejs에 전달하여 렌더링
+//       res.render('introduce.ejs', { 스탯: stats });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send("서버 오류가 발생했습니다.");
+//     }
+//   } else {
+//     res.render('introduce.ejs', { 스탯 : stats });
+//   }
+// });
+
+app.post('/statinfo', async (req, res) => {
+  const playerInfo = req.body.playerInfo;
+  let userID = null;
+
+  // req.user 객체가 정의되어 있는지 확인 후, userID 설정
+  if (req.user && req.user.userID) {
+    userID = req.user.userID;
+  } else {
+    userID = 0; // req.user.userID가 없는 경우 0을 사용
+  }
+
+  req.session.playerInfo = playerInfo;
+
+  try {
+    // user 컬렉션에서 특정 사용자의 프로필 정보 조회
+    let result = await db.collection('user').aggregate([
+      {
+        $match: {
+          userID: playerInfo
+        }
+      },
+      {
+        $project: {
+          profileImage: 1,
+          backnumber: 1,
+          username: 1
+        }
+      }
+    ]).toArray();
+
+    // user 데이터가 존재하는 경우
+    if (result.length > 0) {
+      // stats 컬렉션에서 특정 조건에 맞는 데이터 조회
+      const stats = await db.collection('stats').find({ userID: userID, 'stat.to_userID': playerInfo}).toArray();
+      const extractedStats = stats.map(stat => stat.stat);
+      // 클라이언트에게 프로필 정보와 통계 정보 함께 응답
+      res.json({
+        profileImage: result[0].profileImage,
+        backnumber: result[0].backnumber,
+        username: result[0].username,
+        stats: extractedStats // stats 데이터 추가
+      });
+      console.log(extractedStats)
+    } else {
+      console.log('해당하는 데이터가 없습니다.');
+      res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('데이터 조회 중 오류 발생:', error.message);
+    res.status(500).json({ error: '데이터 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+
+app.get('/savestat', async (req, res) => {
+  const playerInfo = req.session.playerInfo;
+
+  if (!playerInfo) {
+    return res.status(400).json({ error: 'playerInfo가 없습니다.' });
+  }
+
+  let stats = {
+    userID: req.user.userID,
+    stat: {
+      to_userID: playerInfo,
+      stat1: parseFloat(req.query.stat1),
+      stat2: parseFloat(req.query.stat2),
+      stat3: parseFloat(req.query.stat3),
+      stat4: parseFloat(req.query.stat4),
+      stat5: parseFloat(req.query.stat5),
+      stat6: parseFloat(req.query.stat6),
+      stat7: parseFloat(req.query.stat7),
+      stat8: parseFloat(req.query.stat8),
+      stat9: parseFloat(req.query.stat9),
+      stat10: parseFloat(req.query.stat10),
+      stat11: parseFloat(req.query.stat11),
+      stat12: parseFloat(req.query.stat12),
+      stat13: parseFloat(req.query.stat13),
+      stat14: parseFloat(req.query.stat14),
+      stat15: parseFloat(req.query.stat15),
+      stat16: parseFloat(req.query.stat16),
+      stat17: parseFloat(req.query.stat17),
+      stat18: parseFloat(req.query.stat18)
+    }
+  };
+
+  try {
+    // stats 컬렉션에 데이터 저장
+    await db.collection('stats').updateOne(
+      { userID: req.user.userID, "stat.to_userID": playerInfo },
+      { $set: stats },
+      { upsert: true }
+    );
+
+    // stats_result 컬렉션 업데이트
+    await updateStatsResult(playerInfo);
+
+    res.redirect('/introduce');
+  } catch (error) {
+    console.error('데이터 저장 중 오류 발생:', error.message);
+    res.status(500).json({ error: '데이터 저장 중 오류가 발생했습니다.' });
+  }
+});
+
+async function updateStatsResult(playerInfo) {
+  // 특정 to_userID에 해당하는 stat들의 평균 계산하여 stats_result 컬렉션 업데이트
+  const pipeline = [
+    {
+      $match: {
+        "stat.to_userID": playerInfo
+      }
+    },
+    {
+      $group: {
+        _id: "$stat.to_userID",
+        avg_stat1: { $avg: "$stat.stat1" },
+        avg_stat2: { $avg: "$stat.stat2" },
+        avg_stat3: { $avg: "$stat.stat3" },
+        avg_stat4: { $avg: "$stat.stat4" },
+        avg_stat5: { $avg: "$stat.stat5" },
+        avg_stat6: { $avg: "$stat.stat6" },
+        avg_stat7: { $avg: "$stat.stat7" },
+        avg_stat8: { $avg: "$stat.stat8" },
+        avg_stat9: { $avg: "$stat.stat9" },
+        avg_stat10: { $avg: "$stat.stat10" },
+        avg_stat11: { $avg: "$stat.stat11" },
+        avg_stat12: { $avg: "$stat.stat12" },
+        avg_stat13: { $avg: "$stat.stat13" },
+        avg_stat14: { $avg: "$stat.stat14" },
+        avg_stat15: { $avg: "$stat.stat15" },
+        avg_stat16: { $avg: "$stat.stat16" },
+        avg_stat17: { $avg: "$stat.stat17" },
+        avg_stat18: { $avg: "$stat.stat18" }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        to_userID: "$_id",
+        avg_stat1: { $toInt: { $round: ["$avg_stat1", 0] }},
+        avg_stat2: { $toInt: { $round: ["$avg_stat2", 0] }},
+        avg_stat3: { $toInt: { $round: ["$avg_stat3", 0] }},
+        avg_stat4: { $toInt: { $round: ["$avg_stat4", 0] }},
+        avg_stat5: { $toInt: { $round: ["$avg_stat5", 0] }},
+        avg_stat6: { $toInt: { $round: ["$avg_stat6", 0] }},
+        avg_stat7: { $toInt: { $round: ["$avg_stat7", 0] }},
+        avg_stat8: { $toInt: { $round: ["$avg_stat8", 0] }},
+        avg_stat9: { $toInt: { $round: ["$avg_stat9", 0] }},
+        avg_stat10: { $toInt: { $round: ["$avg_stat10", 0] }},
+        avg_stat11: { $toInt: { $round: ["$avg_stat11", 0] }},
+        avg_stat12: { $toInt: { $round: ["$avg_stat12", 0] }},
+        avg_stat13: { $toInt: { $round: ["$avg_stat13", 0] }},
+        avg_stat14: { $toInt: { $round: ["$avg_stat14", 0] }},
+        avg_stat15: { $toInt: { $round: ["$avg_stat15", 0] }},
+        avg_stat16: { $toInt: { $round: ["$avg_stat16", 0] }},
+        avg_stat17: { $toInt: { $round: ["$avg_stat17", 0] }},
+        avg_stat18: { $toInt: { $round: ["$avg_stat18", 0] }}
+      }
+    }
+  ];
+
+  const result = await db.collection('stats').aggregate(pipeline).toArray();
+
+  if (result.length > 0) {
+    // stats_result 컬렉션 업데이트
+    await db.collection('stats_result').updateOne(
+      { to_userID: playerInfo },
+      { $set: result[0] },
+      { upsert: true }
+    );
+  }
+}
+
 
 app.get('/match-result', async (req, res) => {
   let result = await db.collection('result').find().sort({ _id: -1 }).toArray();

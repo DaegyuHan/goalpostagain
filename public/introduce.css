@@ -1,157 +1,219 @@
 .introduce-main {
-    width: 800px;
-    height: 90%;
-    background-color: #002832;
-    margin: 10% auto 0px auto;
-    color: white;
-    padding-top: 50px;
+  width: 800px;
+  height: 90%;
+  background-color: #002832;
+  margin: 10% auto 0px auto;
+  color: white;
+  padding-top: 50px;
 }
 
 .team-mission-position {
-    width: 100%;
+  width: 100%;
 
-    
+
 }
 
 .team-mission-area {
-    width: 400px;
-    height: 100px;
-    margin: 0px auto 0px auto;
+  width: 400px;
+  height: 100px;
+  margin: 0px auto 0px auto;
 }
 
-.team-mission{
-    max-width: 100%; /* 부모 요소의 최대 너비에 맞게 조정 */
-    max-height: 100%; /* 부모 요소의 최대 높이에 맞게 조정 */
-    width: auto; /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
-    height: auto; /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
+.team-mission {
+  max-width: 100%;
+  /* 부모 요소의 최대 너비에 맞게 조정 */
+  max-height: 100%;
+  /* 부모 요소의 최대 높이에 맞게 조정 */
+  width: auto;
+  /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
+  height: auto;
+  /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
 }
 
 
-.team-pic{
-    max-width: 100%; /* 부모 요소의 최대 너비에 맞게 조정 */
-    max-height: 100%; /* 부모 요소의 최대 높이에 맞게 조정 */
-    width: auto; /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
-    height: auto; /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
+.team-pic {
+  max-width: 100%;
+  /* 부모 요소의 최대 너비에 맞게 조정 */
+  max-height: 100%;
+  /* 부모 요소의 최대 높이에 맞게 조정 */
+  width: auto;
+  /* 가로 크기를 자동으로 조정하여 세로 비율 유지 */
+  height: auto;
+  /* 세로 크기를 자동으로 조정하여 가로 비율 유지 */
 }
 
 .player-profile-area {
-    display: flex;
-    flex-wrap: wrap;
-    /* justify-content: center; */
-  }
+  display: flex;
+  flex-wrap: wrap;
+  /* justify-content: center; */
+}
 
-  .player-profile-area img {
+.player-profile-area img {
 
-    margin: 10px;
-    /* background-color: pink; */
-  }
+  margin: 10px;
+  /* background-color: pink; */
+}
 
-  .player-profile {
-    width: 30%;
-    margin-left: 2%;
-    margin-top: 20px;
-    cursor: pointer;
-  }
+.player-profile {
+  width: 30%;
+  margin-left: 2%;
+  margin-top: 20px;
+  cursor: pointer;
+}
 
-  .player-profile-name {
-    margin-top: 80px;
-    width: 80%;
-  }
+.player-profile-name {
+  margin-top: 80px;
+  width: 80%;
+}
 
-  tbody tr, th, td {
-    border: none;
-  }
+.introduce-stat-inputstatbt {
+  font-size: 50%;
+  color: gray;
+  cursor: pointer;
+  display: inline-block;
+}
 
-  tbody img {
-    align-items: center;
-    margin: 0px 0px 0px 0px;
-    justify-content: center;
-  }
+.introduce-stat-canclebt {
+  font-size: 50%;
+  color: gray;
+  cursor: pointer;
+  display: none;
+}
 
-  .table td {
-    padding: 7px;
-    font-size: 15px;
-    font-weight: 800;
-  }
+.modal-title {
+  font-weight: 800;
+}
 
-  .table th {
-    padding: 10px 0px 0px 0px;
 
-  }
-  
-  .table {
-    width: 100%;
-    margin-left: 8%;
-  }
+tbody tr,
+th,
+td {
+  border: none;
+}
 
-  .table th.introduce-stat-subtitle, .table td {
-    width: 25%; 
-  }
+tbody img {
+  align-items: center;
+  margin: 0px 0px 0px 0px;
+  justify-content: center;
+}
 
-  .player-stat-profile {
-    width: 77%;
-    margin-left: 2%;
-  }
+.table td {
+  padding: 7px;
+  font-weight: 800;
+}
 
-  .introduce-stat-maintitle {
-    float: left;
-    width: 40%;
-    margin-left: 10%;
-  }
+.table th {
+  padding: 10px 0px 0px 0px;
 
-  .introduce-stat-subtitle {
-    font-size: 27px;
-    font-weight: 800;
-  }
+}
 
-  .introduce-stat-logo {
-    width: 80%;
-  }
+.table {
+  width: 100%;
+  margin-left: 8%;
+}
 
-  .introduce-stat-smallfont {
-    font-size: 80% !important;
-  }
+.table th.introduce-stat-subtitle,
+.table td {
+  width: 25%;
+}
 
-  .introduce-stat-smallfont2 {
-    font-size: 85% !important;
-  }
+.player-stat-profile {
+  width: 77%;
+  margin-left: 2%;
+}
 
-  .introduce-stat-line {
-    width: 100%; 
-    height: 1px; 
-    background-color: rgb(235, 235, 235);
-    float: left;
-  }
+.introduce-stat-maintitle {
+  float: left;
+  width: 40%;
+  margin-left: 10%;
+  overflow: hidden;;
+}
 
+.introduce-stat-subtitle {
+  font-size: 150%;
+  font-weight: 800;
+}
+
+.introduce-stat-category {
+  font-size: 90%;
+}
+
+.introduce-stat-num {
+  font-size: 90%;
+  display: block;
+}
+
+.introduce-stat-inputarea {
+  width: 40%;
+  display: none;
+  margin-left: 1%;
+}
+
+.introduce-stat-logo {
+  width: 80%;
+}
+
+.introduce-stat-smallfont {
+  font-size: 80%;
+}
+
+.introduce-stat-smallfont2 {
+  font-size: 85%;
+}
+
+.introduce-stat-line {
+  width: 100%;
+  height: 1px;
+  background-color: rgb(235, 235, 235);
+  float: left;
+}
+
+.modal-footer {
+  text-align: center;
+  justify-content: center;
+}
+
+.introduce-stat-savebt {
+  width: 20%;
+  color: white;
+  background-color: #ff3ca0;
+  border: 0px;
+  border-radius: 3px;
+  display: none;
+}
+
+.introduce-stat-savebt:hover {
+  background-color: #002832;
+}
 
 
 @media only screen and (max-width: 1000px) {
-    .introduce-main {
-        width: 100%;
-    }
+  .introduce-main {
+    width: 100%;
+  }
 
-    .team-mission-area {
-        width: 55%;
-        height: 20%;
-        margin: 60px auto 0px auto;
-    }
+  .team-mission-area {
+    width: 55%;
+    height: 20%;
+    margin: 60px auto 0px auto;
+  }
 
-    .player-profile {
-        width: 45%;
-        margin-left: 3%;
-        margin-top: 6%;
-      }
+  .player-profile {
+    width: 45%;
+    margin-left: 3%;
+    margin-top: 6%;
+  }
 
 
 }
 
-@media only screen and (min-width: 327px) and (max-width: 341) { 
+@media only screen and (min-width: 327px) and (max-width: 341px) {
   .introduce-stat-smallfont {
-    font-size: 60%;
+    font-size: 30%;
   }
 }
 
-@media only screen and (min-width: 200px) and (max-width: 327) { 
+@media only screen and (min-width: 200px) and (max-width: 327) {
   .introduce-stat-smallfont2 {
     font-size: 70%;
   }
