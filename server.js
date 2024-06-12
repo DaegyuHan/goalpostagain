@@ -757,7 +757,12 @@ async function updateStatsResult(playerInfo) {
         avg_stat15: { $avg: "$stat.stat15" },
         avg_stat16: { $avg: "$stat.stat16" },
         avg_stat17: { $avg: "$stat.stat17" },
-        avg_stat18: { $avg: "$stat.stat18" }
+        avg_stat18: { $avg: "$stat.stat18" },
+        kick_avg: { $avg: { $avg: ["$stat.stat1", "$stat.stat3", "$stat.stat5"] } },
+        physical_avg: { $avg: { $avg: ["$stat.stat2", "$stat.stat4", "$stat.stat6", "$stat.stat7"] } },
+        dribble_avg: { $avg: { $avg: ["$stat.stat8", "$stat.stat10", "$stat.stat12", "$stat.stat14"] } },
+        intelligence_avg: { $avg: { $avg: ["$stat.stat9", "$stat.stat11", "$stat.stat13", "$stat.stat15"] } },
+        deffense_avg: { $avg: { $avg: ["$stat.stat16", "$stat.stat17", "$stat.stat18"] } }
       }
     },
     {
@@ -781,7 +786,12 @@ async function updateStatsResult(playerInfo) {
         avg_stat15: { $toInt: { $round: ["$avg_stat15", 0] }},
         avg_stat16: { $toInt: { $round: ["$avg_stat16", 0] }},
         avg_stat17: { $toInt: { $round: ["$avg_stat17", 0] }},
-        avg_stat18: { $toInt: { $round: ["$avg_stat18", 0] }}
+        avg_stat18: { $toInt: { $round: ["$avg_stat18", 0] }},
+        kick_avg: { $toInt: { $round: ["$kick_avg", 0] }},
+        physical_avg: { $toInt: { $round: ["$physical_avg", 0] }},
+        dribble_avg: { $toInt: { $round: ["$dribble_avg", 0] }},
+        intelligence_avg: { $toInt: { $round: ["$intelligence_avg", 0] }},
+        deffense_avg: { $toInt: { $round: ["$deffense_avg", 0] }}
       }
     }
   ];
@@ -797,6 +807,7 @@ async function updateStatsResult(playerInfo) {
     );
   }
 }
+
 
 
 app.get('/match-result', async (req, res) => {
