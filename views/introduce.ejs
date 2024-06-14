@@ -123,18 +123,35 @@
               }
               
             } 
-            // else {
-            //   for (let i=1; i<=18; i++) {
-            //     document.getElementById('stat'+i).value = '0';
-            //   }
-            // }
+            else {
+              for (let i=1; i<=18; i++) {
+                document.getElementById('stat'+i).value = '';
+              }
+            }
+          <% if (typeof 유저 !== 'undefined') { %>
+            var 유저 = '<%=유저.username%>'
+          <%}%>
 
-        <% if (typeof 유저 !== 'undefined') { %>
-
-              modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
-        <%} else {%>
+            if (typeof 유저 !== 'undefined') {
+            if (name === 유저) {
               modalLabel.innerHTML = num_plus_name;
-        <%}%>
+            } else {
+              modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
+            }
+          } else {
+            modalLabel.innerHTML = num_plus_name;
+          }
+        // <% if (typeof 유저 !== 'undefined') { %>
+
+        //       modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
+
+        // <%} else {%>
+        //       modalLabel.innerHTML = num_plus_name;
+        // <%}%>
+        
+
+
+
       } else {
             console.error("서버 요청 중 오류 발생:", xhr.status);
           }

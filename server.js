@@ -667,7 +667,7 @@ app.post('/statinfo', async (req, res) => {
         username: result[0].username,
         stats: extractedStats // stats 데이터 추가
       });
-      console.log(extractedStats)
+      console.log(result[0].username)
     } else {
       console.log('해당하는 데이터가 없습니다.');
       res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
