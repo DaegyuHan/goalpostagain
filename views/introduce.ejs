@@ -118,41 +118,206 @@
             const stats = responseData.stats;
             if (stats.length > 0) {
 
-              for (let i=1; i<=18; i++) {
-                document.getElementById('stat'+i).value = stats[0]['stat'+i];
+              for (let i = 1; i <= 18; i++) {
+                document.getElementById('stat' + i).value = stats[0]['stat' + i];
               }
-              
-            } 
+
+            }
             else {
-              for (let i=1; i<=18; i++) {
-                document.getElementById('stat'+i).value = '';
+              for (let i = 1; i <= 18; i++) {
+                document.getElementById('stat' + i).value = '';
               }
             }
+
+            // 서버에서 전달된 stats_result 데이터에서 각 각에 맞는 데이터를 설정
+            const statsResult = responseData.statsResult;
+            if (statsResult.length > 0) {
+              for (let i = 1; i <= 18; i++) {
+                document.getElementById('statsResult' + i).textContent = '0' + statsResult[0]['avg_stat' + i];
+              }
+            }
+
+            //chr
+            if (statsResult[0].chr.length > 0) {
+              for (let i = 1; i <= 4; i++) {
+                document.getElementById('stat-chr' + i).src = statsResult[0].chr[(i-1)];
+              }
+            }
+
+            //deffense
+            if (statsResult.length > 0) {
+              if (statsResult[0].deffense_avg == '1') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2001.png?updatedAt=1718433587954'
+              }
+              if (statsResult[0].deffense_avg == '2') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2002.png?updatedAt=1718433588068'
+              }
+              if (statsResult[0].deffense_avg == '3') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2003.png?updatedAt=1718433588008'
+              }
+              if (statsResult[0].deffense_avg == '4') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2004.png?updatedAt=1718433588004'
+              }
+              if (statsResult[0].deffense_avg == '5') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2005.png?updatedAt=1718433588073'
+              }
+              if (statsResult[0].deffense_avg == '6') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2006.png?updatedAt=1718433588007'
+              }
+              if (statsResult[0].deffense_avg == '7') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2007.png?updatedAt=1718433588004'
+              }
+              if (statsResult[0].deffense_avg == '8') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2008.png?updatedAt=1718433587971'
+              }
+              if (statsResult[0].deffense_avg == '9') {
+                document.getElementById('deffense_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE/DEFENSE%2009.png?updatedAt=1718433587962'
+              }
+            }
+
+            //dribble
+            if (statsResult.length > 0) {
+              if (statsResult[0].dribble_avg == '1') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2001.png?updatedAt=1718434759244'
+              }
+              if (statsResult[0].dribble_avg == '2') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2002.png?updatedAt=1718434759359'
+              }
+              if (statsResult[0].dribble_avg == '3') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2003.png?updatedAt=1718434759319'
+              }
+              if (statsResult[0].dribble_avg == '4') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2004.png?updatedAt=1718434759315'
+              }
+              if (statsResult[0].dribble_avg == '5') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2005.png?updatedAt=1718434759258'
+              }
+              if (statsResult[0].dribble_avg == '6') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2006.png?updatedAt=1718434759361'
+              }
+              if (statsResult[0].dribble_avg == '7') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2007.png?updatedAt=1718434759318'
+              }
+              if (statsResult[0].dribble_avg == '8') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2008.png?updatedAt=1718434759256'
+              }
+              if (statsResult[0].dribble_avg == '9') {
+                document.getElementById('dribble_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE/DRIBBLE%2009.png?updatedAt=1718434759312'
+              }
+            }
+
+            //intelligence
+            if (statsResult.length > 0) {
+              if (statsResult[0].intelligence_avg == '1') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2001.png?updatedAt=1718435194983'
+              }
+              if (statsResult[0].intelligence_avg == '2') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2002.png?updatedAt=1718435195083'
+              }
+              if (statsResult[0].intelligence_avg == '3') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2003.png?updatedAt=1718435195043'
+              }
+              if (statsResult[0].intelligence_avg == '4') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2004.png?updatedAt=1718435195080'
+              }
+              if (statsResult[0].intelligence_avg == '5') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2005.png?updatedAt=1718435195047'
+              }
+              if (statsResult[0].intelligence_avg == '6') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2006.png?updatedAt=1718435195058'
+              }
+              if (statsResult[0].intelligence_avg == '7') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2007.png?updatedAt=1718435195012'
+              }
+              if (statsResult[0].intelligence_avg == '8') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2008.png?updatedAt=1718435195061'
+              }
+              if (statsResult[0].intelligence_avg == '9') {
+                document.getElementById('intelligence_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE/INTELLIGENCE%2009.png?updatedAt=1718435195071'
+              }
+            }
+
+            //kick
+            if (statsResult.length > 0) {
+              if (statsResult[0].kick_avg == '1') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2001.png?updatedAt=1718433138463'
+              }
+              if (statsResult[0].kick_avg == '2') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2002.png?updatedAt=1718433138598'
+              }
+              if (statsResult[0].kick_avg == '3') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2003.png?updatedAt=1718433138507'
+              }
+              if (statsResult[0].kick_avg == '4') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2004.png?updatedAt=1718433138502'
+              }
+              if (statsResult[0].kick_avg == '5') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2005.png?updatedAt=1718433138577'
+              }
+              if (statsResult[0].kick_avg == '6') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2006.png?updatedAt=1718433138515'
+              }
+              if (statsResult[0].kick_avg == '7') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2007.png?updatedAt=1718433138520'
+              }
+              if (statsResult[0].kick_avg == '8') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2008.png?updatedAt=1718433138594'
+              }
+              if (statsResult[0].kick_avg == '9') {
+                document.getElementById('kick_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK/KICK%2009.png?updatedAt=1718433138480'
+              }
+            }
+
+            //physical
+            if (statsResult.length > 0) {
+              if (statsResult[0].physical_avg == '1') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2001.png?updatedAt=1718435426452'
+              }
+              if (statsResult[0].physical_avg == '2') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2002.png?updatedAt=1718435426551'
+              }
+              if (statsResult[0].physical_avg == '3') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2003.png?updatedAt=1718435426589'
+              }
+              if (statsResult[0].physical_avg == '4') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2004.png?updatedAt=1718435426531'
+              }
+              if (statsResult[0].physical_avg == '5') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2005.png?updatedAt=1718435426823'
+              }
+              if (statsResult[0].physical_avg == '6') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2006.png?updatedAt=1718435426782'
+              }
+              if (statsResult[0].physical_avg == '7') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2007.png?updatedAt=1718435426860'
+              }
+              if (statsResult[0].physical_avg == '8') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2008.png?updatedAt=1718435426887'
+              }
+              if (statsResult[0].physical_avg == '9') {
+                document.getElementById('physical_avg_img').src = 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL/PHYSICAL%2009.png?updatedAt=1718435426484'
+              }
+            }
+
+          
+
           <% if (typeof 유저 !== 'undefined') { %>
             var 유저 = '<%=유저.username%>'
-          <%}%>
+                <%}%>
 
             if (typeof 유저 !== 'undefined') {
-            if (name === 유저) {
-              modalLabel.innerHTML = num_plus_name;
+              if (name === 유저) {
+                modalLabel.innerHTML = num_plus_name;
+              } else {
+                modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
+              }
             } else {
-              modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
+              modalLabel.innerHTML = num_plus_name;
             }
+
+
+
           } else {
-            modalLabel.innerHTML = num_plus_name;
-          }
-        // <% if (typeof 유저 !== 'undefined') { %>
-
-        //       modalLabel.innerHTML = num_plus_name + ' <span onclick="handleStatAllocation()" class="introduce-stat-inputstatbt">스탯부여하기</span><span onclick="handleCancelAllocation()" class="introduce-stat-canclebt">취소하기</span>';
-
-        // <%} else {%>
-        //       modalLabel.innerHTML = num_plus_name;
-        // <%}%>
-        
-
-
-
-      } else {
             console.error("서버 요청 중 오류 발생:", xhr.status);
           }
         }
@@ -322,36 +487,37 @@
             </div>
             <div style="float: left; width: 60%; height: 55%; padding-bottom: 30px;">
 
-              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+              <div style="float: left; width: 25%; height: 30%;"><img id="stat-chr1" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/none.png?updatedAt=1718208375239"
                   alt="none"></div>
-              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+              <div style="float: left; width: 25%; height: 30%;"><img id="stat-chr2" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/none.png?updatedAt=1718208375239"
                   alt="none"></div>
-              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+              <div style="float: left; width: 25%; height: 30%;"><img id="stat-chr3" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/none.png?updatedAt=1718208375239"
                   alt="none"></div>
-              <div style="float: left; width: 25%; height: 30%;"><img style="width: 85%;"
+              <div style="float: left; width: 25%; height: 30%;"><img id="stat-chr4" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/none.png?updatedAt=1718208375239"
                   alt="none"></div>
 
 
 
-              <div style="float: left; width: 50%; height: 35%;"><img style="width: 56%; margin-left: 33%;"
+              <div style="float: left; width: 50%; height: 35%;"><img id="kick_avg_img"
+                  style="width: 56%; margin-left: 33%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/KICK%2000.png?updatedAt=1718208201937"
                   alt="kick00"></div>
-              <div style="float: left; width: 50%; height: 35%;"><img style="width: 56%;"
+              <div style="float: left; width: 50%; height: 35%;"><img id="physical_avg_img" style="width: 56%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/PHYSICAL%2000.png?updatedAt=1718208201887"
                   alt="physical00"></div>
 
 
-              <div style="float: left; width: 33%; height: 35%;"><img style="width: 85%;"
+              <div style="float: left; width: 33%; height: 35%;"><img id="dribble_avg_img" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DRIBBLE%2000.png?updatedAt=1718208201854"
                   alt="dribble00"></div>
-              <div style="float: left; width: 34%; height: 35%;"><img style="width: 85%;"
+              <div style="float: left; width: 34%; height: 35%;"><img id="intelligence_avg_img" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/INTELLIGENCE%2000.png?updatedAt=1718208201885"
                   alt="intelligence00"></div>
-              <div style="float: left; width: 33%; height: 35%;"><img style="width: 85%;"
+              <div style="float: left; width: 33%; height: 35%;"><img id="deffense_avg_img" style="width: 85%;"
                   src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/average/DEFENSE%2000.png?updatedAt=1718208201881"
                   alt="defense00"></div>
 
@@ -384,36 +550,36 @@
                       <tr>
                         <td class="introduce-stat-category">킥파워</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult1" class="introduce-stat-num">00</div>
                           <input id="stat1" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-category">밸런스</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult2" class="introduce-stat-num">00</div>
                           <input id="stat2" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-smallfont2">킥정확도</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult3" class="introduce-stat-num">00</div>
                           <input id="stat3" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-category">체력</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult4" class="introduce-stat-num">00</div>
                           <input id="stat4" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-category">원터치</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult5" class="introduce-stat-num">00</div>
                           <input id="stat5" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td>속도</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult6" class="introduce-stat-num">00</div>
                           <input id="stat6" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
@@ -422,7 +588,7 @@
                         <td></td>
                         <td class="introduce-stat-category">민첩성</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult7" class="introduce-stat-num">00</div>
                           <input id="stat7" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
@@ -437,48 +603,48 @@
                       <tr>
                         <td class="introduce-stat-category">돌파력</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult8" class="introduce-stat-num">00</div>
                           <input id="stat8" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-category">시야</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult9" class="introduce-stat-num">00</div>
                           <input id="stat9" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-smallfont">드리블속도</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult10" class="introduce-stat-num">00</div>
                           <input id="stat10" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-smallfont2">위치선정</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult11" class="introduce-stat-num">00</div>
                           <input id="stat11" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-category">컨트롤</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult12" class="introduce-stat-num">00</div>
                           <input id="stat12" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-category">판단력</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult13" class="introduce-stat-num">00</div>
                           <input id="stat13" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-category">볼키핑</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult14" class="introduce-stat-num">00</div>
                           <input id="stat14" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                         <td class="introduce-stat-category">적극성</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult15" class="introduce-stat-num">00</div>
                           <input id="stat15" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
@@ -496,21 +662,21 @@
                       <tr>
                         <td class="introduce-stat-smallfont2">대인방어</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult16" class="introduce-stat-num">00</div>
                           <input id="stat16" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-category">커버력</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult17" class="introduce-stat-num">00</div>
                           <input id="stat17" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>
                       <tr>
                         <td class="introduce-stat-category">태클</td>
                         <td>
-                          <div class="introduce-stat-num">00</div>
+                          <div id="statsResult18" class="introduce-stat-num">00</div>
                           <input id="stat18" class="introduce-stat-inputarea" type="text" placeholder="0">
                         </td>
                       </tr>

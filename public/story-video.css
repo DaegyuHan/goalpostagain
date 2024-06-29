@@ -38,6 +38,18 @@
     height: 200px;
 }
 
+.story-video-moreview {
+    width: 100%;
+}
+
+.story-video-moreviewbt {
+    padding: 15px 0px 15px 0px;
+    cursor: pointer;
+    font-size: 150%;
+    color: rgb(214, 214, 214);
+}
+
+
 
 
 @media only screen and (max-width: 1000px) {

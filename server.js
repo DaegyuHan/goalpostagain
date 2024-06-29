@@ -108,7 +108,37 @@ app.get('/management', async (req, res) => {
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard });
+
+  let avgStats = await db.collection('stats_result_pure').aggregate([
+    {
+      $group: {
+        _id: null,
+        avg_stat1: { $avg: "$avg_stat1" },
+        avg_stat2: { $avg: "$avg_stat2" },
+        avg_stat3: { $avg: "$avg_stat3" },
+        avg_stat4: { $avg: "$avg_stat4" },
+        avg_stat5: { $avg: "$avg_stat5" },
+        avg_stat6: { $avg: "$avg_stat6" },
+        avg_stat7: { $avg: "$avg_stat7" },
+        avg_stat8: { $avg: "$avg_stat8" },
+        avg_stat9: { $avg: "$avg_stat9" },
+        avg_stat10: { $avg: "$avg_stat10" },
+        avg_stat11: { $avg: "$avg_stat11" },
+        avg_stat12: { $avg: "$avg_stat12" },
+        avg_stat13: { $avg: "$avg_stat13" },
+        avg_stat14: { $avg: "$avg_stat14" },
+        avg_stat15: { $avg: "$avg_stat15" },
+        avg_stat16: { $avg: "$avg_stat16" },
+        avg_stat17: { $avg: "$avg_stat17" },
+        avg_stat18: { $avg: "$avg_stat18" }
+      }
+    }
+  ]).toArray();
+
+  // Extract the averages from the result
+  let avgStatsResult = avgStats[0];
+
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard, avgStatsResult: avgStatsResult });
 });
 
 
@@ -184,6 +214,7 @@ app.post('/match-plan', async (req, res) => {
 
 app.get('/result', async (req, res) => {
   let result = db.collection('result').insertOne({
+    year: req.query.year,
     month: req.query.month,
     day: req.query.day,
     day2: req.query.day2,
@@ -606,24 +637,7 @@ app.get('/introduce', async (req, res) => {
 
   res.render('introduce.ejs');
 });
-// app.get('/introduce', async (req, res) => {
-//   const playerInfo = req.session.playerInfo;
 
-//   if (req.user && req.user.userID) {
-//     try {
-//       const userID = req.user.userID;
-//       const stats = await db.collection('stats').find({ userID: userID, 'stat.to_userID': playerInfo}).toArray();
-
-//       // stats 변수를 introduce.ejs에 전달하여 렌더링
-//       res.render('introduce.ejs', { 스탯: stats });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send("서버 오류가 발생했습니다.");
-//     }
-//   } else {
-//     res.render('introduce.ejs', { 스탯 : stats });
-//   }
-// });
 
 app.post('/statinfo', async (req, res) => {
   const playerInfo = req.body.playerInfo;
@@ -660,14 +674,72 @@ app.post('/statinfo', async (req, res) => {
       // stats 컬렉션에서 특정 조건에 맞는 데이터 조회
       const stats = await db.collection('stats').find({ userID: userID, 'stat.to_userID': playerInfo}).toArray();
       const extractedStats = stats.map(stat => stat.stat);
+
+      // stats_result 컬렉션에서 특정 조건에 맞는 데이터 조회
+      const statsResult = await db.collection('stats_result').find({ 'to_userID': playerInfo }).toArray();
+      const extractedStatsResult = statsResult.map(stat => stat);
+
       // 클라이언트에게 프로필 정보와 통계 정보 함께 응답
       res.json({
         profileImage: result[0].profileImage,
         backnumber: result[0].backnumber,
         username: result[0].username,
-        stats: extractedStats // stats 데이터 추가
+        stats: extractedStats, // stats 데이터 추가
+        statsResult: extractedStatsResult // stats_result 데이터 추가
       });
-      console.log(result[0].username)
+    } else {
+      console.log('해당하는 데이터가 없습니다.');
+      res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('데이터 조회 중 오류 발생:', error.message);
+    res.status(500).json({ error: '데이터 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+
+app.post('/statinfo', async (req, res) => {
+  const playerInfo = req.body.playerInfo;
+  let userID = null;
+
+  if (req.user && req.user.userID) {
+    userID = req.user.userID;
+  } else {
+    userID = 0;
+  }
+
+  req.session.playerInfo = playerInfo;
+
+  try {
+    let result = await db.collection('user').aggregate([
+      {
+        $match: {
+          userID: playerInfo
+        }
+      },
+      {
+        $project: {
+          profileImage: 1,
+          backnumber: 1,
+          username: 1
+        }
+      }
+    ]).toArray();
+
+    if (result.length > 0) {
+      const stats = await db.collection('stats').find({ userID: userID, 'stat.to_userID': playerInfo }).toArray();
+      const extractedStats = stats.map(stat => stat.stat);
+
+      const statsResult = await db.collection('stats_result').find({ 'to_userID': playerInfo }).toArray();
+      const extractedStatsResult = statsResult.map(stat => stat);
+
+      res.json({
+        profileImage: result[0].profileImage,
+        backnumber: result[0].backnumber,
+        username: result[0].username,
+        stats: extractedStats,
+        statsResult: extractedStatsResult
+      });
     } else {
       console.log('해당하는 데이터가 없습니다.');
       res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
@@ -712,14 +784,12 @@ app.get('/savestat', async (req, res) => {
   };
 
   try {
-    // stats 컬렉션에 데이터 저장
     await db.collection('stats').updateOne(
       { userID: req.user.userID, "stat.to_userID": playerInfo },
       { $set: stats },
       { upsert: true }
     );
 
-    // stats_result 컬렉션 업데이트
     await updateStatsResult(playerInfo);
 
     res.redirect('/introduce');
@@ -730,7 +800,6 @@ app.get('/savestat', async (req, res) => {
 });
 
 async function updateStatsResult(playerInfo) {
-  // 특정 to_userID에 해당하는 stat들의 평균 계산하여 stats_result 컬렉션 업데이트
   const pipeline = [
     {
       $match: {
@@ -799,14 +868,110 @@ async function updateStatsResult(playerInfo) {
   const result = await db.collection('stats').aggregate(pipeline).toArray();
 
   if (result.length > 0) {
-    // stats_result 컬렉션 업데이트
     await db.collection('stats_result').updateOne(
       { to_userID: playerInfo },
       { $set: result[0] },
       { upsert: true }
     );
   }
+
+  // 새로운 파이프라인으로 소수 첫째 자리까지 반올림한 평균 계산 및 저장
+  const pipelinePure = [
+    {
+      $match: {
+        "stat.to_userID": playerInfo
+      }
+    },
+    {
+      $group: {
+        _id: "$stat.to_userID",
+        avg_stat1: { $avg: "$stat.stat1" },
+        avg_stat2: { $avg: "$stat.stat2" },
+        avg_stat3: { $avg: "$stat.stat3" },
+        avg_stat4: { $avg: "$stat.stat4" },
+        avg_stat5: { $avg: "$stat.stat5" },
+        avg_stat6: { $avg: "$stat.stat6" },
+        avg_stat7: { $avg: "$stat.stat7" },
+        avg_stat8: { $avg: "$stat.stat8" },
+        avg_stat9: { $avg: "$stat.stat9" },
+        avg_stat10: { $avg: "$stat.stat10" },
+        avg_stat11: { $avg: "$stat.stat11" },
+        avg_stat12: { $avg: "$stat.stat12" },
+        avg_stat13: { $avg: "$stat.stat13" },
+        avg_stat14: { $avg: "$stat.stat14" },
+        avg_stat15: { $avg: "$stat.stat15" },
+        avg_stat16: { $avg: "$stat.stat16" },
+        avg_stat17: { $avg: "$stat.stat17" },
+        avg_stat18: { $avg: "$stat.stat18" },
+        kick_avg: { $avg: { $avg: ["$stat.stat1", "$stat.stat3", "$stat.stat5"] } },
+        physical_avg: { $avg: { $avg: ["$stat.stat2", "$stat.stat4", "$stat.stat6", "$stat.stat7"] } },
+        dribble_avg: { $avg: { $avg: ["$stat.stat8", "$stat.stat10", "$stat.stat12", "$stat.stat14"] } },
+        intelligence_avg: { $avg: { $avg: ["$stat.stat9", "$stat.stat11", "$stat.stat13", "$stat.stat15"] } },
+        deffense_avg: { $avg: { $avg: ["$stat.stat16", "$stat.stat17", "$stat.stat18"] } }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        to_userID: "$_id",
+        avg_stat1: { $round: ["$avg_stat1", 2] },
+        avg_stat2: { $round: ["$avg_stat2", 2] },
+        avg_stat3: { $round: ["$avg_stat3", 2] },
+        avg_stat4: { $round: ["$avg_stat4", 2] },
+        avg_stat5: { $round: ["$avg_stat5", 2] },
+        avg_stat6: { $round: ["$avg_stat6", 2] },
+        avg_stat7: { $round: ["$avg_stat7", 2] },
+        avg_stat8: { $round: ["$avg_stat8", 2] },
+        avg_stat9: { $round: ["$avg_stat9", 2] },
+        avg_stat10: { $round: ["$avg_stat10", 2] },
+        avg_stat11: { $round: ["$avg_stat11", 2] },
+        avg_stat12: { $round: ["$avg_stat12", 2] },
+        avg_stat13: { $round: ["$avg_stat13", 2] },
+        avg_stat14: { $round: ["$avg_stat14", 2] },
+        avg_stat15: { $round: ["$avg_stat15", 2] },
+        avg_stat16: { $round: ["$avg_stat16", 2] },
+        avg_stat17: { $round: ["$avg_stat17", 2] },
+        avg_stat18: { $round: ["$avg_stat18", 2] },
+        kick_avg: { $round: ["$kick_avg", 2] },
+        physical_avg: { $round: ["$physical_avg", 2] },
+        dribble_avg: { $round: ["$dribble_avg", 2] },
+        intelligence_avg: { $round: ["$intelligence_avg", 2] },
+        deffense_avg: { $round: ["$deffense_avg", 2] }
+      }
+    }
+  ];
+
+  const resultPure = await db.collection('stats').aggregate(pipelinePure).toArray();
+
+  if (resultPure.length > 0) {
+    await db.collection('stats_result_pure').updateOne(
+      { to_userID: playerInfo },
+      { $set: resultPure[0] },
+      { upsert: true }
+    );
+  }
 }
+
+
+
+app.get('/ChrStat', async (req, res) => {
+  try {
+    let userID = req.query.userID;
+    let chr = req.query.chr.split(','); // 쉼표로 구분된 문자열을 배열로 변환
+
+    // stats_result 컬렉션에서 문서를 업데이트
+    let result = await db.collection('stats_result').updateOne(
+      { to_userID: userID }, // 필터: 해당 userID를 가진 문서를 찾음
+      { $set: { chr: chr } }, // 업데이트: chr 필드를 새로운 값으로 설정
+      { upsert: true } // 옵션: 문서가 존재하지 않으면 새로 삽입
+    );
+
+    res.redirect('back');
+  } catch (error) {
+    console.error('stats_result 업데이트 중 오류 발생:', error.message);
+    res.status(500).send('내부 서버 오류');
+  }
+});
 
 
 
@@ -1002,11 +1167,21 @@ app.get('/photo-comment-delete/:id', async (req, res) => {
 })
 
 app.get('/video', this.isLoggedIn, async (req, res) => {
-  let URL = await db.collection('youtubeURL').find().sort({ _id: -1 }).toArray();
-  res.render('video.ejs', { URL: URL });
+  let URL3 = await db.collection('youtubeURL').find().sort({ _id: -1 }).limit(3).toArray();
+
+  res.render('video.ejs', { URL3:URL3 });
 });
 
-
+app.get('/load-more-videos', this.isLoggedIn, async (req, res) => {
+  try {
+    // DB에서 추가적인 비디오 데이터를 가져옴
+    const newVideos = await db.collection('youtubeURL').find().sort({ _id: -1 }).skip(3).toArray();
+    res.json(newVideos); // JSON 형식으로 클라이언트에 응답
+  } catch (error) {
+    console.error('Error loading more videos:', error);
+    res.status(500).send('Failed to load more videos');
+  }
+});
 
 
 app.get('/UploadURL', async (req, res) => {

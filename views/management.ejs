@@ -114,7 +114,7 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_02.png?updatedAt=1718033243449">
           </div>`
           break
-          case '황덕현':
+        case '황덕현':
           var MVP_Name = '황덕현'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_01.png?updatedAt=1718033243911">
@@ -135,6 +135,7 @@
     }
 
     function upload_match() {
+      var year = document.getElementById("match-result-year").value;
       var month = document.getElementById("match-result-month").value;
       var day = document.getElementById("match-result-day").value;
       var day2 = document.getElementById("match-result-day2").value;
@@ -169,7 +170,7 @@
             alt="win">`
       }
 
-      location.href = `/result?month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&day2=${encodeURIComponent(day2)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}&resultlogo=${encodeURIComponent(resultlogo)}&home_resultlogo=${encodeURIComponent(home_resultlogo)}`;
+      location.href = `/result?year=${encodeURIComponent(year)}&month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&day2=${encodeURIComponent(day2)}&time=${encodeURIComponent(time)}&place=${encodeURIComponent(place)}&homescore=${encodeURIComponent(homescore)}&awayscore=${encodeURIComponent(awayscore)}&awayname=${encodeURIComponent(awayname)}&resultlogo=${encodeURIComponent(resultlogo)}&home_resultlogo=${encodeURIComponent(home_resultlogo)}`;
 
       alert("등록되었습니다.")
     }
@@ -197,17 +198,22 @@
     }
 
     function UploadYoutube() {
-      var fullURL = document.getElementById('inputYoutubeURL').value;
+  var fullURL = document.getElementById('inputYoutubeURL').value;
+  var videoId;
 
-      var videoIdStartIndex = fullURL.indexOf('v=') + 2; // 'v=' 다음부터 시작
+  if (fullURL.startsWith('https://www.youtube.com/watch?v=')) {
+    var videoIdStartIndex = fullURL.indexOf('v=') + 2;
+    videoId = fullURL.substring(videoIdStartIndex);
+  } else if (fullURL.startsWith('https://youtu.be/')) {
+    var videoIdStartIndex = fullURL.indexOf('.be/') + 4;
+    var videoIdEndIndex = fullURL.indexOf('?') !== -1 ? fullURL.indexOf('?') : fullURL.length;
+    videoId = fullURL.substring(videoIdStartIndex, videoIdEndIndex);
+  }
 
+  var modifiedVideoId = videoId.replace(/&/g, '?');
+  location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
+}
 
-      var videoId = fullURL.substring(videoIdStartIndex);
-
-      var modifiedVideoId = videoId.replace(/&/g, '?');
-
-      location.href = `/UploadURL?URL=${encodeURIComponent(modifiedVideoId)}`;
-    }
 
     function reset_ShootingGame() {
       var confirmDelete = confirm('정말 초기화하시겠습니까?');
@@ -215,6 +221,18 @@
       if (confirmDelete) {
         window.location.href = '/reset-shootinggame'
       }
+    }
+
+    function ChrStat() {
+      var userID = document.getElementById("chr-userID").value;
+      var chr1 = document.getElementById("chr-choose1").value;
+      var chr2 = document.getElementById("chr-choose2").value;
+      var chr3 = document.getElementById("chr-choose3").value;
+      var chr4 = document.getElementById("chr-choose4").value;
+      var chr = [chr1, chr2, chr3, chr4]
+
+
+      location.href = `/ChrStat?userID=${encodeURIComponent(userID)}&chr=${encodeURIComponent(chr)}`;
     }
 
 
@@ -233,6 +251,12 @@
         <button onclick="gotoNoticePost()" class="btn btn-primary">작성하기</button>
 
       </div>
+
+      <% if (typeof 유저 !=='undefined' ) { %>
+        <% if (유저.username == '한대규'||유저.username == '관리자'||유저.username == '양철진'||유저.username == '안태훈'||유저.username == '김정훈') {%>
+
+
+
 
       <form class="form-box" action="/match-plan" method="POST">
         <div class="management-container">
@@ -289,6 +313,8 @@
           </div>
         </div>
       </div>
+
+      
       <div class="management-container">
         <h4>경기결과</h4>
         <div style="height: 250px;">
@@ -413,15 +439,81 @@
       <div class="management-container">
         <button class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
       </div>
+      <%}%>
+      <%}%>
+
+      <% if (typeof 유저 !=='undefined' ) { %>
+        <% if (유저.username=='한대규'||유저.username == '석범수'  ) { %>
+
+      <div class="management-container">
+        <h4>선수 특성 부여</h4>
+        <select class="form-select" id="chr-userID">
+          <option value="박승룡">박승룡</option>
+              <option value="oyt001">오연택</option>
+              <option value="cjfwls34">양철진</option>
+              <option value="tjrqjatn97">석범수</option>
+              <option value="qkrwjd24568">장희승</option>
+              <option value="saaq45">노용준</option>
+              <option value="taehoon9908">안태훈</option>
+              <option value="rere4581">김정훈</option>
+              <option value="als123eotlr">민대식</option>
+              <option value="chw7244">이찬웅</option>
+              <option value="hsn972">나현수</option>
+              <option value="bigstarhan33">한대규</option>
+              <option value="yusjin96">유성진</option>
+              <option value="ks9071">황덕현</option>
+        </select>
+        <div>
 
 
+          <% for (i=1; i<5 ; i++) {%>
+            <select class="form-select" id="chr-choose<%=i%>">
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EB%8C%80%EC%9D%B8%EC%88%98%EB%B9%84.png?updatedAt=1718522627702">대인수비</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EB%91%90%EA%B0%9C%EC%9D%98%20%EC%8B%AC%EC%9E%A5.png?updatedAt=1718522627526">두개의 심장</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EB%A1%9C%EB%B9%99%20%ED%8C%A8%EC%8A%A4.png?updatedAt=1718522627590">로빙 패스</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EB%B8%8C%EB%A3%A8%EC%A0%80.png?updatedAt=1718522671792">브루저</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%82%AC%EC%9D%B4%EB%A0%8C.png?updatedAt=1718522630806">사이렌</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%8A%A4%ED%94%BC%EB%93%9C%20%EB%93%9C%EB%A6%AC%EB%B8%94%EB%9F%AC.png?updatedAt=1718522655404">스피드 드리블러</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%95%84%EC%9B%83%EC%82%AC%EC%9D%B4%EB%93%9C%20%EB%8A%A5%EC%88%99.png?updatedAt=1718522671741">아웃사이드 능숙</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%95%84%ED%81%AC%EB%A1%9C%EB%B0%94%ED%8B%B1.png?updatedAt=1718522631142">아크로바틱</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%9A%B0%EC%B8%A1%20%ED%8C%8C%EA%B4%B4%EC%9E%90.png?updatedAt=1718522630948">우측 파괴자</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%9C%A0%EB%A6%AC%EB%AA%B8.png?updatedAt=1718522630939">유리몸</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%9D%B8%ED%84%B0%EC%85%89%ED%8A%B8.png?updatedAt=1718522671914">인터셉트</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%A3%BC%EB%B0%9C%20%EC%84%A0%ED%98%B8.png?updatedAt=1718522634178">주발 선호</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%B9%A8%EC%B0%A9%ED%95%9C%20%EB%B3%BC%20%EC%86%8C%EC%9C%A0.png?updatedAt=1718522634240">침착한 볼 소유</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%B9%A9%EC%8A%9B%20%EC%84%A0%ED%98%B8.png?updatedAt=1718522634402">칩슛 선호</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%85%8C%ED%81%AC%EB%8B%88%EC%BB%AC.png?updatedAt=1718522671874">테크니컬</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%8B%B0%ED%82%A4%ED%83%80%EC%B9%B4.png?updatedAt=1718522627566">티키 타카</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%8C%8C%EC%9A%B8%20%EC%9C%A0%EB%8F%84.png?updatedAt=1718624343593">파울 유도 선호</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%8C%8C%EC%9B%8C%EC%8A%9B.png?updatedAt=1718522627486">파워 슛</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%8C%A8%EC%8A%A4%EB%A7%88%EC%8A%A4%ED%84%B0.png?updatedAt=1718522671939">패스마스터</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%8D%BC%EC%8A%A4%ED%8A%B8%20%ED%84%B0%EC%B9%98.png?updatedAt=1718522627697">퍼스트 터치</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%94%8C%EB%A0%88%EC%9D%B4%EB%A9%94%EC%9D%B4%EC%BB%A4.png?updatedAt=1718522671798">플레이메이커</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%ED%94%BC%EB%84%A4%EC%8A%A4%20%EC%83%B7.png?updatedAt=1718522671815">피네스 샷</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%B9%A8%EC%B0%A9%ED%95%9C%201%EB%8C%801%20%EC%88%98%EB%B9%84.png?updatedAt=1718624872542">GK 침착한 1:1 수비</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/%EC%A0%81%EA%B7%B9%EC%A0%81%20%EB%8B%A4%EC%9D%B4%EB%B9%99.png?updatedAt=1718624872571">GK 적극적 다이빙</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/GK%20%EB%A9%80%EB%A6%AC%20%EB%8D%98%EC%A7%80%EA%B8%B0.png?updatedAt=1718624872517">GK 멀리 던지기</option>
+              <option value="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/stat/%ED%8A%B9%EC%84%B1/GK%20%EB%8A%A5%EC%88%99%ED%95%9C%20%ED%8E%80%EC%B9%AD.png?updatedAt=1718624872505">GK 능숙한 펀칭</option>
 
+            </select>
+            <%}%>
+          <button class="btn btn-primary" onclick="ChrStat()">등록</button>
+        </div>
+
+      </div>
+      <%}%>
+      <%}%>
+
+      <% if (typeof 유저 !=='undefined' ) { %>
+        <% if (유저.username=='한대규'||유저.username == '김정훈'  ) { %>
       <div style="padding-top: 100px; padding-bottom: 100px;" class="management-container">
         <h4>동영상 업로드</h4>
         <div> youtube 영상 링크 입력</div>
         <input id="inputYoutubeURL" type="text">
         <button class="btn btn-primary" onclick="UploadYoutube()">등록</button>
       </div>
+      <%}%>
+      <%}%>
 
       <% if (typeof 유저 !=='undefined' ) { %>
         <% if (유저.username=='한대규' ) { %>
@@ -436,11 +528,40 @@
           </div>
 
 
-          <%}%>
-            <%}%>
 
 
+
+              <h1>Average Stats Result</h1>
+              <ul>
+                  <li>킥파워: <%= avgStatsResult.avg_stat1.toFixed(1) %></li>
+                  <li>킥정확도: <%= avgStatsResult.avg_stat3.toFixed(1) %></li>
+                  <li>원터치: <%= avgStatsResult.avg_stat5.toFixed(1) %></li>
+                  <hr>      
+                  <li>밸런스: <%= avgStatsResult.avg_stat2.toFixed(1) %></li>
+                  <li>체력: <%= avgStatsResult.avg_stat4.toFixed(1) %></li>
+                  <li>속도: <%= avgStatsResult.avg_stat6.toFixed(1) %></li>    
+                  <li>민첩성: <%= avgStatsResult.avg_stat7.toFixed(1) %></li>  
+                  <hr>
+                  <li>돌파력: <%= avgStatsResult.avg_stat8.toFixed(1) %></li>
+                  <li>드리블속도: <%= avgStatsResult.avg_stat10.toFixed(1) %></li>
+                  <li>컨트롤: <%= avgStatsResult.avg_stat12.toFixed(1) %></li>    
+                  <li>볼키핑: <%= avgStatsResult.avg_stat14.toFixed(1) %></li>  
+                  <hr>
+                  <li>시야: <%= avgStatsResult.avg_stat9.toFixed(1) %></li>
+                  <li>위치선정: <%= avgStatsResult.avg_stat11.toFixed(1) %></li>
+                  <li>판단력: <%= avgStatsResult.avg_stat13.toFixed(1) %></li>    
+                  <li>적극성: <%= avgStatsResult.avg_stat15.toFixed(1) %></li>  
+                  <hr>
+                  <li>대인방어: <%= avgStatsResult.avg_stat16.toFixed(1) %></li>
+                  <li>커버력: <%= avgStatsResult.avg_stat17.toFixed(1) %></li>
+                  <li>태클: <%= avgStatsResult.avg_stat18.toFixed(1) %></li>    
+
+
+              </ul>
+              <%}%>
+              <%}%>
     </div>
+
 </body>
 
 </html>
