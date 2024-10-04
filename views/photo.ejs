@@ -231,22 +231,40 @@
                                         <% } %>
                         </div>
                         <div class="carousel-inner">
-                            <% if (포토[i].img[1]===undefined) { %>
-                                <div class="carousel-item active">
-                                    <img class="carousel-img d-block" src="<%= 포토[i].img[0].location %>" alt="...">
-                                </div>
-                                <% } else { %>
+                            <% if (포토[i].img.length === 1) { %>
+                                <% if (포토[i].img[0]) { %>
                                     <div class="carousel-item active">
                                         <img class="carousel-img d-block" src="<%= 포토[i].img[0].location %>" alt="...">
                                     </div>
-                                    <% for (k=1; k < 포토[i].img.length; k++) { %>
+                                <% } else { %>
+                                    <div class="carousel-item active">
+                                        <p>Image not available</p>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <% if (포토[i].img[0]) { %>
+                                    <div class="carousel-item active">
+                                        <img class="carousel-img d-block" src="<%= 포토[i].img[0].location %>" alt="...">
+                                    </div>
+                                <% } else { %>
+                                    <div class="carousel-item active">
+                                        <p>Image not available</p>
+                                    </div>
+                                <% } %>
+                                <% for (k = 1; k < 포토[i].img.length; k++) { %>
+                                    <% if (포토[i].img[k]) { %>
                                         <div class="carousel-item">
-                                            <img class="carousel-img d-block" src="<%= 포토[i].img[k].location %>"
-                                                alt="...">
+                                            <img class="carousel-img d-block" src="<%= 포토[i].img[k].location %>" alt="...">
                                         </div>
-                                        <% } %>
-                                            <% } %>
+                                    <% } else { %>
+                                        <div class="carousel-item">
+                                            <p>Image not available</p>
+                                        </div>
+                                    <% } %>
+                                <% } %>
+                            <% } %>
                         </div>
+                        
                         <% if (포토[i].img[1] !=undefined) { %>
                             <button style="width: 20px;" class="carousel-control-prev" type="button"
                                 data-bs-target="#carouselExampleIndicators<%= i %>" data-bs-slide="prev">
