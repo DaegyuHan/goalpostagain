@@ -82,6 +82,13 @@ https://hanstory33.tistory.com/category/Project/%EC%B6%95%EA%B5%AC%EB%AA%A8%EC%9
 ## 💡 업데이트 내역
 🔗 [개발자 업데이트 노트](http://www.goalpostagain.com/update-note)
 <details>
+  <summary>2024.12.17 v1.2.3</summary>
+  
+- 송시창(13) 프로필 사진
+  - 팀소개 탭에 시창이형 프로필 사진이 추가되었어요. 그에 따라 MVP 프로필 사진, 사진첩 프로필 등번호도 업데이트 되었습니다. 
+
+</details>
+<details>
   <summary>2024.06.29 v1.2.2</summary>
   
 - 선수 스탯창
