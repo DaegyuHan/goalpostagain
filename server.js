@@ -28,7 +28,7 @@ app.use(session({
   secret: '암호화에 쓸 비번',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 480 * 60 * 1000 },
+  cookie: { maxAge: 12 * 60 * 60 * 1000 },
   // 480분 / 60분 = 8 시간
   store: MongoStore.create({
     mongoUrl: 'mongodb+srv://sparta:test@cluster0.edvfknb.mongodb.net/?retryWrites=true&w=majority',
