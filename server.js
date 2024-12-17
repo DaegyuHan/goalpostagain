@@ -175,6 +175,7 @@ app.get('/mvpboard', async (req, res) => {
     안태훈: req.query.num9,
     김정훈: req.query.num10,
     민대식: req.query.num11,
+    송시창: req.query.num13,
     이찬웅: req.query.num14,
     나현수: req.query.num23,
     한대규: req.query.num33,
