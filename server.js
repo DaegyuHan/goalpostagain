@@ -164,6 +164,7 @@ app.get('/mvp', async (req, res) => {
   res.redirect('/');
 });
 
+// TODO
 app.get('/mvpboard', async (req, res) => {
   let member_score = {
     박승룡: req.query.num1,
@@ -172,6 +173,7 @@ app.get('/mvpboard', async (req, res) => {
     석범수: req.query.num5,
     장희승: req.query.num6,
     노용준: req.query.num7,
+    손윤기: req.query.num8,
     안태훈: req.query.num9,
     김정훈: req.query.num10,
     민대식: req.query.num11,

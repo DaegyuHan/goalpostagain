@@ -73,6 +73,12 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%85%B8%EC%9A%A9%EC%A4%80MVP.png?updatedAt=1705229241093">
           </div>`
           break
+        case '손윤기':
+          var MVP_Name = '손윤기'
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20251110_205138453.png?updatedAt=1762781455199">
+          </div>`
+          break
         case '안태훈':
           var MVP_Name = '안태훈'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
@@ -189,6 +195,7 @@
       var num5 = document.getElementById("management-mvpboard-score5").value;
       var num6 = document.getElementById("management-mvpboard-score6").value;
       var num7 = document.getElementById("management-mvpboard-score7").value;
+      var num8 = document.getElementById("management-mvpboard-score8").value;
       var num9 = document.getElementById("management-mvpboard-score9").value;
       var num10 = document.getElementById("management-mvpboard-score10").value;
       var num11 = document.getElementById("management-mvpboard-score11").value;
@@ -200,7 +207,22 @@
       var num99 = document.getElementById("management-mvpboard-score99").value;
 
 
-      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}&num2=${encodeURIComponent(num2)}&num4=${encodeURIComponent(num4)}&num5=${encodeURIComponent(num5)}&num6=${encodeURIComponent(num6)}&num7=${encodeURIComponent(num7)}&num9=${encodeURIComponent(num9)}&num10=${encodeURIComponent(num10)}&num11=${encodeURIComponent(num11)}&num13=${encodeURIComponent(num13)}&num14=${encodeURIComponent(num14)}&num23=${encodeURIComponent(num23)}&num33=${encodeURIComponent(num33)}&num96=${encodeURIComponent(num96)}&num99=${encodeURIComponent(num99)}`;
+      location.href = `/mvpboard?num1=${encodeURIComponent(num1)}
+      &num2=${encodeURIComponent(num2)}
+      &num4=${encodeURIComponent(num4)}
+      &num5=${encodeURIComponent(num5)}
+      &num6=${encodeURIComponent(num6)}
+      &num7=${encodeURIComponent(num7)}
+      &num8=${encodeURIComponent(num8)}
+      &num9=${encodeURIComponent(num9)}
+      &num10=${encodeURIComponent(num10)}
+      &num11=${encodeURIComponent(num11)}
+      &num13=${encodeURIComponent(num13)}
+      &num14=${encodeURIComponent(num14)}
+      &num23=${encodeURIComponent(num23)}
+      &num33=${encodeURIComponent(num33)}
+      &num96=${encodeURIComponent(num96)}
+      &num99=${encodeURIComponent(num99)}`;
 
       alert("등록되었습니다.")
     }
@@ -301,6 +323,7 @@
           <input class="mvp-date" type="text" id="mvp-date-month" value="<%=매치일정[0].month %>">월
           <input class="mvp-date" type="text" id="mvp-date-day" value="<%=매치일정[0].date %>">일
           <div>
+            <!-- TODO -->
             <select class="form-select" id="WeeklyMVPSelect">
               <option value="박승룡">박승룡</option>
               <option value="오연택">오연택</option>
@@ -308,6 +331,7 @@
               <option value="석범수">석범수</option>
               <option value="장희승">장희승</option>
               <option value="노용준">노용준</option>
+              <option value="손윤기">손윤기</option>
               <option value="안태훈">안태훈</option>
               <option value="김정훈">김정훈</option>
               <option value="민대식">민대식</option>
@@ -359,6 +383,7 @@
         </thead>
         <tbody>
           <tr>
+            <!-- TODO -->
             <th scope="row">1</th>
             <td>박승룡</td>
             <td><input id="management-mvpboard-score1" style="margin-left: 10px;" class="management-input" type="text"
@@ -395,58 +420,64 @@
                 value="<%=Object.values(mvpboard)[5]%>"></td>
           </tr>
           <tr>
+            <th scope="row">8</th>
+            <td>손윤기</td>
+            <td><input id="management-mvpboard-score8" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[6]%>"></td>
+          </tr>
+          <tr>
             <th scope="row">9</th>
             <td>안태훈</td>
             <td><input id="management-mvpboard-score9" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[6]%>"></td>
+                value="<%=Object.values(mvpboard)[7]%>"></td>
           </tr>
           <tr>
             <th scope="row">10</th>
             <td>김정훈</td>
             <td><input id="management-mvpboard-score10" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[7]%>"></td>
+                value="<%=Object.values(mvpboard)[8]%>"></td>
           </tr>
           <tr>
             <th scope="row">11</th>
             <td>민대식</td>
             <td><input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[8]%>"></td>
+                value="<%=Object.values(mvpboard)[9]%>"></td>
           </tr>
           <tr>
             <th scope="row">13</th>
             <td>송시창</td>
             <td><input id="management-mvpboard-score13" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[9]%>"></td>
+                value="<%=Object.values(mvpboard)[10]%>"></td>
           </tr>
           <tr>
             <th scope="row">14</th>
             <td>이찬웅</td>
             <td><input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[10]%>"></td>
+                value="<%=Object.values(mvpboard)[11]%>"></td>
           </tr>
           <tr>
             <th scope="row">23</th>
             <td>나현수</td>
             <td><input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[11]%>"></td>
+                value="<%=Object.values(mvpboard)[12]%>"></td>
           </tr>
           <tr>
             <th scope="row">33</th>
             <td>한대규</td>
             <td><input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[12]%>"></td>
+                value="<%=Object.values(mvpboard)[13]%>"></td>
           </tr>
           <tr>
             <th scope="row">96</th>
             <td>유성진</td>
             <td><input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[13]%>"></td>
+                value="<%=Object.values(mvpboard)[14]%>"></td>
           </tr>
           <tr>
             <th scope="row">99</th>
             <td>황덕현</td>
             <td><input id="management-mvpboard-score99" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[14]%>"></td>
+                value="<%=Object.values(mvpboard)[15]%>"></td>
           </tr>
         </tbody>
       </table>
@@ -460,6 +491,7 @@
       <% if (typeof 유저 !=='undefined' ) { %>
         <% if (유저.username=='한대규'||유저.username == '석범수'  ) { %>
 
+      <!-- TODO -->
       <div class="management-container">
         <h4>선수 특성 부여</h4>
         <select class="form-select" id="chr-userID">
@@ -469,6 +501,7 @@
               <option value="tjrqjatn97">석범수</option>
               <option value="qkrwjd24568">장희승</option>
               <option value="saaq45">노용준</option>
+              <option value="손윤기">손윤기</option>
               <option value="taehoon9908">안태훈</option>
               <option value="rere4581">김정훈</option>
               <option value="als123eotlr">민대식</option>
