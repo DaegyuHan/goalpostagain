@@ -164,9 +164,10 @@ app.get('/mvp', async (req, res) => {
   res.redirect('/');
 });
 
-// TODO
+// TODO1
 app.get('/mvpboard', async (req, res) => {
   let member_score = {
+    이현직: req.query.num0,
     박승룡: req.query.num1,
     오연택: req.query.num2,
     양철진: req.query.num4,
@@ -179,8 +180,12 @@ app.get('/mvpboard', async (req, res) => {
     민대식: req.query.num11,
     송시창: req.query.num13,
     이찬웅: req.query.num14,
+    이기범: req.query.num16,
+    장원하: req.query.num20,
+    이기백: req.query.num22,
     나현수: req.query.num23,
     한대규: req.query.num33,
+    김세론: req.query.num77,
     유성진: req.query.num96,
     황덕현: req.query.num99
   }
