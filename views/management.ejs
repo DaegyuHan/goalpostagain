@@ -290,7 +290,18 @@
       var confirmDelete = confirm('정말 초기화하시겠습니까?');
 
       if (confirmDelete) {
-        window.location.href = '/reset-shootinggame'
+        fetch('/reset-shootinggame', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = '/';
+          }
+        })
+        .catch(error => console.error('Error:', error));
       }
     }
 
@@ -422,6 +433,11 @@
 
       <table class="table" style="margin-top: 50px;">
         <thead>
+          <tr>
+            <td colspan="3">
+              <strong>마지막 저장:</strong> <%= lastSavedUsername %> - <%= lastSavedTime %>
+            </td>
+          </tr>
           <tr>
             <th scope="col">Number</th>
             <th scope="col">Name</th>

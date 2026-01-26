@@ -28,8 +28,8 @@ app.use(session({
   secret: '암호화에 쓸 비번',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 12 * 60 * 60 * 1000 },
-  // 480분 / 60분 = 8 시간
+  cookie: { maxAge: 7 *24 * 60 * 60 * 1000 },
+  // 1 주일
   store: MongoStore.create({
     mongoUrl: 'mongodb+srv://sparta:test@cluster0.edvfknb.mongodb.net/?retryWrites=true&w=majority',
     dbName: 'goalpostagain'
@@ -78,6 +78,14 @@ connectDB.then((client) => {
 // mongoDB library 연결 코드
 
 
+// 로깅 함수
+function logActivity(username, action, details = '') {
+  const timeZone = 'Asia/Seoul';
+  const timestamp = new Date().toLocaleString('ko-KR', { timeZone });
+  const logMessage = `[${timestamp}] 사용자: ${username} | 작업: ${action} ${details}`;
+  console.log(logMessage);
+}
+
 
 app.use((req, res, next) => {
   if (req.user) {
@@ -107,6 +115,8 @@ app.get('/management', async (req, res) => {
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
+  let lastSavedTime = mvpboardDic[0].savedTime || '저장된 시간 없음';
+  let lastSavedUsername = mvpboardDic[0].savedUsername || '저장한 사람 없음';
 
 
   let avgStats = await db.collection('stats_result_pure').aggregate([
@@ -138,7 +148,7 @@ app.get('/management', async (req, res) => {
   // Extract the averages from the result
   let avgStatsResult = avgStats[0];
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard, avgStatsResult: avgStatsResult });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername });
 });
 
 
@@ -155,6 +165,8 @@ app.get('/mvp', async (req, res) => {
 
   let updateResult = await db.collection('result').updateOne(query, { $set: { mvp_name: req.query.MVP_Name } });
 
+  logActivity(req.user.username, 'MVP 선정', `- MVP: ${req.query.MVP_Name} (${req.query.month}.${req.query.day})`);
+
   if (updateResult.modifiedCount === 1) {
     console.log("Result collection 업데이트 성공");
   } else {
@@ -166,6 +178,11 @@ app.get('/mvp', async (req, res) => {
 
 // TODO1
 app.get('/mvpboard', async (req, res) => {
+  const timeZone = 'Asia/Seoul';
+  const now = new Date();
+  const savedTime = now.toLocaleString('ko-KR', { timeZone });
+  const savedUsername = req.user.username;
+
   let member_score = {
     이현직: req.query.num0,
     박승룡: req.query.num1,
@@ -190,8 +207,11 @@ app.get('/mvpboard', async (req, res) => {
     황덕현: req.query.num99
   }
   let result = await db.collection('mvpboard').insertOne({
-    member_score
+    member_score,
+    savedTime: savedTime,
+    savedUsername: savedUsername
   })
+  logActivity(savedUsername, 'MVP Board 점수 저장', `- 총 21명 점수 업데이트`);
   res.redirect('/')
 })
 
@@ -217,6 +237,7 @@ app.post('/match-plan', async (req, res) => {
     place: req.body.planplace,
     address: previousAddress
   })
+  logActivity(req.user.username, '경기 일정 등록', `- ${req.body.planyear}.${req.body.planmonth}.${req.body.plandate} vs ${req.body.planawayteam}`);
   res.redirect('/')
 })
 
@@ -235,6 +256,7 @@ app.get('/result', async (req, res) => {
     home_resultlogo: req.query.home_resultlogo,
     mvp_name: '미정'
   })
+  logActivity(req.user.username, '경기 결과 등록', `- ${req.query.year}.${req.query.month}.${req.query.day} (오골 ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname})`);
   res.redirect('/match-result')
 })
 
@@ -264,7 +286,7 @@ passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) =
 // passport.authenticate('local')() 가 실행될 때 마다 아래 코드도 같이 실행됨 ( 세선만드는 코드 )
 
 passport.serializeUser((user, done) => {
-  console.log(user)
+  console.log(user.username + '님이 로그인하였습니다.');
   process.nextTick(() => {
     done(null, { id: user._id, userID: user.userID })
   })
@@ -453,6 +475,7 @@ app.post('/notice-post', async (req, res) => {
             username: req.user.username
           }
         )
+        logActivity(req.user.username, '공지사항 작성', `- 제목: ${req.body.title} (이미지: ${imageArray.length}개)`);
         res.redirect('/notice/1')
       }
     } catch (e) {
@@ -487,6 +510,7 @@ app.put('/notice-edit', async (req, res) => {
       }
     })
 
+  logActivity(req.user.username, '공지사항 수정', `- ID: ${req.body.id}`);
   res.redirect('/notice/notice-detail/' + req.body.id)
 
 })
@@ -495,6 +519,7 @@ app.get('/notice-delete/:id', async (req, res) => {
   let result = await db.collection('notice').deleteOne({
     _id: new ObjectId(req.params.id)
   })
+  logActivity(req.user.username, '공지사항 삭제', `- ID: ${req.params.id}`);
   res.redirect('/notice/1')
 })
 
@@ -575,6 +600,7 @@ app.post('/update-note-post', async (req, res) => {
             username: req.user.username
           }
         )
+        logActivity(req.user.username, '업데이트 공지 작성', `- 제목: ${req.body.title} (이미지: ${imageArray.length}개)`);
         res.redirect('/update-note')
       }
     } catch (e) {
@@ -974,6 +1000,7 @@ app.get('/ChrStat', async (req, res) => {
       { upsert: true } // 옵션: 문서가 존재하지 않으면 새로 삽입
     );
 
+    logActivity(req.user.username, '선수 특성 부여', `- 대상: ${userID} (${chr.length}개 특성)`);
     res.redirect('back');
   } catch (error) {
     console.error('stats_result 업데이트 중 오류 발생:', error.message);
@@ -989,10 +1016,15 @@ app.get('/match-result', async (req, res) => {
 });
 
 app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
+  const timeZone = 'Asia/Seoul';
+  const today = new Date();
+  const currentMonth = today.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
+  const currentYear = today.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
+  const yearMonth = `${currentYear}-${currentMonth}`;
+
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
-  let ShootingScore = await db.collection('gamezone_shooting').find().toArray();
-
+  let ShootingScore = await db.collection('gamezone_shooting').find({ yearMonth: yearMonth }).sort({ top_score: -1 }).toArray();
 
   res.render('gamezone-shooting.ejs', { mvpboard: mvpboard, ShootingScore: ShootingScore });
 });
@@ -1000,7 +1032,7 @@ app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
 app.post('/gamezone-shooting-extrachance', async (req, res) => {
   let username = req.user.username;
   let userShootingCount = req.body.userShootingCount;
-  console.log(userShootingCount)
+  // console.log(userShootingCount)
 
   await db.collection('user').updateOne(
     { username: username },
@@ -1010,49 +1042,56 @@ app.post('/gamezone-shooting-extrachance', async (req, res) => {
 });
 
 app.get('/gamezone-shooting-scoreboard-check', async (req, res) => {
+  const timeZone = 'Asia/Seoul';
+  const today = new Date();
+  const currentMonth = today.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
+  const currentYear = today.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
+  const yearMonth = `${currentYear}-${currentMonth}`;
+
   let username = req.user.username;
-  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
+  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username, yearMonth: yearMonth });
 
   if (existingUser) {
     res.json({ top_score: existingUser.top_score });
   } else {
-    res.json({ top_score: 0 }); // or any default value if the user doesn't exist
+    res.json({ top_score: 0 });
   }
 });
 
 
 app.get('/gamezone-shooting-scoreboard', async (req, res) => {
+  const timeZone = 'Asia/Seoul';
+  const today = new Date();
+  const currentMonth = today.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
+  const currentYear = today.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
+  const yearMonth = `${currentYear}-${currentMonth}`;
+
   let score = parseInt(req.query.score);
   let username = req.user.username;
 
-  // Check if the user exists in the collection
-  let existingUser = await db.collection('gamezone_shooting').findOne({ name: username });
+  // 같은 월이면 update, 아니면 insert
+  let result = await db.collection('gamezone_shooting').updateOne(
+    { name: username, yearMonth: yearMonth },
+    { $set: { top_score: score, yearMonth: yearMonth } },
+    { upsert: true }
+  );
 
-  if (existingUser) {
-    // Update the top_score with the provided score
-    await db.collection('gamezone_shooting').updateOne(
-      { name: username },
-      { $set: { top_score: score } }
-    );
-    console.log(`${username}'s top_score updated to ${score}`);
-  } else {
-    // If the user does not exist in the collection, insert a new record
-    await db.collection('gamezone_shooting').insertOne({
-      name: username,
-      top_score: score
-    });
-    console.log(`${username}'s record inserted with top_score ${score}`);
-  }
+  logActivity(username, '승부차기 점수 저장', `- 점수: ${score}점 (${yearMonth})`);
 
   res.redirect('back');
 });
 
 
-app.get('/reset-shootinggame', async (req, res) => {
-  const collectionName = 'gamezone_shooting';
+app.post('/reset-shootinggame', async (req, res) => {
+  const timeZone = 'Asia/Seoul';
+  const today = new Date();
+  const currentMonth = today.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
+  const currentYear = today.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
+  const yearMonth = `${currentYear}-${currentMonth}`;
 
-  const collection = db.collection(collectionName);
-  await collection.deleteMany({});
+  const collection = db.collection('gamezone_shooting');
+  await collection.deleteMany({ yearMonth: yearMonth });
+  logActivity(req.user.username, '승부차기 데이터 초기화', `- 삭제월: ${yearMonth}`);
   res.redirect('/')
 })
 
@@ -1197,6 +1236,7 @@ app.get('/UploadURL', async (req, res) => {
   let result = await db.collection('youtubeURL').insertOne({
     URL: req.query.URL
   })
+  logActivity(req.user.username, 'YouTube 영상 업로드', `- 비디오 ID: ${req.query.URL}`);
   res.redirect('/video')
 })
 
