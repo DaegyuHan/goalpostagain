@@ -1101,6 +1101,15 @@ app.post('/reset-shootinggame', async (req, res) => {
 
 app.get('/photo', this.isLoggedIn, async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 10;
+    const skip = (page - 1) * perPage;
+    
+    // 전체 사진 개수 조회
+    const totalPhotos = await db.collection('photo').countDocuments();
+    const totalPages = Math.ceil(totalPhotos / perPage);
+    
+    // 현재 페이지의 사진 10개 로드
     let result = await db.collection('photo').aggregate([
       {
         $lookup: {
@@ -1114,9 +1123,17 @@ app.get('/photo', this.isLoggedIn, async (req, res, next) => {
         $sort: {
           _id: -1
         }
+      },
+      {
+        $skip: skip
+      },
+      {
+        $limit: perPage
       }
     ]).toArray();
-    res.render('photo.ejs', { 포토: result });
+    
+    logActivity(req.user.username, '사진 페이지 접속', `- 페이지: ${page}/${totalPages}`);
+    res.render('photo.ejs', { 포토: result, currentPage: page, totalPages: totalPages });
   } catch (error) {
     console.error(error);
     next(error);
