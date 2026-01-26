@@ -1132,7 +1132,6 @@ app.get('/photo', this.isLoggedIn, async (req, res, next) => {
       }
     ]).toArray();
     
-    logActivity(req.user.username, '사진 페이지 접속', `- 페이지: ${page}/${totalPages}`);
     res.render('photo.ejs', { 포토: result, currentPage: page, totalPages: totalPages });
   } catch (error) {
     console.error(error);

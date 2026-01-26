@@ -8,7 +8,7 @@
     <meta name="supported-color-schemes" content="light" />
     <!-- PWA 설정 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="오늘도골대FC">
     <meta name="theme-color" content="#ff3ca0">
     <!-- 화면 방향 고정 (세로 모드) -->
@@ -514,13 +514,6 @@
             <% if (totalPages > 1) { %>
                 
                 <div class="pagination-container">
-                    <!-- 이전 버튼 -->
-                    <% if (currentPage > 1) { %>
-                        <button class="pagination-btn" onclick="goToPage(<%= currentPage - 1 %>)">← 이전</button>
-                    <% } else { %>
-                        <button class="pagination-btn" disabled>← 이전</button>
-                    <% } %>
-                    
                     <!-- 페이지 번호 -->
                     <% 
                     const pageNumbers = getPaginationRange(currentPage, totalPages);
@@ -544,13 +537,6 @@
                             <span style="color: #999;">...</span>
                         <% } %>
                         <button class="pagination-btn" onclick="goToPage(<%= totalPages %>)"><%= totalPages %></button>
-                    <% } %>
-                    
-                    <!-- 다음 버튼 -->
-                    <% if (currentPage < totalPages) { %>
-                        <button class="pagination-btn" onclick="goToPage(<%= currentPage + 1 %>)">다음 →</button>
-                    <% } else { %>
-                        <button class="pagination-btn" disabled>다음 →</button>
                     <% } %>
                 </div>
             <% } %>
