@@ -177,43 +177,23 @@ app.get('/mvp', async (req, res) => {
 });
 
 // TODO1
-app.get('/mvpboard', async (req, res) => {
+app.post('/mvpboard', async (req, res) => {
   const timeZone = 'Asia/Seoul';
   const now = new Date();
   const savedTime = now.toLocaleString('ko-KR', { timeZone });
   const savedUsername = req.user.username;
 
-  let member_score = {
-    이현직: req.query.num0,
-    박승룡: req.query.num1,
-    오연택: req.query.num2,
-    양철진: req.query.num4,
-    석범수: req.query.num5,
-    장희승: req.query.num6,
-    노용준: req.query.num7,
-    손윤기: req.query.num8,
-    안태훈: req.query.num9,
-    김정훈: req.query.num10,
-    민대식: req.query.num11,
-    송시창: req.query.num13,
-    이찬웅: req.query.num14,
-    이기범: req.query.num16,
-    장원하: req.query.num20,
-    이기백: req.query.num22,
-    나현수: req.query.num23,
-    한대규: req.query.num33,
-    김세론: req.query.num77,
-    유성진: req.query.num96,
-    황덕현: req.query.num99
-  }
-  let result = await db.collection('mvpboard').insertOne({
+  const member_score = req.body;
+
+  await db.collection('mvpboard').insertOne({
     member_score,
-    savedTime: savedTime,
-    savedUsername: savedUsername
-  })
-  logActivity(savedUsername, 'MVP Board 점수 저장', `- 총 21명 점수 업데이트`);
-  res.redirect('/')
-})
+    savedTime,
+    savedUsername
+  });
+
+  logActivity(savedUsername, 'MVP Board 점수 저장', `- 총 ${Object.keys(member_score).length}명 점수 업데이트`);
+  res.json({ ok: true });
+});
 
 app.post('/match-plan', async (req, res) => {
 

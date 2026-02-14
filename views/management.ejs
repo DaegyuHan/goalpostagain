@@ -220,52 +220,41 @@
 
     // TODO1
     function registMVPBoard() {
-      var num0 = document.getElementById("management-mvpboard-score0").value;
-      var num1 = document.getElementById("management-mvpboard-score1").value;
-      var num2 = document.getElementById("management-mvpboard-score2").value;
-      var num4 = document.getElementById("management-mvpboard-score4").value;
-      var num5 = document.getElementById("management-mvpboard-score5").value;
-      var num6 = document.getElementById("management-mvpboard-score6").value;
-      var num7 = document.getElementById("management-mvpboard-score7").value;
-      var num8 = document.getElementById("management-mvpboard-score8").value;
-      var num9 = document.getElementById("management-mvpboard-score9").value;
-      var num10 = document.getElementById("management-mvpboard-score10").value;
-      var num11 = document.getElementById("management-mvpboard-score11").value;
-      var num13 = document.getElementById("management-mvpboard-score13").value;
-      var num14 = document.getElementById("management-mvpboard-score14").value;
-      var num16 = document.getElementById("management-mvpboard-score16").value;
-      var num20 = document.getElementById("management-mvpboard-score20").value;
-      var num22 = document.getElementById("management-mvpboard-score22").value;
-      var num23 = document.getElementById("management-mvpboard-score23").value;
-      var num33 = document.getElementById("management-mvpboard-score33").value;
-      var num77 = document.getElementById("management-mvpboard-score77").value;
-      var num96 = document.getElementById("management-mvpboard-score96").value;
-      var num99 = document.getElementById("management-mvpboard-score99").value;
+      const payload = {
+        이현직: document.getElementById("management-mvpboard-score0").value,
+        박승룡: document.getElementById("management-mvpboard-score1").value,
+        오연택: document.getElementById("management-mvpboard-score2").value,
+        양철진: document.getElementById("management-mvpboard-score4").value,
+        석범수: document.getElementById("management-mvpboard-score5").value,
+        장희승: document.getElementById("management-mvpboard-score6").value,
+        노용준: document.getElementById("management-mvpboard-score7").value,
+        손윤기: document.getElementById("management-mvpboard-score8").value,
+        안태훈: document.getElementById("management-mvpboard-score9").value,
+        김정훈: document.getElementById("management-mvpboard-score10").value,
+        민대식: document.getElementById("management-mvpboard-score11").value,
+        송시창: document.getElementById("management-mvpboard-score13").value,
+        이찬웅: document.getElementById("management-mvpboard-score14").value,
+        이기범: document.getElementById("management-mvpboard-score16").value,
+        장원하: document.getElementById("management-mvpboard-score20").value,
+        이기백: document.getElementById("management-mvpboard-score22").value,
+        나현수: document.getElementById("management-mvpboard-score23").value,
+        한대규: document.getElementById("management-mvpboard-score33").value,
+        김세론: document.getElementById("management-mvpboard-score77").value,
+        유성진: document.getElementById("management-mvpboard-score96").value,
+        황덕현: document.getElementById("management-mvpboard-score99").value
+      };
 
-//TODO1
-      location.href = `/mvpboard?num0=${encodeURIComponent(num0)}
-      &num1=${encodeURIComponent(num1)}
-      &num2=${encodeURIComponent(num2)}
-      &num4=${encodeURIComponent(num4)}
-      &num5=${encodeURIComponent(num5)}
-      &num6=${encodeURIComponent(num6)}
-      &num7=${encodeURIComponent(num7)}
-      &num8=${encodeURIComponent(num8)}
-      &num9=${encodeURIComponent(num9)}
-      &num10=${encodeURIComponent(num10)}
-      &num11=${encodeURIComponent(num11)}
-      &num13=${encodeURIComponent(num13)}
-      &num14=${encodeURIComponent(num14)}
-      &num16=${encodeURIComponent(num16)}
-      &num20=${encodeURIComponent(num20)}
-      &num22=${encodeURIComponent(num22)}
-      &num23=${encodeURIComponent(num23)}
-      &num33=${encodeURIComponent(num33)}
-      &num77=${encodeURIComponent(num77)}
-      &num96=${encodeURIComponent(num96)}
-      &num99=${encodeURIComponent(num99)}`;
-
-      alert("등록되었습니다.")
+      fetch('/mvpboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(() => alert("등록되었습니다."))
+      .catch(err => {
+        console.error(err);
+        alert("등록 실패");
+      });
     }
 
     function UploadYoutube() {
@@ -576,7 +565,7 @@
       </table>
 
       <div class="management-container">
-        <button class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
+        <button type="button" class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
       </div>
       <%}%>
       <%}%>
