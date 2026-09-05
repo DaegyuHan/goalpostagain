@@ -6,6 +6,37 @@ const methodOverride = require('method-override')
 const bcrypt = require('bcrypt')
 const ytdl = require('ytdl-core');
 require('dotenv').config()
+const https = require('https')
+
+// Discord webhook (환경변수 우선)
+const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK || 'https://discord.com/api/webhooks/1545608454650077205/PrVdshqwrV6JItdnMMYkW-Pu0mj7VJOIJNYvfc64qB58wqTVT-DX6vuBNZO71H0pIUjZ';
+
+function sendDiscordNotification(message) {
+  try {
+    const url = new URL(DISCORD_WEBHOOK);
+    const body = { content: message || '' };
+    const postData = JSON.stringify(body);
+
+    const options = {
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      res.on('data', () => {});
+    });
+    req.on('error', (e) => console.error('Discord webhook error:', e));
+    req.write(postData);
+    req.end();
+  } catch (e) {
+    console.error('sendDiscordNotification error:', e);
+  }
+}
 
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public')) // public 폴더 내의 파일을 사용할 수 있게 함 css,js,jpg 파일들(static 파일들)
@@ -456,6 +487,7 @@ app.post('/notice-post', async (req, res) => {
           }
         )
         logActivity(req.user.username, '공지사항 작성', `- 제목: ${req.body.title} (이미지: ${imageArray.length}개)`);
+        sendDiscordNotification(`공지가 등록되었습니다.[${req.body.title}]`);
         res.redirect('/notice/1')
       }
     } catch (e) {
@@ -514,6 +546,7 @@ app.post('/comment', async (req, res) => {
     writer: req.user.username,
     parentId: new ObjectId(req.body.parentId)
   })
+  sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 공지 글 댓글을 달았습니다.`);
   res.redirect('back')
 }
 
@@ -1152,6 +1185,7 @@ app.post('/photo-post', async (req, res) => {
             username: req.user.username
           }
         )
+        sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 사진을 등록하였습니다.`);
         res.redirect('/photo')
       }
     } catch (e) {
@@ -1197,9 +1231,9 @@ app.post('/photo-comment', async (req, res) => {
     writer: req.user.username,
     parentId: new ObjectId(req.body.parentId)
   })
+  sendDiscordNotification(`${req.user?.username || '익명'} 님이 사진에 댓글을 달았습니다. [${req.body.content}]`);
   res.redirect('back')
 }
-
 )
 
 app.get('/photo-comment-delete/:id', async (req, res) => {
