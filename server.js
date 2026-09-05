@@ -249,6 +249,7 @@ app.post('/match-plan', async (req, res) => {
     address: previousAddress
   })
   logActivity(req.user.username, '경기 일정 등록', `- ${req.body.planyear}.${req.body.planmonth}.${req.body.plandate} vs ${req.body.planawayteam}`);
+  sendDiscordNotification(`이번 주 매치가 잡혔습니다. 홈페이지를 확인해주세요 !`);
   res.redirect('/')
 })
 
@@ -268,6 +269,7 @@ app.get('/result', async (req, res) => {
     mvp_name: '미정'
   })
   logActivity(req.user.username, '경기 결과 등록', `- ${req.query.year}.${req.query.month}.${req.query.day} (오골 ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname})`);
+  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname}`);
   res.redirect('/match-result')
 })
 
