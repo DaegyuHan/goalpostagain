@@ -1089,6 +1089,20 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
     { upsert: true }
   );
 
+  // 업데이트 후 현재 월의 1등을 확인하여 조건(점수 >= 10 && 1등) 만족 시 알림 전송
+  const topList = await db.collection('gamezone_shooting')
+    .find({ yearMonth: yearMonth })
+    .sort({ top_score: -1 })
+    .limit(1)
+    .toArray();
+
+  if (topList && topList.length > 0) {
+    const topEntry = topList[0];
+    if (score >= 10 && topEntry.name === username && topEntry.top_score === score) {
+      sendDiscordNotification(`[${username}] 님이 승부차기에서 ${score}점으로 1위를 기록했습니다.`);
+    }
+  }
+
   logActivity(username, '승부차기 점수 저장', `- 점수: ${score}점 (${yearMonth})`);
 
   res.redirect('back');
