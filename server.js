@@ -1033,13 +1033,23 @@ app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
   const today = new Date();
   const currentMonth = today.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
   const currentYear = today.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
-  const yearMonth = `${currentYear}-${currentMonth}`;
+  let yearMonth = `${currentYear}-${currentMonth}`;
+
+  // 쿼리로 이전 달 보기 옵션 지원 (예: ?prev=1)
+  const isPrev = req.query.prev === '1';
+  if (isPrev) {
+    const prevDate = new Date();
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const prevMonth = prevDate.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
+    const prevYear = prevDate.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
+    yearMonth = `${prevYear}-${prevMonth}`;
+  }
 
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
   let ShootingScore = await db.collection('gamezone_shooting').find({ yearMonth: yearMonth }).sort({ top_score: -1 }).toArray();
 
-  res.render('gamezone-shooting.ejs', { mvpboard: mvpboard, ShootingScore: ShootingScore });
+  res.render('gamezone-shooting.ejs', { mvpboard: mvpboard, ShootingScore: ShootingScore, isPrev: isPrev, yearMonth: yearMonth });
 });
 
 app.post('/gamezone-shooting-extrachance', async (req, res) => {
