@@ -201,7 +201,15 @@
     }
 
     // TODO1
-    function registMVPBoard() {
+    function registMVPBoard(applyIncrement = false) {
+      const incrementInput = document.getElementById("management-mvpboard-increment");
+      const increment = incrementInput.value.trim() === '' ? 0 : Number(incrementInput.value);
+
+      if (applyIncrement && !Number.isFinite(increment)) {
+        alert("일괄 가산 점수는 숫자로 입력해주세요.");
+        return;
+      }
+
       const payload = {
         박승룡: document.getElementById("management-mvpboard-score1").value,
         오연택: document.getElementById("management-mvpboard-score2").value,
@@ -222,6 +230,22 @@
         유성진: document.getElementById("management-mvpboard-score96").value,
         황덕현: document.getElementById("management-mvpboard-score99").value
       };
+
+      if (applyIncrement) {
+        const selectedCheckboxes = document.querySelectorAll(".management-mvpboard-checkbox:checked");
+        for (const checkbox of selectedCheckboxes) {
+          const memberName = checkbox.value;
+          const scoreInput = document.getElementById(checkbox.dataset.scoreInput);
+          const currentScore = Number(scoreInput.value);
+
+          if (scoreInput.value.trim() === '' || !Number.isFinite(currentScore)) {
+            alert(`${memberName}의 점수를 숫자로 입력해주세요.`);
+            return;
+          }
+
+          payload[memberName] = String(currentScore + increment);
+        }
+      }
 
       fetch('/mvpboard', {
         method: 'POST',
@@ -399,11 +423,12 @@
       <table class="table" style="margin-top: 50px;">
         <thead>
           <tr>
-            <td colspan="3">
+            <td colspan="4">
               <strong>마지막 저장:</strong> <%= lastSavedUsername %> - <%= lastSavedTime %>
             </td>
           </tr>
           <tr>
+            <th scope="col">Select</th>
             <th scope="col">Number</th>
             <th scope="col">Name</th>
             <th scope="col">Score</th>
@@ -412,108 +437,126 @@
         <tbody>
         <!-- TODO1 -->
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="박승룡" data-score-input="management-mvpboard-score1"></td>
             <th scope="row">1</th>
             <td>박승룡</td>
             <td><input id="management-mvpboard-score1" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[0]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="오연택" data-score-input="management-mvpboard-score2"></td>
             <th scope="row">2</th>
             <td>오연택</td>
             <td><input id="management-mvpboard-score2" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[1]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="양철진" data-score-input="management-mvpboard-score4"></td>
             <th scope="row">4</th>
             <td>양철진</td>
             <td><input id="management-mvpboard-score4" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[2]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="석범수" data-score-input="management-mvpboard-score5"></td>
             <th scope="row">5</th>
             <td>석범수</td>
             <td><input id="management-mvpboard-score5" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[3]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="장희승" data-score-input="management-mvpboard-score6"></td>
             <th scope="row">6</th>
             <td>장희승</td>
             <td><input id="management-mvpboard-score6" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[4]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="노용준" data-score-input="management-mvpboard-score7"></td>
             <th scope="row">7</th>
             <td>노용준</td>
             <td><input id="management-mvpboard-score7" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[5]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="손윤기" data-score-input="management-mvpboard-score8"></td>
             <th scope="row">8</th>
             <td>손윤기</td>
             <td><input id="management-mvpboard-score8" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[6]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="안태훈" data-score-input="management-mvpboard-score9"></td>
             <th scope="row">9</th>
             <td>안태훈</td>
             <td><input id="management-mvpboard-score9" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[7]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="김정훈" data-score-input="management-mvpboard-score10"></td>
             <th scope="row">10</th>
             <td>김정훈</td>
             <td><input id="management-mvpboard-score10" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[8]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="민대식" data-score-input="management-mvpboard-score11"></td>
             <th scope="row">11</th>
             <td>민대식</td>
             <td><input id="management-mvpboard-score11" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[9]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="송시창" data-score-input="management-mvpboard-score13"></td>
             <th scope="row">13</th>
             <td>송시창</td>
             <td><input id="management-mvpboard-score13" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[10]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="이찬웅" data-score-input="management-mvpboard-score14"></td>
             <th scope="row">14</th>
             <td>이찬웅</td>
             <td><input id="management-mvpboard-score14" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[11]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="이기남" data-score-input="management-mvpboard-score18"></td>
             <th scope="row">18</th>
             <td>이기남</td>
             <td><input id="management-mvpboard-score18" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[12]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="나현수" data-score-input="management-mvpboard-score23"></td>
             <th scope="row">23</th>
             <td>나현수</td>
             <td><input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[13]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="한대규" data-score-input="management-mvpboard-score33"></td>
             <th scope="row">33</th>
             <td>한대규</td>
             <td><input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[14]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="이원근" data-score-input="management-mvpboard-score47"></td>
             <th scope="row">47</th>
             <td>이원근</td>
             <td><input id="management-mvpboard-score47" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[15]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="유성진" data-score-input="management-mvpboard-score96"></td>
             <th scope="row">96</th>
             <td>유성진</td>
             <td><input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
                 value="<%=Object.values(mvpboard)[16]%>"></td>
           </tr>
           <tr>
+            <td><input type="checkbox" class="management-mvpboard-checkbox" value="황덕현" data-score-input="management-mvpboard-score99"></td>
             <th scope="row">99</th>
             <td>황덕현</td>
             <td><input id="management-mvpboard-score99" style="margin-left: 10px;" class="management-input" type="text"
@@ -523,7 +566,10 @@
       </table>
 
       <div class="management-container">
-        <button type="button" class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">변경</button>
+        <label for="management-mvpboard-increment">선택 항목 일괄 가산:</label>
+        <input id="management-mvpboard-increment" class="management-input management-mvpboard-increment" type="text" inputmode="decimal">
+        <button type="button" class="btn btn-primary" onclick="registMVPBoard(true)">일괄등록</button>
+        <button type="button" class="btn btn-primary" onclick="registMVPBoard()" style="margin-bottom: 100px;">직접변경</button>
       </div>
       <%}%>
       <%}%>
