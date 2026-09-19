@@ -144,6 +144,7 @@ app.get('/', async (req, res) => {
 app.get('/management', async (req, res) => {
   let result = await db.collection('notice').find().toArray();
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
+  let latestResult = await db.collection('result').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
   let mvpboard = mvpboardDic[0].member_score;
   let lastSavedTime = mvpboardDic[0].savedTime || '저장된 시간 없음';
@@ -179,7 +180,7 @@ app.get('/management', async (req, res) => {
   // Extract the averages from the result
   let avgStatsResult = avgStats[0];
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername });
 });
 
 
@@ -253,6 +254,30 @@ app.post('/match-plan', async (req, res) => {
   res.redirect('/')
 })
 
+app.post('/match-plan/latest', async (req, res) => {
+  const latestMatchPlan = await db.collection('matchplan').findOne({}, { sort: { _id: -1 } });
+
+  if (!latestMatchPlan) {
+    return res.status(404).json({ ok: false, message: '수정할 매치 일정이 없습니다.' });
+  }
+
+  const updatedFields = {
+    year: req.body.planyear,
+    month: req.body.planmonth,
+    date: req.body.plandate,
+    day: req.body.planday,
+    time: req.body.plantime,
+    timeto: req.body.plantimeto,
+    awayteam: req.body.planawayteam,
+    place: req.body.planplace,
+    address: req.body.planaddress || latestMatchPlan.address
+  };
+
+  await db.collection('matchplan').updateOne({ _id: latestMatchPlan._id }, { $set: updatedFields });
+  logActivity(req.user.username, '최근 경기 일정 수정', `- ${updatedFields.year}.${updatedFields.month}.${updatedFields.date} vs ${updatedFields.awayteam}`);
+  res.json({ ok: true });
+});
+
 app.get('/result', async (req, res) => {
   let result = db.collection('result').insertOne({
     year: req.query.year,
@@ -272,6 +297,32 @@ app.get('/result', async (req, res) => {
   sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname}`);
   res.redirect('/match-result')
 })
+
+app.post('/result/latest', async (req, res) => {
+  const latestResult = await db.collection('result').findOne({}, { sort: { _id: -1 } });
+
+  if (!latestResult) {
+    return res.status(404).json({ ok: false, message: '수정할 경기 결과가 없습니다.' });
+  }
+
+  const updatedFields = {
+    year: req.body.year,
+    month: req.body.month,
+    day: req.body.day,
+    day2: req.body.day2,
+    time: req.body.time,
+    place: req.body.place,
+    homescore: String(req.body.homescore),
+    awayscore: String(req.body.awayscore),
+    awayname: req.body.awayname,
+    resultlogo: req.body.resultlogo,
+    home_resultlogo: req.body.home_resultlogo
+  };
+
+  await db.collection('result').updateOne({ _id: latestResult._id }, { $set: updatedFields });
+  logActivity(req.user.username, '최근 경기 결과 수정', `- ${updatedFields.year}.${updatedFields.month}.${updatedFields.day} (오골 ${updatedFields.homescore} : ${updatedFields.awayscore} ${updatedFields.awayname})`);
+  res.json({ ok: true });
+});
 
 app.get('/match-result-delete/:id', async (req, res) => {
   let result = await db.collection('result').deleteOne({

@@ -1,40 +1,402 @@
-.management-title {
-    padding-top: 130px;
+:root {
+    --management-ink: #092f38;
+    --management-muted: #6c7b80;
+    --management-line: #dbe4e6;
+    --management-pink: #ff3ca0;
+    --management-pink-soft: #fff0f7;
+    --management-surface: #ffffff;
+    --management-background: #f4f7f7;
 }
 
-.mvp-date {
-    width: 50px;
+.notice-title {
+    padding-top: 28px;
+    margin-top: 80px;
+    margin-bottom: 18px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
 }
 
-.management-input {
-    width: 50px;
-    margin-bottom: 3px;
+.white-main {
+    width: min(1100px, calc(100% - 28px));
+    height: auto;
+    min-height: calc(100vh - 150px);
+    margin: 0 auto 50px;
+    padding: 28px clamp(16px, 3vw, 42px) 80px;
+    box-sizing: border-box;
+    background: linear-gradient(145deg, #ffffff 0%, var(--management-background) 100%);
+    border: 1px solid rgba(219, 228, 230, 0.9);
+    border-radius: 10px;
+    color: var(--management-ink);
 }
 
-.management-input2 {
-    width: 70px;
-    margin-bottom: 3px;
-
+.management-dashboard-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 8px 4px 24px;
 }
 
-.management-input3 {
-    width: 200px;
-    margin-bottom: 3px;
-
+.management-dashboard-head h1,
+.management-section-heading h2,
+.management-card-title h3 {
+    margin: 0;
+    color: var(--management-ink);
 }
 
-.management-mvpboard-num {
-    width: 20px;
-    margin-left: 10px;
+.management-dashboard-head h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.management-dashboard-head p:not(.management-eyebrow) {
+    margin: 8px 0 0;
+    color: var(--management-muted);
+    font-size: 14px;
+}
+
+.management-eyebrow,
+.management-section-kicker {
+    margin: 0 0 7px;
+    color: var(--management-pink);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.management-status {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border: 1px solid #f4b3d3;
+    border-radius: 999px;
+    background: var(--management-pink-soft);
+    color: #b3266b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.management-status span {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #25a878;
+}
+
+.management-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin: 0 0 22px;
+    padding: 6px;
+    border: 1px solid var(--management-line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 8px 22px rgba(9, 47, 56, 0.06);
+}
+
+.management-tabs a {
+    flex: 1 0 auto;
+    padding: 11px 16px;
+    border-radius: 5px;
+    color: var(--management-muted);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.management-tabs a:hover,
+.management-tabs a.active {
+    background: var(--management-ink);
+    color: white;
+}
+
+.management-is-hidden {
+    display: none !important;
+}
+
+.management-section {
+    scroll-margin-top: 78px;
+    margin: 0 0 22px;
+    padding: 24px;
+    border: 1px solid var(--management-line);
+    border-radius: 8px;
+    background: var(--management-surface);
+    box-shadow: 0 12px 30px rgba(9, 47, 56, 0.06);
+}
+
+.management-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.management-section-heading h2 {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.management-section-note {
+    color: var(--management-muted);
+    font-size: 12px;
+    text-align: right;
 }
 
 .management-container {
-    width: 80%;
-    margin: 0px auto 0px auto;
-    align-items: center;
+    width: 100%;
+    margin: 0 auto;
     text-align: center;
 }
 
-.btn-primary {
-    width: 100px;
+.management-section > .management-container + .management-container {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--management-line);
+}
+
+.management-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.management-card-title h3 {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.management-icon {
+    display: inline-grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 6px;
+    background: var(--management-pink);
+}
+
+.management-icon i {
+    color: white;
+    font-size: 14px;
+}
+
+.management-input,
+.management-input2,
+.management-input3,
+.mvp-date,
+#navi_address,
+#inputYoutubeURL {
+    box-sizing: border-box;
+    min-height: 36px;
+    margin: 4px 2px;
+    padding: 6px 9px;
+    border: 1px solid #cbd8da;
+    border-radius: 4px;
+    background: #fbfdfd;
+    color: var(--management-ink);
+}
+
+.management-input:focus,
+.management-input2:focus,
+.management-input3:focus,
+.mvp-date:focus,
+#navi_address:focus,
+#inputYoutubeURL:focus,
+.form-select:focus {
+    border-color: var(--management-pink);
+    box-shadow: 0 0 0 3px rgba(255, 60, 160, 0.12);
+    outline: 0;
+}
+
+.management-input { width: 58px; }
+.management-input2 { width: 82px; }
+.management-input3 { width: min(220px, 42vw); }
+.mvp-date { width: 58px; }
+#navi_address { width: min(300px, 75vw) !important; }
+#inputYoutubeURL { width: min(420px, 80vw); }
+
+.management-section .form-select {
+    max-width: 360px;
+    margin: 8px auto;
+    border-color: #cbd8da;
+}
+
+.management-section [style*="height"] {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 8px;
+}
+
+.management-section .btn,
+.management-container .btn {
+    width: auto;
+    min-width: 92px;
+    min-height: 38px;
+    margin: 7px 3px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.management-section .btn-primary,
+.management-container .btn-primary {
+    background: var(--management-ink);
+}
+
+.management-section .btn-primary:hover,
+.management-container .btn-primary:hover {
+    background: #155361;
+}
+
+.management-section .btn-secondary,
+.management-container .btn-secondary {
+    background: #e8eef0;
+    color: var(--management-ink);
+}
+
+.management-score-table {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    color: var(--management-ink);
+    vertical-align: middle;
+}
+
+.management-score-table thead th,
+.management-score-table thead td {
+    border-bottom: 1px solid var(--management-line);
+    background: #f3f7f7;
+    color: var(--management-muted);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.management-score-table tbody tr:hover {
+    background: #fff8fb;
+}
+
+.management-score-table td,
+.management-score-table th {
+    padding: 10px 8px;
+    vertical-align: middle;
+}
+
+.management-score-table .management-input {
+    margin: 0;
+}
+
+.management-mvpboard-checkbox {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--management-pink);
+}
+
+.management-tools-section {
+    padding-top: 28px;
+}
+
+.management-tools-section > .management-container {
+    margin-bottom: 34px;
+    padding: 22px;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: #fbfdfd;
+}
+
+.management-tools-section h4,
+.management-tools-section h1 {
+    margin-bottom: 16px;
+    color: var(--management-ink);
+    font-weight: 800;
+}
+
+.management-tools-section ul {
+    max-width: 620px;
+    margin: 20px auto;
+    padding: 18px 28px;
+    columns: 2;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: white;
+    text-align: left;
+}
+
+.management-tools-section li {
+    margin-bottom: 7px;
+    color: var(--management-muted);
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .white-main {
+        width: calc(100% - 14px);
+        margin-bottom: 20px;
+        padding: 18px 10px 50px;
+        border-radius: 6px;
+    }
+
+    .management-dashboard-head {
+        display: block;
+        padding: 4px 4px 18px;
+    }
+
+    .management-status {
+        display: inline-block;
+        margin-top: 14px;
+    }
+
+    .management-section {
+        padding: 16px 10px;
+    }
+
+    .management-section-heading {
+        display: block;
+    }
+
+    .management-section-note {
+        display: block;
+        margin-top: 8px;
+        text-align: left;
+    }
+
+    .management-input3 {
+        width: min(180px, 48vw);
+    }
+
+    .management-score-table {
+        font-size: 12px;
+    }
+
+    .management-score-table td,
+    .management-score-table th {
+        padding: 8px 3px;
+    }
+
+    .management-score-table .management-input {
+        width: 48px;
+    }
+
+    .management-tools-section > .management-container {
+        padding: 16px 8px;
+    }
+
+    .management-tools-section ul {
+        columns: 1;
+    }
 }
