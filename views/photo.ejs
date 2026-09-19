@@ -135,6 +135,31 @@
 
         }
 
+        async function togglePhotoLike(event, photoId) {
+            event.preventDefault();
+            const button = event.currentTarget;
+            const countElement = document.getElementById(button.dataset.countTarget);
+            button.disabled = true;
+
+            try {
+                const response = await fetch(`/photo-like/${photoId}`, { method: 'POST' });
+                if (!response.ok) throw new Error('좋아요 처리에 실패했습니다.');
+
+                const data = await response.json();
+                button.classList.toggle('is-liked', data.liked);
+                button.setAttribute('aria-pressed', String(data.liked));
+                const icon = button.querySelector('i');
+                icon.classList.toggle('fa-solid', data.liked);
+                icon.classList.toggle('fa-regular', !data.liked);
+                countElement.textContent = data.likeCount;
+            } catch (error) {
+                console.error(error);
+                alert('좋아요 처리 중 문제가 발생했습니다.');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
         function EditPhoto(event) {
 
 
@@ -201,6 +226,8 @@
             <hr>
 
             <%for (i=0; i<포토.length; i++) {%>
+                <% const photoLikes = Array.isArray(포토[i].likes) ? 포토[i].likes : []; %>
+                <% const photoIsLiked = photoLikes.includes(유저.username); %>
 
                 <div class="story-photo-area">
 
@@ -258,11 +285,13 @@
                             ) {%>
                             <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/backnumber/14.png?updatedAt=1707830969195"
                             alt="14">
+                            <%}%>
                             <% if
                             (포토[i].username=='이기남'
                             ) {%>
                             <img src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/backnumber/KakaoTalk_20260919_144203599_01.jpg"
                             alt="18">
+                            <%}%>
                             <% if
                             (포토[i].username=='나현수'
                             ) {%>
@@ -395,8 +424,15 @@
 
                         </div>
 
-                        <div class="story-photo-add-comment">
-                            댓글 <%=포토[i].comments.length%>개
+                        <div class="story-photo-actions">
+                            <button type="button" class="story-photo-like <%= photoIsLiked ? 'is-liked' : '' %>"
+                                onclick="togglePhotoLike(event, '<%=포토[i]._id%>')"
+                                data-count-target="photo-like-count-<%=i%>"
+                                aria-label="좋아요" aria-pressed="<%= photoIsLiked %>">
+                                <i class="fa-<%= photoIsLiked ? 'solid' : 'regular' %> fa-heart"></i>
+                                <span id="photo-like-count-<%=i%>"><%=photoLikes.length%></span>
+                            </button>
+                            <span class="story-photo-comment-count">댓글 <%=포토[i].comments.length%>개</span>
                         </div>
 
 

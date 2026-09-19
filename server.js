@@ -1299,6 +1299,25 @@ app.get('/photo-delete/:id', async (req, res) => {
   res.redirect('/photo')
 })
 
+app.post('/photo-like/:id', async (req, res) => {
+  const photoId = new ObjectId(req.params.id);
+  const username = req.user.username;
+  const photo = await db.collection('photo').findOne({ _id: photoId }, { projection: { likes: 1 } });
+
+  if (!photo) {
+    return res.status(404).json({ ok: false, message: '사진을 찾을 수 없습니다.' });
+  }
+
+  const likes = Array.isArray(photo.likes) ? photo.likes : [];
+  const isLiked = likes.includes(username);
+  const update = isLiked
+    ? { $pull: { likes: username } }
+    : { $addToSet: { likes: username } };
+
+  await db.collection('photo').updateOne({ _id: photoId }, update);
+  res.json({ ok: true, liked: !isLiked, likeCount: isLiked ? likes.length - 1 : likes.length + 1 });
+});
+
 app.post('/photo-comment', async (req, res) => {
 
 

@@ -144,6 +144,51 @@ p {
     width: 20%;
 }
 
+.story-photo-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 10px 0 8px 3%;
+    color: #777;
+    font-size: 70%;
+}
+
+.story-photo-like {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 0;
+    border: 0;
+    background: transparent;
+    color: #777;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+.story-photo-like i {
+    color: #999;
+    font-size: 15px;
+    transition: color 160ms ease, transform 160ms ease;
+}
+
+.story-photo-like:hover i,
+.story-photo-like.is-liked i {
+    color: #ff3ca0;
+}
+
+.story-photo-like.is-liked i {
+    transform: scale(1.08);
+}
+
+.story-photo-like:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.story-photo-comment-count {
+    color: #777;
+}
+
 /* .story-photo-add-comment-input-area0 {
     display: none;
 } */
