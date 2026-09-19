@@ -71,8 +71,7 @@
             gamezoneArea.style.display = 'block';
             var gamezoneStartButton = document.getElementById('gamezone-start-button');
             gamezoneStartButton.style.display = 'none';
-            var gamezoneExplanation = document.getElementById('gamezone-explanation');
-            gamezoneExplanation.style.display = 'none';
+            document.getElementById('gamezone-status').textContent = '골대를 선택해 슈팅하세요.';
         }
 
 
@@ -112,6 +111,7 @@
                         if (randomArea.classList.contains('selected')) {
                             randomArea.classList.add('keeper-left');
 
+                            document.getElementById('gamezone-status').textContent = '선방! 이번 도전의 기록이 종료되었습니다.';
                             alert('막힘');
 
                             userShootingCount -= 1;
@@ -142,7 +142,8 @@
                                 .then(data => {
                                     if (currentScore > data.top_score) {
                                         // If currentScore is greater than top_score, send data to the server
-                                        alert('신기록갱신!')
+                                        document.getElementById('gamezone-status').textContent = '신기록 갱신! 기록을 저장합니다.';
+                                        alert('신기록갱신!');
                                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                                     }
                                 })
@@ -160,12 +161,14 @@
                             var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
                             var newScore = currentScore + 1;
                             scoreArea.textContent = '골 : ' + newScore;
+                            document.getElementById('gamezone-status').textContent = '골 성공! 다음 슈팅을 선택하세요.';
                         }
 
                     } else if (randomIndex == 2) {
                         if (randomArea.classList.contains('selected')) {
                             randomArea.classList.add('keeper');
 
+                            document.getElementById('gamezone-status').textContent = '선방! 이번 도전의 기록이 종료되었습니다.';
                             alert('막힘');
                             userShootingCount -= 1;
                             userShootingCountElement.textContent = userShootingCount;
@@ -195,7 +198,8 @@
                                 .then(data => {
                                     if (currentScore > data.top_score) {
                                         // If currentScore is greater than top_score, send data to the server
-                                        alert('신기록갱신!')
+                                        document.getElementById('gamezone-status').textContent = '신기록 갱신! 기록을 저장합니다.';
+                                        alert('신기록갱신!');
                                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                                     }
                                 })
@@ -213,6 +217,7 @@
                             var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
                             var newScore = currentScore + 1;
                             scoreArea.textContent = '골 : ' + newScore;
+                            document.getElementById('gamezone-status').textContent = '골 성공! 다음 슈팅을 선택하세요.';
                         }
                     }
 
@@ -221,6 +226,7 @@
                         if (randomArea.classList.contains('selected')) {
                             randomArea.classList.add('keeper-right');
 
+                            document.getElementById('gamezone-status').textContent = '선방! 이번 도전의 기록이 종료되었습니다.';
                             alert('막힘');
                             userShootingCount -= 1;
                             userShootingCountElement.textContent = userShootingCount;
@@ -252,7 +258,8 @@
                                 .then(data => {
                                     if (currentScore > data.top_score) {
                                         // If currentScore is greater than top_score, send data to the server
-                                        alert('신기록갱신!')
+                                        document.getElementById('gamezone-status').textContent = '신기록 갱신! 기록을 저장합니다.';
+                                        alert('신기록갱신!');
                                         location.href = `/gamezone-shooting-scoreboard?score=${encodeURIComponent(currentScore)}`;
                                     }
                                 })
@@ -269,12 +276,13 @@
                             var currentScore = parseInt(scoreArea.textContent.replace('골 : ', ''));
                             var newScore = currentScore + 1;
                             scoreArea.textContent = '골 : ' + newScore;
+                            document.getElementById('gamezone-status').textContent = '골 성공! 다음 슈팅을 선택하세요.';
                         }
 
                     }
                 }
             } else {
-                alert('오늘 기회 끝')
+                document.getElementById('gamezone-status').textContent = '오늘의 도전 기회를 모두 사용했습니다.';
             }
             buttonClickable = true;
         }
@@ -287,24 +295,34 @@
 <body>
     <%- include('nav.ejs') %>
 
-        <div class="gamezone-main">
-            <button id="gamezone-start-button" class="gamezone-start-button" onclick="GameStart()">시작하기</button>
-            <div id="gamezone-explanation">
-                <h3>게임 설명</h3>
-                <div>
-                    ＊ 상품은 공지 확인
-                    <br>
-                    ＊ 도전 가능 횟수 하루 20회
-                    <br>
-                    ＊ 누적 점수 매 달 1일 초기화
-                    <br>
-                    ＊ 마지막 날 23:00 ~ 00:00 기준 (랜덤)
-                    <br>
-                    ＊ 순위표 캡처 후 할인자 공지 예정
+        <main class="gamezone-main">
+            <header class="gamezone-header">
+                <div class="gamezone-kicker"><span></span> GOALPOST CHALLENGE · <%= yearMonth %></div>
+                <h1>오늘의 승부차기</h1>
+                <div class="gamezone-header-meta">
+                    <span><i class="fa-solid fa-bolt"></i> 하루 20회 도전</span>
+                    <span><i class="fa-solid fa-rotate"></i> 매월 기록 초기화</span>
+                    <button id="gamezone-start-button" class="gamezone-start-button" onclick="GameStart()">
+                        <span>게임 시작</span><i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
-            </div>
+            </header>
             <div id="gamezone-area" class="gamezone-area">
+                <div class="gamezone-hud">
+                    <div class="gamezone-hud-score">
+                        <span class="gamezone-label">CURRENT SCORE</span>
+                        <div id="gamezone-scorearea" class="gamezone-scorearea">골 : 0</div>
+                    </div>
+                    <div class="gamezone-extrachance-area">
+                        <span class="gamezone-label">REMAINING SHOTS</span>
+                        <div id="gamezone-extrachance" class="gamezone-extrachance">
+                            <%=유저.shooting_count%>
+                        </div>
+                    </div>
+                </div>
+                <div id="gamezone-status" class="gamezone-status" aria-live="polite">게임을 시작하면 슈팅할 수 있어요.</div>
                 <div class="gaolpost-area">
+                    <div class="gamezone-goal-label">TARGET GOAL</div>
                     <div class="goalpost">
                         <div id="goalpost-1" class="goalpost-area goalpost-left"></div>
                         <div id="goalpost-2" class="goalpost-area goalpost-center"></div>
@@ -317,23 +335,16 @@
                         alt="ball">
                 </div>
                 <div class="shoot-way-bt-area">
-                    <button onclick="shoot(1)" id="shoot-way-bt-left" class="shoot-way-bt">왼쪽</button>
-                    <button onclick="shoot(2)" id="shoot-way-bt-center" class="shoot-way-bt">중앙</button>
-                    <button onclick="shoot(3)" id="shoot-way-bt-right" class="shoot-way-bt">오른쪽</button>
+                    <button onclick="shoot(1)" id="shoot-way-bt-left" class="shoot-way-bt"><span>왼쪽</span><i class="fa-solid fa-arrow-left"></i></button>
+                    <button onclick="shoot(2)" id="shoot-way-bt-center" class="shoot-way-bt"><span>중앙</span><i class="fa-solid fa-crosshairs"></i></button>
+                    <button onclick="shoot(3)" id="shoot-way-bt-right" class="shoot-way-bt"><span>오른쪽</span><i class="fa-solid fa-arrow-right"></i></button>
                 </div>
-                <div class="gamezone-extrachance-area">
-                    <div class="gamezone-extrachance-text">남은 기회</div>
-                    <div id="gamezone-extrachance" class="gamezone-extrachance">
-                        <%=유저.shooting_count%>
-                    </div>
-                </div>
-
-                <div id="gamezone-scorearea" class="gamezone-scorearea">골 : 0</div>
             </div>
 
-            <div style="margin-top: 200px;" class="MvpBoard-Container">
-                <div class="MvpBoard-ti tle">
-                    BOARD
+            <section class="gamezone-leaderboard MvpBoard-Container">
+                <div class="gamezone-section-heading">
+                    <div><span class="gamezone-label">MONTHLY LADDER</span><h2>이달의 슈팅 기록</h2></div>
+                    <span class="gamezone-section-mark"><i class="fa-solid fa-ranking-star"></i> TOP PLAYERS</span>
                 </div>
                 
                 <div class="MvpBoard-menu">
@@ -360,7 +371,7 @@
                         <% } %>
                             <% } %>
 
-                        <div style="display:flex; justify-content:flex-end; padding:8px 12px; margin-top:12px;">
+                        <div class="gamezone-board-links">
                             <% if (typeof isPrev !== 'undefined' && isPrev) { %>
                                 <a href="/gamezone-shooting" class="btn btn-sm btn-outline-primary">돌아가기</a>
                             <% } else { %>
@@ -369,7 +380,8 @@
                         </div>
 
                     </div>
-        </div>
+            </section>
+        </main>
 </body>
 
 </html>

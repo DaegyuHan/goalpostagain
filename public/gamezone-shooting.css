@@ -1,173 +1,401 @@
-.gamezone-main {
-    width: 800px;
-    background-color: #002832;
-    margin: 10% auto 0px auto;
-    color: white;
-    text-align: center;
-    padding-top: 100px;
-}
+:root {
+        --game-ink: #06252d;
+        --game-ink-soft: #0b3943;
+        --game-pink: #ff3ca0;
+        --game-cyan: #9de8d6;
+        --game-paper: #f6fbfa;
+        --game-muted: #9bb5b9;
+    }
 
-.gamezone-area {
-    display: none;
-    width: 100%;
-    height: 400px;
-    background-color: white;
-}
-
-.gamezone-start-button {
-    width: 70%;
-    height: 70px;
-    background-color: white;
-    color: #002832;
-    font-size: 170%;
-    font-weight: 500;
-    margin-bottom: 20px;
-}
-
-.gaolpost-area {
-    position: relative;
-    /* 위치를 relative로 설정 */
-    background-color: white;
-    height: 60%;
-    padding-top: 35px;
-
-
-}
-
-.gaolpost-area.selected {
-    opacity: 1; 
-}
-
-.goalpost {
-    width: 250px;
-    height: 120px;
-    border: 5px solid black;
-    border-bottom: white;
-    margin: 0px auto 0px auto;
-    display: flex;
-}
-
-.goalpost-left {
-    background-color: #eaeff1;
-    width: 33%;
-}
-
-.goalpost-center {
-    background-color: #eaeff1;
-    width: 34%;
-}
-
-.goalpost-right {
-    background-color: #eaeff1;
-    width: 33%;
-}
-
-.gamezone-ball-area {
-    width: 100px;
-    height: 100px;
-    margin: 0px auto 10px auto;
-    background-color: white;
-
-}
-
-.gamezone-ball-area img {
-    width: 100%;
-    height: auto;
-}
-
-.shoot-way-bt-area {
-    display: flex;
-    height: 20%;
-    text-align: center;
-    justify-content: center;
-    background-color: white;
-}
-
-.shoot-way-bt {
-    width: 20%;
-    height: 65%;
-    background-color: #002832;
-    color: white;
-    font-size: 100%;
-    justify-content: center;
-    align-items: center;
-    margin: 0px 10px 0px 10px;
-    border: 1px transparent;
-    border-radius: 8px;
-    display: flex;
-}
-
-.shoot-way-bt:hover {
-    background-color: #ff3ca0;
-}
-
-.gamezone-extrachance-area {
-    background-color: white;
-    color: black;
-    font-weight: 500;
-}
-
-.gamezone-scorearea {
-    padding-top: 0px;
-    background-color: white;
-    color: black;
-    font-size: 400%;
-    margin-bottom: 400px;
-}
-
-.selected {
-
-    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EA%B3%B5.png?updatedAt=1707713736048');
-    background-repeat: no-repeat;
-    background-size: 100%;
-    z-index: 1;
-
-}
-
-.keeper {
-    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%A0%95%EB%A9%B4.png?updatedAt=1707713731747');
-    background-repeat: no-repeat;
-    background-size: 170%;
-    background-position: 50% 2px;
-    z-index: 0;
-    /* 다른 요소 뒤에 나오도록 낮은 z-index 설정 */
-}
-
-.keeper-left {
-    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%98%A4%EB%A5%B8%EC%AA%BD.png?updatedAt=1707713731567');
-    background-repeat: no-repeat;
-    background-size: 170%;
-    background-position: 62% -22px;
-    z-index: 2;
-
-}
-
-.keeper-right {
-    background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%99%BC%EC%AA%BD.png?updatedAt=1707713732190');
-    background-repeat: no-repeat;
-    background-size: 170%;
-    background-position: 60% -17px;
-    z-index: 2;
-
-}
-
-button[disabled] {
-    opacity: 0.5;
-    /* 비활성화된 상태의 투명도를 조절할 수 있습니다. */
-    cursor: not-allowed;
-    /* 비활성화된 상태에서 마우스 커서를 변경할 수 있습니다. */
-}
-
-@media only screen and (max-width: 1000px) {
     .gamezone-main {
-        width: 98%;
+        position: relative;
+        width: min(800px, calc(100% - 28px));
+        min-height: calc(100vh - 90px);
+        margin: 90px auto 0;
+        padding: 56px clamp(16px, 4vw, 66px) 90px;
+        box-sizing: border-box;
+        overflow: hidden;
+        background:
+        linear-gradient(140deg, rgba(255, 60, 160, 0.2), rgba(6, 37, 45, 0.94) 54%),
+        linear-gradient(320deg, rgba(157, 232, 214, 0.14), rgba(6, 37, 45, 0.92) 70%),
+        url('https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=1200&q=85');
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: normal, normal, multiply;
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 22px 60px rgba(0, 40, 50, 0.28);
     }
-}
 
-@media only screen and (max-width: 354px) {
+    .gamezone-header {
+        max-width: 660px;
+        margin-bottom: 26px;
+    }
+
+    .gamezone-kicker,
+    .gamezone-label {
+        color: var(--game-pink);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+    }
+
+    .gamezone-kicker span {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 5px;
+        border-radius: 50%;
+        background: var(--game-cyan);
+    }
+
+    .gamezone-header h1 {
+        margin: 10px 0 8px;
+        font-size: clamp(34px, 6vw, 66px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+    }
+
+    .gamezone-header p {
+        margin: 0;
+        color: var(--game-muted);
+        font-size: 15px;
+    }
+
+    .gamezone-header-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        align-items: center;
+        margin-top: 18px;
+        color: #d4e3e4;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .gamezone-header-meta i {
+        margin-right: 5px;
+        color: var(--game-cyan);
+    }
+
+    .gamezone-start-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        min-width: 150px;
+        padding: 14px 16px;
+        border: 0;
+        border-radius: 5px;
+        background: var(--game-pink);
+        color: white;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .gamezone-start-button:hover {
+        background: #ff63b4;
+        transform: translateY(-2px);
+    }
+
+    .gamezone-area {
+        position: relative;
+        display: none;
+        padding: clamp(16px, 3vw, 30px);
+        border: 1px solid rgba(157, 232, 214, 0.22);
+        border-radius: 8px;
+        background: linear-gradient(180deg, #f8fcfb 0%, #eaf5f2 100%);
+        color: var(--game-ink);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    }
+
+    .gamezone-hud {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 14px;
+    }
+
+    .gamezone-hud .gamezone-label {
+        display: block;
+        color: #739096;
+        font-size: 10px;
+    }
+
+    .gamezone-scorearea {
+        margin-top: 2px;
+        color: var(--game-ink);
+        font-size: clamp(32px, 6vw, 54px);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.05em;
+    }
+
+    .gamezone-extrachance-area {
+        min-width: 92px;
+        padding: 9px 13px;
+        border: 1px solid #c9e1dc;
+        border-radius: 5px;
+        background: white;
+        text-align: right;
+    }
+
+    .gamezone-extrachance {
+        color: var(--game-pink);
+        font-size: 25px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .gamezone-status {
+        min-height: 22px;
+        margin-bottom: 7px;
+        color: #648087;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .gamezone-goal-label {
+        margin-bottom: 8px;
+        color: #739096;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-align: center;
+    }
+
+    .gaolpost-area {
+        position: relative;
+        height: 185px;
+        padding-top: 25px;
+        border: 1px solid #c8dfdb;
+        border-radius: 6px;
+        background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 1px, transparent 1px, transparent 42px), #d9eee9;
+    }
+
+    .goalpost {
+        display: flex;
+        width: min(390px, 72vw);
+        height: 145px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 5px solid var(--game-ink);
+        border-bottom: 0;
+        background: #d8e5e5;
+        box-shadow: 0 10px 0 rgba(6, 37, 45, 0.12);
+    }
+
+    .goalpost-area {
+        position: relative;
+        width: 33.333%;
+        border-right: 1px dashed rgba(6, 37, 45, 0.2);
+        background-color: #eef8f5;
+        background-image: linear-gradient(135deg, rgba(6, 37, 45, 0.05) 25%, transparent 25%, transparent 50%, rgba(6, 37, 45, 0.05) 50%, rgba(6, 37, 45, 0.05) 75%, transparent 75%);
+        background-size: 18px 18px;
+    }
+
+    .goalpost-area:last-child { border-right: 0; }
+
+    .gamezone-ball-area {
+        position: absolute;
+        width: 74px;
+        height: 74px;
+        margin: 0;
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 50%;
+        z-index: 4;
+        pointer-events: none;
+    }
+
+    .gamezone-ball-area img {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 7px 5px rgba(6, 37, 45, 0.2));
+    }
+
+    .shoot-way-bt-area {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 18px;
+    }
+
     .shoot-way-bt {
-        font-size: 80%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 48px;
+        padding: 10px 14px;
+        border: 1px solid #c4dbd7;
+        border-radius: 5px;
+        background: white;
+        color: var(--game-ink);
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
     }
 
+    .shoot-way-bt i { color: var(--game-pink); }
 
-}
+    .shoot-way-bt:hover {
+        border-color: var(--game-pink);
+        background: #fff4f9;
+        transform: translateY(-2px);
+    }
+
+    .shoot-way-bt:active { transform: translateY(0); }
+
+    .gamezone-leaderboard {
+        margin-top: 48px;
+    }
+
+    .gamezone-section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .gamezone-section-heading h2 {
+        margin: 6px 0 0;
+        color: white;
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+    .gamezone-section-mark {
+        color: var(--game-cyan);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+    }
+
+    .gamezone-section-mark i { margin-right: 5px; }
+
+    .gamezone-leaderboard .MvpBoard-menu,
+    .gamezone-leaderboard .MvpBoard-area {
+        border: 0;
+        border-radius: 4px;
+    }
+
+    .gamezone-leaderboard .MvpBoard-menu {
+        margin-bottom: 7px;
+        padding: 12px 0;
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--game-cyan);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+    }
+
+    .gamezone-leaderboard .MvpBoard-bar { background: rgba(157, 232, 214, 0.25); }
+
+    .gamezone-leaderboard .MvpBoard-area {
+        margin-bottom: 5px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--game-ink);
+        font-size: 13px;
+    }
+
+    .gamezone-leaderboard .MvpBoard-area-rank,
+    .gamezone-leaderboard .MvpBoard-area-name {
+        box-sizing: border-box;
+        padding: 11px 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+    }
+
+    .gamezone-leaderboard .MvpBoard-area-rank:first-child {
+        color: var(--game-pink);
+        font-weight: 800;
+    }
+
+    .gamezone-board-links {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .gamezone-board-links a {
+        padding: 8px 12px;
+        border: 1px solid rgba(157, 232, 214, 0.3);
+        border-radius: 4px;
+        color: var(--game-cyan);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .gamezone-board-links a:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+    .selected {
+        background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EA%B3%B5.png?updatedAt=1707713736048');
+        background-repeat: no-repeat;
+        background-size: 100%;
+        background-position: center;
+        z-index: 1;
+    }
+
+    .keeper {
+        background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%A0%95%EB%A9%B4.png?updatedAt=1707713731747');
+        background-repeat: no-repeat;
+        background-size: 170%;
+        background-position: 50% 2px;
+        z-index: 0;
+    }
+
+    .keeper-left {
+        background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%98%A4%EB%A5%B8%EC%AA%BD.png?updatedAt=1707713731567');
+        background-repeat: no-repeat;
+        background-size: 170%;
+        background-position: 62% -22px;
+        z-index: 2;
+    }
+
+    .keeper-right {
+        background-image: url('https://ik.imagekit.io/wlalafg7g/GoalPostAgain/game/%EC%99%BC%EC%AA%BD.png?updatedAt=1707713732190');
+        background-repeat: no-repeat;
+        background-size: 170%;
+        background-position: 60% -17px;
+        z-index: 2;
+    }
+
+    button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 760px) {
+        .gamezone-main {
+            width: calc(100% - 14px);
+            margin-top: 74px;
+            padding: 34px 12px 56px;
+            border-radius: 7px;
+        }
+
+        .gamezone-start-button { width: 100%; }
+        .gamezone-hud { align-items: center; }
+        .gamezone-section-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+        .gamezone-section-heading h2 { font-size: 20px; }
+        .gamezone-section-mark { align-self: flex-end; }
+    }
+
+    @media (max-width: 420px) {
+        .gamezone-header h1 { font-size: 34px; }
+        .gamezone-header-meta { gap: 9px; font-size: 11px; }
+        .gamezone-area { padding: 12px; }
+        .gaolpost-area { height: 153px; padding-top: 21px; }
+        .goalpost { height: 120px; border-width: 4px; }
+        .gamezone-ball-area { width: 58px; height: 58px; }
+        .shoot-way-bt { padding: 9px 8px; font-size: 11px; }
+        .shoot-way-bt i { font-size: 10px; }
+    }
