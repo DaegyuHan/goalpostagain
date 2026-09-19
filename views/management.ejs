@@ -109,6 +109,12 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276">
           </div>`
           break
+        case '이기남':
+          var MVP_Name = '이기남'
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_03.png">
+          </div>`
+          break  
         case '나현수':
           var MVP_Name = '나현수'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
@@ -121,6 +127,12 @@
               src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%ED%95%9C%EB%8C%80%EA%B7%9CMVP.png?updatedAt=1705229240781">
           </div>`
           break
+        case '이원근':
+          var MVP_Name = '이원근'
+          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
+              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_02.png">
+          </div>`
+          break  
         case '유성진':
           var MVP_Name = '유성진'
           var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
@@ -203,8 +215,10 @@
         민대식: document.getElementById("management-mvpboard-score11").value,
         송시창: document.getElementById("management-mvpboard-score13").value,
         이찬웅: document.getElementById("management-mvpboard-score14").value,
+        이기남: document.getElementById("management-mvpboard-score18").value,
         나현수: document.getElementById("management-mvpboard-score23").value,
         한대규: document.getElementById("management-mvpboard-score33").value,
+        이원근: document.getElementById("management-mvpboard-score47").value,
         유성진: document.getElementById("management-mvpboard-score96").value,
         황덕현: document.getElementById("management-mvpboard-score99").value
       };
@@ -344,8 +358,10 @@
               <option value="민대식">민대식</option>
               <option value="송시창">송시창</option>
               <option value="이찬웅">이찬웅</option>
+              <option value="이기남">이기남</option>
               <option value="나현수">나현수</option>
               <option value="한대규">한대규</option>
+              <option value="이원근">이원근</option>
               <option value="유성진">유성진</option>
               <option value="황덕현">황덕현</option>
             </select>
@@ -468,28 +484,40 @@
                 value="<%=Object.values(mvpboard)[11]%>"></td>
           </tr>
           <tr>
+            <th scope="row">18</th>
+            <td>이기남</td>
+            <td><input id="management-mvpboard-score18" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[12]%>"></td>
+          </tr>
+          <tr>
             <th scope="row">23</th>
             <td>나현수</td>
             <td><input id="management-mvpboard-score23" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[12]%>"></td>
+                value="<%=Object.values(mvpboard)[13]%>"></td>
           </tr>
           <tr>
             <th scope="row">33</th>
             <td>한대규</td>
             <td><input id="management-mvpboard-score33" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[13]%>"></td>
+                value="<%=Object.values(mvpboard)[14]%>"></td>
+          </tr>
+          <tr>
+            <th scope="row">47</th>
+            <td>이원근</td>
+            <td><input id="management-mvpboard-score47" style="margin-left: 10px;" class="management-input" type="text"
+                value="<%=Object.values(mvpboard)[15]%>"></td>
           </tr>
           <tr>
             <th scope="row">96</th>
             <td>유성진</td>
             <td><input id="management-mvpboard-score96" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[14]%>"></td>
+                value="<%=Object.values(mvpboard)[16]%>"></td>
           </tr>
           <tr>
             <th scope="row">99</th>
             <td>황덕현</td>
             <td><input id="management-mvpboard-score99" style="margin-left: 10px;" class="management-input" type="text"
-                value="<%=Object.values(mvpboard)[15]%>"></td>
+                value="<%=Object.values(mvpboard)[17]%>"></td>
           </tr>
         </tbody>
       </table>
@@ -519,8 +547,10 @@
               <option value="als123eotlr">민대식</option>
               <option value="sst266">송시창</option>
               <option value="chw7244">이찬웅</option>
+              <option value="lkn0821">이기남</option>
               <option value="hsn972">나현수</option>
               <option value="bigstarhan33">한대규</option>
+              <option value="wonkeun625">이원근</option>
               <option value="yusjin96">유성진</option>
               <option value="ks9071">황덕현</option>
         </select>
