@@ -238,7 +238,7 @@ app.post('/match-plan', async (req, res) => {
     }
   }
 
-  let result = db.collection('matchplan').insertOne({
+  await db.collection('matchplan').insertOne({
     year: req.body.planyear,
     month: req.body.planmonth,
     date: req.body.plandate,
@@ -248,10 +248,16 @@ app.post('/match-plan', async (req, res) => {
     awayteam: req.body.planawayteam,
     place: req.body.planplace,
     address: previousAddress
-  })
+  });
+
   logActivity(req.user.username, '경기 일정 등록', `- ${req.body.planyear}.${req.body.planmonth}.${req.body.plandate} vs ${req.body.planawayteam}`);
   sendDiscordNotification(`이번 주 매치가 잡혔습니다. 홈페이지를 확인해주세요 !`);
-  res.redirect('/')
+
+  if (req.headers['content-type'] && req.headers['content-type'].includes('application/json')) {
+    return res.json({ ok: true });
+  }
+
+  res.redirect('/');
 })
 
 app.post('/match-plan/latest', async (req, res) => {
@@ -275,6 +281,35 @@ app.post('/match-plan/latest', async (req, res) => {
 
   await db.collection('matchplan').updateOne({ _id: latestMatchPlan._id }, { $set: updatedFields });
   logActivity(req.user.username, '최근 경기 일정 수정', `- ${updatedFields.year}.${updatedFields.month}.${updatedFields.date} vs ${updatedFields.awayteam}`);
+  res.json({ ok: true });
+});
+
+app.post('/result', async (req, res) => {
+  const data = req.body || {};
+  const homescore = data.homescore;
+  const awayscore = data.awayscore;
+
+  if (!data.year || !data.month || !data.day || !data.awayname) {
+    return res.status(400).json({ ok: false, message: '필수 경기 결과 값이 누락되었습니다.' });
+  }
+
+  await db.collection('result').insertOne({
+    year: data.year,
+    month: data.month,
+    day: data.day,
+    day2: data.day2,
+    time: data.time,
+    place: data.place,
+    homescore: String(homescore),
+    awayscore: String(awayscore),
+    awayname: data.awayname,
+    resultlogo: data.resultlogo,
+    home_resultlogo: data.home_resultlogo,
+    mvp_name: '미정'
+  });
+
+  logActivity(req.user.username, '경기 결과 등록', `- ${data.year}.${data.month}.${data.day} (오골 ${homescore} : ${awayscore} ${data.awayname})`);
+  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${homescore} : ${awayscore} ${data.awayname}`);
   res.json({ ok: true });
 });
 

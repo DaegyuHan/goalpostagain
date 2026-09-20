@@ -262,6 +262,18 @@
     background: #155361;
 }
 
+.management-section .btn-pink,
+.management-container .btn-pink {
+    background: var(--management-pink);
+    color: #fff;
+}
+
+.management-section .btn-pink:hover,
+.management-container .btn-pink:hover {
+    background: #e52c8b;
+    color: #fff;
+}
+
 .management-section .btn-secondary,
 .management-container .btn-secondary {
     background: #e8eef0;
