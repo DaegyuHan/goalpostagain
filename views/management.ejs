@@ -602,10 +602,14 @@
         .catch((error) => alert(error.message || '최종 결과 저장에 실패했습니다.'));
     }
 
-    function deletePredictionHistory() {
-      if (!confirm('지난 승부예측 이력을 모두 삭제하시겠습니까?')) return;
+    function deleteOnePredictionHistory(settingId) {
+      if (!confirm('선택한 승부예측 이력을 삭제하시겠습니까?')) return;
 
-      fetch('/prediction/history/delete', { method: 'POST' })
+      fetch('/prediction/history/delete-one', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settingId })
+      })
         .then((response) => response.json())
         .then((data) => {
           if (!data.ok) throw new Error(data.message || '예측 이력 삭제 실패');
@@ -750,7 +754,16 @@
               <input id="prediction-final-away-score" class="prediction-score-input" type="number" min="0" value="<%= predictionSetting && predictionSetting.finalAwayScore != null ? predictionSetting.finalAwayScore : '' %>">
               <button class="btn btn-pink" type="button" onclick="savePredictionResult()">최종 결과 저장</button>
             </div>
-            <button class="prediction-history-delete-button" type="button" onclick="deletePredictionHistory()">지난 예측 이력 전체 삭제</button>
+            <% if (predictionHistory && predictionHistory.length > 0) { %>
+              <div class="prediction-history-single-delete">
+                <select id="prediction-history-to-delete" class="management-input3">
+                  <% predictionHistory.forEach((history) => { %>
+                    <option value="<%= history.settingId %>"><%= history.homeTeam %> <%= history.finalHomeScore %>:<%= history.finalAwayScore %> <%= history.awayTeam %></option>
+                  <% }); %>
+                </select>
+                <button class="prediction-history-delete-button" type="button" onclick="deleteOnePredictionHistory(document.getElementById('prediction-history-to-delete').value)">선택 이력 삭제</button>
+              </div>
+            <% } %>
           </div>
         </div>
       </div>
@@ -1107,6 +1120,20 @@
 
 
               </ul>
+              <div class="prediction-leaderboard">
+                <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-ranking-star"></i></span><h3>승부예측 적중 순위</h3></div>
+                <% if (!predictionLeaderboard || predictionLeaderboard.length === 0) { %>
+                  <div class="prediction-empty">아직 적중한 예측 기록이 없습니다.</div>
+                <% } else { %>
+                  <% predictionLeaderboard.forEach((player, index) => { %>
+                    <div class="prediction-leaderboard-row">
+                      <strong><%= index + 1 %>위</strong>
+                      <span><%= player.username %></span>
+                      <b><%= player.correctCount %>회 적중</b>
+                    </div>
+                  <% }); %>
+                <% } %>
+              </div>
               </div>
               <%}%>
               <%}%>

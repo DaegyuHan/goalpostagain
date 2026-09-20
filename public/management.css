@@ -228,6 +228,34 @@
     background: #ffe8f1;
 }
 
+.prediction-history-single-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.prediction-leaderboard {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--management-line);
+}
+
+.prediction-leaderboard-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 10px;
+    border-top: 1px solid var(--management-line);
+    color: var(--management-ink);
+}
+
+.prediction-leaderboard-row b {
+    color: #18743d;
+}
+
 .management-section > .management-container + .management-container {
     margin-top: 16px;
     padding-top: 16px;

@@ -151,6 +151,8 @@ app.get('/management', async (req, res) => {
   let lastSavedTime = mvpboardDic[0].savedTime || '저장된 시간 없음';
   let lastSavedUsername = mvpboardDic[0].savedUsername || '저장한 사람 없음';
   let predictionSetting = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  const predictionLeaderboard = await getPredictionLeaderboard();
+  const predictionHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).toArray();
 
 
   let avgStats = await db.collection('stats_result_pure').aggregate([
@@ -182,8 +184,29 @@ app.get('/management', async (req, res) => {
   // Extract the averages from the result
   let avgStatsResult = avgStats[0];
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory });
 });
+
+async function getPredictionLeaderboard() {
+  const histories = await db.collection('prediction_history').find({}).toArray();
+  const counts = new Map();
+
+  histories.forEach((history) => {
+    const finalHomeScore = Number(history.finalHomeScore);
+    const finalAwayScore = Number(history.finalAwayScore);
+    const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
+
+    (history.votes || []).forEach((vote) => {
+      const isCorrect = vote.isCorrect === true || vote.pick === finalPick;
+      if (!isCorrect) return;
+      const current = counts.get(vote.username) || 0;
+      counts.set(vote.username, current + 1);
+    });
+  });
+
+  return Array.from(counts, ([username, correctCount]) => ({ username, correctCount }))
+    .sort((first, second) => second.correctCount - first.correctCount || first.username.localeCompare(second.username, 'ko'));
+}
 
 app.post('/prediction/setting', (req, res) => {
   upload.fields([
@@ -205,24 +228,18 @@ app.post('/prediction/setting', (req, res) => {
       const homeLogo = req.files?.homeLogo?.[0]?.location || previousSetting?.homeLogo || '';
       const awayLogo = req.files?.awayLogo?.[0]?.location || previousSetting?.awayLogo || '';
 
-      await db.collection('prediction_setting').updateOne(
-        {},
-        {
-          $set: {
-            homeTeam: homeTeam.trim(),
-            awayTeam: awayTeam.trim(),
-            matchTime: matchTime.trim(),
-            homeLogo,
-            awayLogo,
-            isOpen: true,
-            finalHomeScore: null,
-            finalAwayScore: null,
-            finalizedAt: null,
-            updatedAt: new Date()
-          }
-        },
-        { upsert: true }
-      );
+      await db.collection('prediction_setting').insertOne({
+        homeTeam: homeTeam.trim(),
+        awayTeam: awayTeam.trim(),
+        matchTime: matchTime.trim(),
+        homeLogo,
+        awayLogo,
+        isOpen: true,
+        finalHomeScore: null,
+        finalAwayScore: null,
+        finalizedAt: null,
+        updatedAt: new Date()
+      });
 
       await db.collection('prediction_votes').deleteMany({});
       logActivity(req.user.username, '승부예측 경기 설정 저장', `- ${homeTeam} vs ${awayTeam} (${matchTime})`);
@@ -234,11 +251,30 @@ app.post('/prediction/setting', (req, res) => {
   });
 });
 
-app.get('/prediction', async (req, res) => {
+app.get('/prediction', (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+
+  req.session.returnTo = req.originalUrl;
+  res.render('login', { Needlogin_Message: '로그인이 필요합니다.', send_url: req.session.returnTo });
+}, async (req, res) => {
   const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
   const votes = await db.collection('prediction_votes').find({}).sort({ createdAt: -1 }).toArray();
-  const predictionHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).limit(20).toArray();
-  res.render('prediction.ejs', { prediction: prediction || null, votes: votes || [], predictionHistory: predictionHistory || [] });
+  const storedHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).limit(20).toArray();
+  const predictionHistory = storedHistory.map((history) => {
+    const finalPick = Number(history.finalHomeScore) > Number(history.finalAwayScore)
+      ? 'home'
+      : Number(history.finalHomeScore) < Number(history.finalAwayScore) ? 'away' : 'draw';
+    return {
+      ...history,
+      votes: (history.votes || []).map((vote) => ({
+        ...vote,
+        isCorrect: vote.isCorrect === true || vote.pick === finalPick
+      }))
+    };
+  });
+  res.render('prediction.ejs', { prediction: prediction || null, votes: votes || [], predictionHistory });
 });
 
 app.post('/prediction/toggle', async (req, res) => {
@@ -268,7 +304,9 @@ app.post('/prediction/result', async (req, res) => {
     return res.status(400).json({ ok: false, message: '최종 결과 스코어를 올바르게 입력해주세요.' });
   }
 
+  const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
   const votes = await db.collection('prediction_votes').find({ settingId: String(prediction._id) }).toArray();
+  const evaluatedVotes = votes.map((vote) => ({ ...vote, isCorrect: vote.pick === finalPick }));
   const archivedAt = new Date();
   await db.collection('prediction_history').updateOne(
     { settingId: String(prediction._id) },
@@ -282,7 +320,7 @@ app.post('/prediction/result', async (req, res) => {
         matchTime: prediction.matchTime,
         finalHomeScore,
         finalAwayScore,
-        votes,
+        votes: evaluatedVotes,
         archivedAt
       }
     },
@@ -297,11 +335,20 @@ app.post('/prediction/result', async (req, res) => {
   res.json({ ok: true, message: '최종 결과가 저장되고 예측이 마감되었습니다.' });
 });
 
-app.post('/prediction/history/delete', async (req, res) => {
+app.post('/prediction/history/delete-one', async (req, res) => {
   try {
-    const result = await db.collection('prediction_history').deleteMany({});
-    logActivity(req.user.username, '승부예측 이력 삭제', `- ${result.deletedCount}건`);
-    res.json({ ok: true, message: `${result.deletedCount}개의 승부예측 이력을 삭제했습니다.` });
+    const { settingId } = req.body || {};
+    if (!settingId) {
+      return res.status(400).json({ ok: false, message: '삭제할 예측 이력을 선택해주세요.' });
+    }
+
+    const result = await db.collection('prediction_history').deleteOne({ settingId: String(settingId) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ ok: false, message: '예측 이력을 찾을 수 없습니다.' });
+    }
+
+    logActivity(req.user.username, '승부예측 이력 개별 삭제', `- ${settingId}`);
+    res.json({ ok: true, message: '선택한 승부예측 이력을 삭제했습니다.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, message: '승부예측 이력 삭제에 실패했습니다.' });
