@@ -69,15 +69,24 @@
         경기 시작 시간: <strong><%= prediction.matchTime %></strong>
       </div>
 
-      <div class="prediction-form">
-        <div class="prediction-score-inputs">
-          <input id="prediction-home-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
-          <span style="font-size: 26px; font-weight: 900; color: #ff3ca0;">:</span>
-          <input id="prediction-away-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
+      <% if (prediction.isOpen === false) { %>
+        <div class="prediction-closed-box">
+          <strong>이번 승부예측은 마감되었습니다.</strong>
+          <% if (prediction.finalHomeScore != null && prediction.finalAwayScore != null) { %>
+            <span>최종 결과: <%= prediction.homeTeam %> <%= prediction.finalHomeScore %> : <%= prediction.finalAwayScore %> <%= prediction.awayTeam %></span>
+          <% } %>
         </div>
+      <% } else { %>
+        <div class="prediction-form">
+          <div class="prediction-score-inputs">
+            <input id="prediction-home-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
+            <span style="font-size: 26px; font-weight: 900; color: #ff3ca0;">:</span>
+            <input id="prediction-away-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
+          </div>
 
-        <button class="prediction-submit-button" type="button" onclick="submitPrediction()">예측 등록</button>
-      </div>
+          <button class="prediction-submit-button" type="button" onclick="submitPrediction()">예측 등록</button>
+        </div>
+      <% } %>
 
       <div class="prediction-list">
         <h3>예측 현황</h3>
@@ -103,6 +112,37 @@
         <% } %>
       </div>
     <% } %>
+
+    <div class="prediction-list prediction-history-list">
+      <h3>지난 승부예측</h3>
+      <% if (!predictionHistory || predictionHistory.length === 0) { %>
+        <div class="prediction-empty">종료된 승부예측이 아직 없습니다.</div>
+      <% } else { %>
+        <% predictionHistory.forEach((history) => { %>
+          <div class="prediction-history-item">
+            <div class="prediction-history-match">
+              <div class="prediction-history-team">
+                <img class="prediction-history-logo" src="<%= history.homeLogo || 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837' %>" alt="홈팀 로고">
+                <span><%= history.homeTeam %></span>
+              </div>
+              <strong class="prediction-history-score"><%= history.finalHomeScore %> : <%= history.finalAwayScore %></strong>
+              <div class="prediction-history-team">
+                <img class="prediction-history-logo" src="<%= history.awayLogo || 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0_%EC%83%89,%EC%82%AC%EC%9D%B4%EC%A6%88%EB%B3%80%ED%99%98.png?updatedAt=1707054939468' %>" alt="원정팀 로고">
+                <span><%= history.awayTeam %></span>
+              </div>
+            </div>
+            <div class="prediction-history-meta">경기 시간: <%= history.matchTime %> · 참여 예측 <%= history.votes ? history.votes.length : 0 %>명</div>
+            <% if (history.votes && history.votes.length > 0) { %>
+              <div class="prediction-history-votes">
+                <% history.votes.forEach((vote) => { %>
+                  <span><%= vote.username %> <b><%= vote.homeScore %> : <%= vote.awayScore %></b></span>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
   </div>
 </body>
 </html>

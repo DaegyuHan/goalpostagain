@@ -564,6 +564,57 @@
       });
     }
 
+    function togglePrediction(isOpen) {
+      fetch('/prediction/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isOpen })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.ok) throw new Error(data.message || '예측 상태 변경 실패');
+          alert(isOpen ? '승부예측을 다시 열었습니다.' : '승부예측을 마감했습니다.');
+          window.location.reload();
+        })
+        .catch((error) => alert(error.message || '예측 상태 변경에 실패했습니다.'));
+    }
+
+    function savePredictionResult() {
+      const finalHomeScore = Number(document.getElementById('prediction-final-home-score').value);
+      const finalAwayScore = Number(document.getElementById('prediction-final-away-score').value);
+
+      if (!Number.isInteger(finalHomeScore) || !Number.isInteger(finalAwayScore) || finalHomeScore < 0 || finalAwayScore < 0) {
+        alert('최종 결과 스코어를 올바르게 입력해주세요.');
+        return;
+      }
+
+      fetch('/prediction/result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ finalHomeScore, finalAwayScore })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.ok) throw new Error(data.message || '최종 결과 저장 실패');
+          alert(data.message || '최종 결과가 저장되었습니다.');
+          window.location.reload();
+        })
+        .catch((error) => alert(error.message || '최종 결과 저장에 실패했습니다.'));
+    }
+
+    function deletePredictionHistory() {
+      if (!confirm('지난 승부예측 이력을 모두 삭제하시겠습니까?')) return;
+
+      fetch('/prediction/history/delete', { method: 'POST' })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.ok) throw new Error(data.message || '예측 이력 삭제 실패');
+          alert(data.message || '예측 이력을 삭제했습니다.');
+          window.location.reload();
+        })
+        .catch((error) => alert(error.message || '예측 이력 삭제에 실패했습니다.'));
+    }
+
     function reset_ShootingGame() {
       var confirmDelete = confirm('정말 초기화하시겠습니까?');
 
@@ -683,6 +734,24 @@
             </div>
           </div>
           <button class="btn btn-pink" type="button" onclick="savePredictionSetting()">예측 등록</button>
+          <div class="prediction-admin-controls">
+            <div class="prediction-admin-status">
+              현재 상태:
+              <strong><%= predictionSetting && predictionSetting.isOpen === false ? '마감' : '진행 중' %></strong>
+            </div>
+            <div class="prediction-admin-buttons">
+              <button class="btn btn-secondary" type="button" onclick="togglePrediction(false)">예측 마감</button>
+              <button class="btn btn-primary" type="button" onclick="togglePrediction(true)">예측 재개</button>
+            </div>
+            <div class="prediction-final-result">
+              최종 결과:
+              <input id="prediction-final-home-score" class="prediction-score-input" type="number" min="0" value="<%= predictionSetting && predictionSetting.finalHomeScore != null ? predictionSetting.finalHomeScore : '' %>">
+              <span>:</span>
+              <input id="prediction-final-away-score" class="prediction-score-input" type="number" min="0" value="<%= predictionSetting && predictionSetting.finalAwayScore != null ? predictionSetting.finalAwayScore : '' %>">
+              <button class="btn btn-pink" type="button" onclick="savePredictionResult()">최종 결과 저장</button>
+            </div>
+            <button class="prediction-history-delete-button" type="button" onclick="deletePredictionHistory()">지난 예측 이력 전체 삭제</button>
+          </div>
         </div>
       </div>
 

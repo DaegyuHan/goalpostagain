@@ -214,6 +214,10 @@ app.post('/prediction/setting', (req, res) => {
             matchTime: matchTime.trim(),
             homeLogo,
             awayLogo,
+            isOpen: true,
+            finalHomeScore: null,
+            finalAwayScore: null,
+            finalizedAt: null,
             updatedAt: new Date()
           }
         },
@@ -233,7 +237,75 @@ app.post('/prediction/setting', (req, res) => {
 app.get('/prediction', async (req, res) => {
   const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
   const votes = await db.collection('prediction_votes').find({}).sort({ createdAt: -1 }).toArray();
-  res.render('prediction.ejs', { prediction: prediction || null, votes: votes || [] });
+  const predictionHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).limit(20).toArray();
+  res.render('prediction.ejs', { prediction: prediction || null, votes: votes || [], predictionHistory: predictionHistory || [] });
+});
+
+app.post('/prediction/toggle', async (req, res) => {
+  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  if (!prediction) {
+    return res.status(404).json({ ok: false, message: '먼저 승부예측 경기를 등록해주세요.' });
+  }
+
+  const isOpen = req.body.isOpen === true || req.body.isOpen === 'true';
+  await db.collection('prediction_setting').updateOne(
+    { _id: prediction._id },
+    { $set: { isOpen, updatedAt: new Date() } }
+  );
+  logActivity(req.user.username, isOpen ? '승부예측 재개' : '승부예측 마감');
+  res.json({ ok: true, isOpen });
+});
+
+app.post('/prediction/result', async (req, res) => {
+  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  if (!prediction) {
+    return res.status(404).json({ ok: false, message: '먼저 승부예측 경기를 등록해주세요.' });
+  }
+
+  const finalHomeScore = Number(req.body.finalHomeScore);
+  const finalAwayScore = Number(req.body.finalAwayScore);
+  if (!Number.isInteger(finalHomeScore) || !Number.isInteger(finalAwayScore) || finalHomeScore < 0 || finalAwayScore < 0) {
+    return res.status(400).json({ ok: false, message: '최종 결과 스코어를 올바르게 입력해주세요.' });
+  }
+
+  const votes = await db.collection('prediction_votes').find({ settingId: String(prediction._id) }).toArray();
+  const archivedAt = new Date();
+  await db.collection('prediction_history').updateOne(
+    { settingId: String(prediction._id) },
+    {
+      $set: {
+        settingId: String(prediction._id),
+        homeTeam: prediction.homeTeam,
+        awayTeam: prediction.awayTeam,
+        homeLogo: prediction.homeLogo || '',
+        awayLogo: prediction.awayLogo || '',
+        matchTime: prediction.matchTime,
+        finalHomeScore,
+        finalAwayScore,
+        votes,
+        archivedAt
+      }
+    },
+    { upsert: true }
+  );
+
+  await db.collection('prediction_setting').updateOne(
+    { _id: prediction._id },
+    { $set: { finalHomeScore, finalAwayScore, isOpen: false, finalizedAt: archivedAt, updatedAt: archivedAt } }
+  );
+  logActivity(req.user.username, '승부예측 최종 결과 저장', `- ${prediction.homeTeam} ${finalHomeScore}:${finalAwayScore} ${prediction.awayTeam}`);
+  res.json({ ok: true, message: '최종 결과가 저장되고 예측이 마감되었습니다.' });
+});
+
+app.post('/prediction/history/delete', async (req, res) => {
+  try {
+    const result = await db.collection('prediction_history').deleteMany({});
+    logActivity(req.user.username, '승부예측 이력 삭제', `- ${result.deletedCount}건`);
+    res.json({ ok: true, message: `${result.deletedCount}개의 승부예측 이력을 삭제했습니다.` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: '승부예측 이력 삭제에 실패했습니다.' });
+  }
 });
 
 app.post('/prediction/submit', async (req, res) => {
@@ -244,6 +316,9 @@ app.post('/prediction/submit', async (req, res) => {
   const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
   if (!prediction) {
     return res.status(404).json({ ok: false, message: '현재 진행 중인 승부예측이 없습니다.' });
+  }
+  if (prediction.isOpen === false) {
+    return res.status(403).json({ ok: false, message: '현재 승부예측은 마감되었습니다.' });
   }
 
   const homeScore = Number(req.body.homeScore);

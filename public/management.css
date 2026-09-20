@@ -180,6 +180,54 @@
     gap: 8px;
 }
 
+.prediction-admin-controls {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--management-line);
+}
+
+.prediction-admin-status {
+    color: var(--management-muted);
+    font-size: 14px;
+}
+
+.prediction-admin-status strong {
+    color: var(--management-ink);
+}
+
+.prediction-admin-buttons,
+.prediction-final-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.prediction-final-result {
+    color: var(--management-muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.prediction-history-delete-button {
+    justify-self: center;
+    padding: 8px 14px;
+    border: 1px solid #e2a5bd;
+    border-radius: 5px;
+    background: #fff7fa;
+    color: #a63865;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.prediction-history-delete-button:hover {
+    background: #ffe8f1;
+}
+
 .management-section > .management-container + .management-container {
     margin-top: 16px;
     padding-top: 16px;

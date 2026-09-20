@@ -306,6 +306,19 @@ img {
   transform: translateY(0);
 }
 
+.prediction-closed-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px auto 18px;
+  padding: 18px 14px;
+  border: 1px solid #f4b3d3;
+  border-radius: 12px;
+  background: #fff0f7;
+  color: #8e2459;
+  text-align: center;
+}
+
 .prediction-pick-group {
   display: flex;
   justify-content: center;
@@ -380,6 +393,72 @@ img {
   text-align: center;
 }
 
+.prediction-history-list {
+  margin-top: 34px;
+}
+
+.prediction-history-item {
+  padding: 18px 10px;
+  border-top: 1px solid #edf2f3;
+}
+
+.prediction-history-item:first-of-type {
+  border-top: 0;
+}
+
+.prediction-history-match {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.prediction-history-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #092f38;
+  font-weight: 800;
+}
+
+.prediction-history-team:last-child {
+  justify-content: flex-end;
+}
+
+.prediction-history-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.prediction-history-score {
+  color: #ff3ca0;
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.prediction-history-meta {
+  margin-top: 10px;
+  color: #6b7c80;
+  font-size: 13px;
+  text-align: center;
+}
+
+.prediction-history-votes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.prediction-history-votes span {
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: #f8fbfb;
+  color: #52676c;
+  font-size: 12px;
+}
+
 @media (max-width: 700px) {
   .prediction-card {
     flex-direction: column;
@@ -393,6 +472,15 @@ img {
 
   .prediction-pick-badge {
     text-align: left;
+  }
+
+  .prediction-history-match {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .prediction-history-team:last-child {
+    justify-content: center;
   }
 }
 
