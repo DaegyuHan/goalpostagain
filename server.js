@@ -5,6 +5,7 @@ const { MongoClient, ObjectId } = require('mongodb')
 const methodOverride = require('method-override')
 const bcrypt = require('bcrypt')
 const ytdl = require('ytdl-core');
+const crypto = require('crypto');
 require('dotenv').config()
 const https = require('https')
 
@@ -85,7 +86,7 @@ const upload = multer({
     s3: s3,
     bucket: 'bigstarhan33',
     key: function (요청, file, cb) {
-      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+      cb(null, `${Date.now()}-${crypto.randomUUID()}`) // 파일마다 고유한 S3 키 생성
     }
   })
 })
@@ -149,6 +150,7 @@ app.get('/management', async (req, res) => {
   let mvpboard = mvpboardDic[0].member_score;
   let lastSavedTime = mvpboardDic[0].savedTime || '저장된 시간 없음';
   let lastSavedUsername = mvpboardDic[0].savedUsername || '저장한 사람 없음';
+  let predictionSetting = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
 
 
   let avgStats = await db.collection('stats_result_pure').aggregate([
@@ -180,7 +182,96 @@ app.get('/management', async (req, res) => {
   // Extract the averages from the result
   let avgStatsResult = avgStats[0];
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null });
+});
+
+app.post('/prediction/setting', (req, res) => {
+  upload.fields([
+    { name: 'homeLogo', maxCount: 1 },
+    { name: 'awayLogo', maxCount: 1 }
+  ])(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ ok: false, message: '팀 로고 업로드에 실패했습니다.' });
+    }
+
+    try {
+      const { homeTeam, awayTeam, matchTime } = req.body || {};
+
+      if (!homeTeam || !awayTeam || !matchTime) {
+        return res.status(400).json({ ok: false, message: '홈팀, 원정팀, 경기 시작 시간을 모두 입력해주세요.' });
+      }
+
+      const previousSetting = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+      const homeLogo = req.files?.homeLogo?.[0]?.location || previousSetting?.homeLogo || '';
+      const awayLogo = req.files?.awayLogo?.[0]?.location || previousSetting?.awayLogo || '';
+
+      await db.collection('prediction_setting').updateOne(
+        {},
+        {
+          $set: {
+            homeTeam: homeTeam.trim(),
+            awayTeam: awayTeam.trim(),
+            matchTime: matchTime.trim(),
+            homeLogo,
+            awayLogo,
+            updatedAt: new Date()
+          }
+        },
+        { upsert: true }
+      );
+
+      await db.collection('prediction_votes').deleteMany({});
+      logActivity(req.user.username, '승부예측 경기 설정 저장', `- ${homeTeam} vs ${awayTeam} (${matchTime})`);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ ok: false, message: '승부예측 설정 저장에 실패했습니다.' });
+    }
+  });
+});
+
+app.get('/prediction', async (req, res) => {
+  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  const votes = await db.collection('prediction_votes').find({}).sort({ createdAt: -1 }).toArray();
+  res.render('prediction.ejs', { prediction: prediction || null, votes: votes || [] });
+});
+
+app.post('/prediction/submit', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+
+  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  if (!prediction) {
+    return res.status(404).json({ ok: false, message: '현재 진행 중인 승부예측이 없습니다.' });
+  }
+
+  const homeScore = Number(req.body.homeScore);
+  const awayScore = Number(req.body.awayScore);
+
+  if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore < 0 || awayScore < 0) {
+    return res.status(400).json({ ok: false, message: '홈팀과 원정팀의 점수를 올바르게 입력해주세요.' });
+  }
+
+  const pick = homeScore > awayScore ? 'home' : homeScore < awayScore ? 'away' : 'draw';
+
+  await db.collection('prediction_votes').updateOne(
+    { username: req.user.username },
+    {
+      $set: {
+        username: req.user.username,
+        homeScore,
+        awayScore,
+        pick,
+        settingId: String(prediction._id),
+        createdAt: new Date()
+      }
+    },
+    { upsert: true }
+  );
+
+  logActivity(req.user.username, '승부예측 참여', `- ${prediction.homeTeam} ${homeScore}:${awayScore} ${prediction.awayTeam} / ${pick}`);
+  res.json({ ok: true, message: '예측이 저장되었습니다.' });
 });
 
 

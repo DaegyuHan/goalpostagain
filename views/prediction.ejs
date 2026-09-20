@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
+  <title>승부예측</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="/main.css" rel="stylesheet">
+  <link href="/management.css" rel="stylesheet">
+  <script src="/main.js"></script>
+  <script>
+    function submitPrediction() {
+      const homeScore = Number(document.getElementById('prediction-home-score').value);
+      const awayScore = Number(document.getElementById('prediction-away-score').value);
+
+      if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore < 0 || awayScore < 0) {
+        alert('홈팀과 원정팀의 점수를 올바르게 입력해주세요.');
+        return;
+      }
+
+      fetch('/prediction/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ homeScore, awayScore })
+      })
+        .then(async (response) => {
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || '예측 등록 실패');
+          alert(data.message || '예측이 저장되었습니다.');
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(error.message || '예측 등록에 실패했습니다.');
+        });
+    }
+  </script>
+</head>
+
+<body>
+  <%- include('nav.ejs') %>
+
+  <div class="notice-title">승부예측</div>
+
+  <div class="white-main prediction-wrap">
+    <% if (!prediction) { %>
+      <div class="prediction-empty">
+        아직 운영진이 등록한 승부예측 경기가 없습니다.
+      </div>
+    <% } else { %>
+      <div class="prediction-card">
+        <div class="prediction-team">
+          <img class="prediction-team-logo" src="<%= prediction.homeLogo || 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837' %>" alt="홈팀 로고">
+          <span class="prediction-team-name"><%= prediction.homeTeam %></span>
+        </div>
+
+        <div class="prediction-vs">VS</div>
+
+        <div class="prediction-team">
+          <img class="prediction-team-logo" src="<%= prediction.awayLogo || 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/%EC%83%81%EB%8C%80%ED%8C%80%20%EB%A1%9C%EA%B3%A0_%EC%83%89,%EC%82%AC%EC%9D%B4%EC%A6%88%EB%B3%80%ED%99%98.png?updatedAt=1707054939468' %>" alt="원정팀 로고">
+          <span class="prediction-team-name"><%= prediction.awayTeam %></span>
+        </div>
+      </div>
+
+      <div class="prediction-meta">
+        경기 시작 시간: <strong><%= prediction.matchTime %></strong>
+      </div>
+
+      <div class="prediction-form">
+        <div class="prediction-score-inputs">
+          <input id="prediction-home-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
+          <span style="font-size: 26px; font-weight: 900; color: #ff3ca0;">:</span>
+          <input id="prediction-away-score" class="prediction-score-input" type="number" min="0" max="20" value="0">
+        </div>
+
+        <button class="prediction-submit-button" type="button" onclick="submitPrediction()">예측 등록</button>
+      </div>
+
+      <div class="prediction-list">
+        <h3>예측 현황</h3>
+
+        <% if (!votes || votes.length === 0) { %>
+          <div class="prediction-empty">아직 예상 결과가 없습니다. 첫 예측을 남겨보세요.</div>
+        <% } else { %>
+          <% votes.forEach((vote) => { %>
+            <div class="prediction-row">
+              <div class="prediction-user"><%= vote.username %></div>
+              <div class="prediction-score-badge"><%= vote.homeScore %> : <%= vote.awayScore %></div>
+              <div class="prediction-pick-badge">
+                <% if (Number(vote.homeScore) > Number(vote.awayScore)) { %>
+                  <%= prediction.homeTeam %> 승
+                <% } else if (Number(vote.homeScore) === Number(vote.awayScore)) { %>
+                  무승부
+                <% } else { %>
+                  <%= prediction.awayTeam %> 승
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

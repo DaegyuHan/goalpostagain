@@ -159,6 +159,27 @@
     text-align: center;
 }
 
+.prediction-setting-form {
+    min-height: 210px;
+}
+
+.prediction-logo-fields {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 10px 0 16px;
+    color: var(--management-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.prediction-logo-fields label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .management-section > .management-container + .management-container {
     margin-top: 16px;
     padding-top: 16px;

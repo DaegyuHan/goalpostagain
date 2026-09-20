@@ -528,6 +528,42 @@
 }
 
 
+    function savePredictionSetting() {
+      const homeTeam = document.getElementById('prediction-home-team').value.trim();
+      const awayTeam = document.getElementById('prediction-away-team').value.trim();
+      const matchTime = document.getElementById('prediction-start-time').value.trim();
+
+      if (!homeTeam || !awayTeam || !matchTime) {
+        alert('홈팀, 원정팀, 경기 시작 시간을 모두 입력해주세요.');
+        return;
+      }
+
+      const payload = new FormData();
+      payload.append('homeTeam', homeTeam);
+      payload.append('awayTeam', awayTeam);
+      payload.append('matchTime', matchTime);
+
+      const homeLogo = document.getElementById('prediction-home-logo').files[0];
+      const awayLogo = document.getElementById('prediction-away-logo').files[0];
+      if (homeLogo) payload.append('homeLogo', homeLogo);
+      if (awayLogo) payload.append('awayLogo', awayLogo);
+
+      fetch('/prediction/setting', {
+        method: 'POST',
+        body: payload
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.ok) throw new Error(data.message || '승부예측 등록 실패');
+        alert('승부예측이 등록되었습니다.');
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error(error);
+        alert(error.message || '승부예측 등록에 실패했습니다.');
+      });
+    }
+
     function reset_ShootingGame() {
       var confirmDelete = confirm('정말 초기화하시겠습니까?');
 
@@ -583,6 +619,7 @@
       </div>
       <nav class="management-tabs" aria-label="관리 메뉴">
         <a class="active" href="#management-schedule" data-management-tab="schedule">일정 · 결과</a>
+        <a href="#management-prediction" data-management-tab="prediction">승부예측</a>
         <a href="#management-mvp" data-management-tab="mvp">MVP</a>
         <a href="#management-score" data-management-tab="score">점수 보드</a>
         <a href="#management-tools-player" data-management-tab="tools">관리 도구</a>
@@ -627,9 +664,31 @@
 
 
 
+      <div id="management-prediction" class="management-container management-section" data-management-panel="prediction">
+        <div class="management-section-heading">
+          <div><span class="management-section-kicker">02 / PREDICTION</span><h2>승부예측</h2></div>
+          <span class="management-section-note">이번 경기의 팀 정보와 시작 시간을 등록합니다.</span>
+        </div>
+        <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-futbol"></i></span><h3>예측 경기 설정</h3></div>
+        <div class="prediction-setting-form">
+          <div>
+            홈팀 : <input id="prediction-home-team" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.homeTeam : '' %>">
+            <br>
+            원정팀 : <input id="prediction-away-team" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.awayTeam : '' %>">
+            <br>
+            경기 시작 시간 : <input id="prediction-start-time" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.matchTime : '' %>" placeholder="예: 2026-09-20 19:00">
+            <div class="prediction-logo-fields">
+              <label>홈팀 로고 <input id="prediction-home-logo" type="file" accept="image/*"></label>
+              <label>원정팀 로고 <input id="prediction-away-logo" type="file" accept="image/*"></label>
+            </div>
+          </div>
+          <button class="btn btn-pink" type="button" onclick="savePredictionSetting()">예측 등록</button>
+        </div>
+      </div>
+
       <div id="management-mvp" class="management-container management-section" data-management-panel="mvp">
         <div class="management-section-heading">
-          <div><span class="management-section-kicker">02 / HIGHLIGHT</span><h2>MVP 선정</h2></div>
+          <div><span class="management-section-kicker">03 / HIGHLIGHT</span><h2>MVP 선정</h2></div>
           <span class="management-section-note">이번 경기의 주인공을 선택합니다.</span>
         </div>
         <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-star"></i></span><h3>주간 MVP</h3></div>
