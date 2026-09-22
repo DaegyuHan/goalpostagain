@@ -131,15 +131,38 @@ app.use((req, res, next) => {
 
 
 app.get('/', async (req, res) => {
+  const [mvpResult, matchResult, matchplan, mvpboardResult] = await Promise.all([
+    db.collection('mvp').find({}, { projection: { mvp: 1 } }).sort({ _id: -1 }).limit(1).toArray(),
+    db.collection('result').find({}, {
+      projection: {
+        awayname: 1,
+        year: 1,
+        month: 1,
+        day: 1,
+        homescore: 1,
+        awayscore: 1,
+        home_resultlogo: 1
+      }
+    }).sort({ _id: -1 }).limit(3).toArray(),
+    db.collection('matchplan').find({}, {
+      projection: {
+        month: 1,
+        date: 1,
+        day: 1,
+        time: 1,
+        timeto: 1,
+        awayteam: 1,
+        place: 1,
+        address: 1
+      }
+    }).sort({ _id: -1 }).limit(1).toArray(),
+    db.collection('mvpboard').find({}, { projection: { member_score: 1 } }).sort({ _id: -1 }).limit(1).toArray()
+  ]);
 
-  let result = await db.collection('mvp').find().sort({ _id: -1 }).limit(1).toArray();
-  let Weeklymvp = result.length > 0 ? result[0].mvp : null;
-  let match_result = await db.collection('result').find().sort({ _id: -1 }).toArray();
-  let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
-  let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
-  let mvpboard = mvpboardDic[0].member_score;
+  const Weeklymvp = mvpResult.length > 0 ? mvpResult[0].mvp : null;
+  const mvpboard = mvpboardResult.length > 0 ? mvpboardResult[0].member_score : {};
 
-  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result: match_result, mvpboard: mvpboard });
+  res.render('home.ejs', { MVP: Weeklymvp, 매치일정: matchplan, result: matchResult, mvpboard });
 })
 
 
