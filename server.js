@@ -10,9 +10,11 @@ require('dotenv').config()
 const https = require('https')
 
 // Discord webhook (환경변수 우선)
-const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK || 'https://discord.com/api/webhooks/1545608454650077205/PrVdshqwrV6JItdnMMYkW-Pu0mj7VJOIJNYvfc64qB58wqTVT-DX6vuBNZO71H0pIUjZ';
+const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
 function sendDiscordNotification(message) {
+  if (!DISCORD_WEBHOOK) return;
+
   try {
     const url = new URL(DISCORD_WEBHOOK);
     const body = { content: message || '' };
@@ -263,14 +265,13 @@ app.get('/prediction', (req, res, next) => {
   const votes = await db.collection('prediction_votes').find({}).sort({ createdAt: -1 }).toArray();
   const storedHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).limit(20).toArray();
   const predictionHistory = storedHistory.map((history) => {
-    const finalPick = Number(history.finalHomeScore) > Number(history.finalAwayScore)
-      ? 'home'
-      : Number(history.finalHomeScore) < Number(history.finalAwayScore) ? 'away' : 'draw';
+    const finalHomeScore = Number(history.finalHomeScore);
+    const finalAwayScore = Number(history.finalAwayScore);
     return {
       ...history,
       votes: (history.votes || []).map((vote) => ({
         ...vote,
-        isCorrect: vote.isCorrect === true || vote.pick === finalPick
+        isCorrect: Number(vote.homeScore) === finalHomeScore && Number(vote.awayScore) === finalAwayScore
       }))
     };
   });
@@ -304,9 +305,11 @@ app.post('/prediction/result', async (req, res) => {
     return res.status(400).json({ ok: false, message: '최종 결과 스코어를 올바르게 입력해주세요.' });
   }
 
-  const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
   const votes = await db.collection('prediction_votes').find({ settingId: String(prediction._id) }).toArray();
-  const evaluatedVotes = votes.map((vote) => ({ ...vote, isCorrect: vote.pick === finalPick }));
+  const evaluatedVotes = votes.map((vote) => ({
+    ...vote,
+    isCorrect: Number(vote.homeScore) === finalHomeScore && Number(vote.awayScore) === finalAwayScore
+  }));
   const archivedAt = new Date();
   await db.collection('prediction_history').updateOne(
     { settingId: String(prediction._id) },

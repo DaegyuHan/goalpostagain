@@ -256,6 +256,9 @@ img {
 }
 
 .prediction-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 24px auto 18px;
   padding: 18px 14px;
   border: 1px solid #e4edf0;
@@ -268,6 +271,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -521,7 +525,7 @@ img {
   }
 
   .prediction-row {
-    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 4px;
     padding: 9px 4px;
     text-align: left;
@@ -538,6 +542,7 @@ img {
   }
 
   .prediction-score-badge {
+    justify-self: center;
     font-size: 13px;
   }
 
