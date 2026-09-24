@@ -1,4 +1,12 @@
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.error('Service worker registration failed:', error);
+    });
+  });
+}
+
 function toggleMenu() {
     const sideMenu = document.querySelector('.side-menu');
     sideMenu.style.left = sideMenu.style.left === '0px' ? '-100%' : '0px';

@@ -3,23 +3,25 @@
   "short_name": "골대FC",
   "description": "오늘도골대 FC 팀 관리 애플리케이션",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ff3ca0",
   "scope": "/",
+  "prefer_related_applications": false,
   "orientation": "portrait-primary",
   "icons": [
     {
       "src": "https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "https://ik.imagekit.io/wlalafg7g/GoalPostAgain/logo.png?updatedAt=1700484789437",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "categories": ["sports"],

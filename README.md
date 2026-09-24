@@ -78,6 +78,21 @@ https://hanstory33.tistory.com/category/Project/%EC%B6%95%EA%B5%AC%EB%AA%A8%EC%9
 - 최고기록 갱신 시 DB 에 기록 업데이트 및 자동 순위 책정
 - 매 달 1일 초기화 및 1,2위 상품 수여
 
+## Vercel 배포
+
+이 프로젝트는 `api/index.js`를 Vercel의 Node.js 함수 진입점으로 사용합니다.
+
+Vercel 프로젝트의 Environment Variables에 `.env.example`의 다음 값을 등록해야 합니다.
+
+- `DB_URL`, `DB_NAME`
+- `SESSION_SECRET`
+- `S3_KEY`, `S3_SECRET`, `S3_BUCKET`
+- `DISCORD_WEBHOOK` (선택)
+
+MongoDB Atlas에서는 Vercel의 배포 IP가 고정되지 않으므로 Network Access를 적절히 설정하고, 기존 접속 문자열이 외부에 노출된 적이 있다면 비밀번호를 먼저 교체해야 합니다.
+
+사진과 공지 이미지 업로드는 S3로 저장되지만 Vercel 함수의 요청 크기 제한을 받습니다. 여러 장의 큰 이미지를 업로드하는 기능은 배포 후 실제 파일 크기로 반드시 확인해야 합니다.
+
 ---
 ## 💡 업데이트 내역
 🔗 [개발자 업데이트 노트](http://www.goalpostagain.com/update-note)

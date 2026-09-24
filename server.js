@@ -44,12 +44,9 @@ function sendDiscordNotification(message) {
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public')) // public 폴더 내의 파일을 사용할 수 있게 함 css,js,jpg 파일들(static 파일들)
 app.set('view engine', 'ejs') // ejs setting
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))  // 유저가 데이터를 보냈을 때 꺼내쓸 수 있게 하는 코드
-
-//
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.set('trust proxy', 1);
 
 // passport 라이브러리 세팅
 const session = require('express-session')
@@ -59,14 +56,17 @@ const MongoStore = require('connect-mongo')
 
 app.use(passport.initialize())
 app.use(session({
-  secret: '암호화에 쓸 비번',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 *24 * 60 * 60 * 1000 },
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production'
+  },
   // 1 주일
   store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://sparta:test@cluster0.edvfknb.mongodb.net/?retryWrites=true&w=majority',
-    dbName: 'goalpostagain'
+    mongoUrl: process.env.DB_URL,
+    dbName: process.env.DB_NAME || 'goalpostagain'
   })
 }))
 app.use(passport.session())
@@ -86,7 +86,7 @@ const s3 = new S3Client({
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'bigstarhan33',
+    bucket: process.env.S3_BUCKET,
     key: function (요청, file, cb) {
       cb(null, `${Date.now()}-${crypto.randomUUID()}`) // 파일마다 고유한 S3 키 생성
     }
@@ -95,21 +95,27 @@ const upload = multer({
 
 
 
-let connectDB = require('./database.js')
+const connectDB = require('./database.js')
 
 let db
-connectDB.then((client) => {
+const dbReady = connectDB.then((client) => {
   console.log('DB연결성공')
-  db = client.db('goalpostagain')
-
-  // 서버 띄우는 코드
-  app.listen(process.env.PORT, () => {    //서버 띄울 포트 번호
-    console.log('http://localhost:5000 에서 서버 실행 중')
-  })
+  db = client.db(process.env.DB_NAME || 'goalpostagain')
+  return db
 }).catch((err) => {
-  console.log(err)
+  console.error('DB 연결 실패:', err)
+  throw err
 })
 // mongoDB library 연결 코드
+
+app.use(async (req, res, next) => {
+  try {
+    await dbReady
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
 
 
 // 로깅 함수
@@ -1662,3 +1668,11 @@ app.get('/mypage/:userId', async (req, res) => {
 
   res.render('mypage.ejs')
 });
+
+if (require.main === module) {
+  app.listen(process.env.PORT || 5000, () => {
+    console.log(`http://localhost:${process.env.PORT || 5000} 에서 서버 실행 중`)
+  })
+}
+
+module.exports = app;
