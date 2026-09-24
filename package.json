@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.451.0",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "connect-mongo": "^5.1.0",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
