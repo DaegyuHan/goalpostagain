@@ -53,6 +53,7 @@ const session = require('express-session')
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const MongoStore = require('connect-mongo')
+const connectDB = require('./database.js')
 
 app.use(passport.initialize())
 app.use(session({
@@ -65,7 +66,7 @@ app.use(session({
   },
   // 1 주일
   store: MongoStore.create({
-    mongoUrl: process.env.DB_URL,
+    clientPromise: connectDB,
     dbName: process.env.DB_NAME || 'goalpostagain'
   })
 }))
@@ -92,10 +93,6 @@ const upload = multer({
     }
   })
 })
-
-
-
-const connectDB = require('./database.js')
 
 let db
 const dbReady = connectDB.then((client) => {
