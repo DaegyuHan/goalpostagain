@@ -43,6 +43,14 @@ async function sendPushNotification(payload) {
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
 function sendDiscordNotification(message) {
+  void sendPushNotification({
+    title: '오늘도골대FC',
+    body: message || '새로운 소식이 있습니다.',
+    url: '/'
+  }).catch((error) => {
+    console.error('Web push notification error:', error.message);
+  });
+
   if (!DISCORD_WEBHOOK) return;
 
   try {
@@ -342,6 +350,7 @@ app.post('/prediction/setting', (req, res) => {
 
       await db.collection('prediction_votes').deleteMany({});
       logActivity(req.user.username, '승부예측 경기 설정 저장', `- ${homeTeam} vs ${awayTeam} (${matchTime})`);
+      sendDiscordNotification(`새로운 승부예측이 등록되었습니다.\n${homeTeam.trim()} vs ${awayTeam.trim()}\n경기 시간: ${matchTime.trim()}`);
       res.json({ ok: true });
     } catch (error) {
       console.error(error);
@@ -1611,11 +1620,6 @@ app.post('/photo-post', async (req, res) => {
           }
         )
         sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 사진을 등록하였습니다.`);
-        await sendPushNotification({
-          title: '오늘도골대FC',
-          body: `${req.user?.username || '누군가'}님이 새 사진을 등록했습니다.`,
-          url: '/photo'
-        });
         res.redirect('/photo')
       }
     } catch (e) {
