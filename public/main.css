@@ -171,6 +171,18 @@ a:hover {
   margin: 10% auto 0px auto
 }
 
+.site-footer {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 24px;
+  padding: 8px 16px;
+  background-color: #002832;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
 .white-main {
   width: 800px;
   height: 90%;
