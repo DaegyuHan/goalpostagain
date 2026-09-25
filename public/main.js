@@ -55,6 +55,51 @@ function gotoUpdatePost() {
   window.location.href = '/management/update-note-post'
 }
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((character) => character.charCodeAt(0)));
+}
+
+async function enablePushNotifications() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+    alert('이 브라우저에서는 웹 알림을 지원하지 않습니다.');
+    return;
+  }
+
+  try {
+    const keyResponse = await fetch('/push/public-key');
+    const keyData = await keyResponse.json();
+    if (!keyResponse.ok) throw new Error(keyData.message || '웹 푸시 설정이 필요합니다.');
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('알림 권한이 허용되지 않았습니다.');
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+    });
+
+    const subscribeResponse = await fetch('/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription })
+    });
+    const subscribeData = await subscribeResponse.json();
+    if (!subscribeResponse.ok) throw new Error(subscribeData.message || '알림 설정에 실패했습니다.');
+
+    alert('알림이 설정되었습니다. 사진 등록 알림을 받을 수 있습니다.');
+  } catch (error) {
+    console.error('Push subscription failed:', error);
+    alert(error.message || '알림 설정에 실패했습니다.');
+  }
+}
+
 
 
 function gotoMypage() {

@@ -8,6 +8,36 @@ const ytdl = require('ytdl-core');
 const crypto = require('crypto');
 require('dotenv').config()
 const https = require('https')
+const webpush = require('web-push')
+
+const PUSH_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const PUSH_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+const PUSH_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@goalpostagain.com';
+
+if (PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY) {
+  webpush.setVapidDetails(PUSH_SUBJECT, PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY);
+}
+
+function isPushConfigured() {
+  return Boolean(PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY);
+}
+
+async function sendPushNotification(payload) {
+  if (!isPushConfigured()) return;
+
+  const subscriptions = await db.collection('push_subscription').find({}).toArray();
+  await Promise.allSettled(subscriptions.map(async (subscriptionRecord) => {
+    try {
+      await webpush.sendNotification(subscriptionRecord.subscription, JSON.stringify(payload));
+    } catch (error) {
+      if (error.statusCode === 404 || error.statusCode === 410) {
+        await db.collection('push_subscription').deleteOne({ _id: subscriptionRecord._id });
+      } else {
+        console.error('Web push error:', error.message);
+      }
+    }
+  }));
+}
 
 // Discord webhook (환경변수 우선)
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
@@ -48,6 +78,40 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.set('trust proxy', 1);
 
+app.get('/push/public-key', (req, res) => {
+  if (!isPushConfigured()) {
+    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
+  }
+
+  res.json({ ok: true, publicKey: PUSH_PUBLIC_KEY });
+});
+
+app.post('/push/subscribe', async (req, res) => {
+  if (!isPushConfigured()) {
+    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
+  }
+
+  const subscription = req.body?.subscription;
+  if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
+    return res.status(400).json({ ok: false, message: '유효하지 않은 푸시 구독 정보입니다.' });
+  }
+
+  await db.collection('push_subscription').updateOne(
+    { endpoint: subscription.endpoint },
+    {
+      $set: {
+        endpoint: subscription.endpoint,
+        subscription,
+        username: req.user?.username || null,
+        updatedAt: new Date()
+      }
+    },
+    { upsert: true }
+  );
+
+  res.json({ ok: true, message: '알림이 설정되었습니다.' });
+});
+
 // passport 라이브러리 세팅
 const session = require('express-session')
 const passport = require('passport')
@@ -62,7 +126,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === 'production'
+      secure: 'auto'
   },
   // 1 주일
   store: MongoStore.create({
@@ -225,15 +289,22 @@ async function getPredictionLeaderboard() {
     const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
 
     (history.votes || []).forEach((vote) => {
-      const isCorrect = vote.isCorrect === true || vote.pick === finalPick;
-      if (!isCorrect) return;
-      const current = counts.get(vote.username) || 0;
-      counts.set(vote.username, current + 1);
+      const isOutcomeCorrect = vote.pick === finalPick;
+      const isScoreCorrect = Number(vote.homeScore) === finalHomeScore
+        && Number(vote.awayScore) === finalAwayScore;
+      const current = counts.get(vote.username) || { outcomeCount: 0, scoreCount: 0 };
+
+      if (isOutcomeCorrect) current.outcomeCount += 1;
+      if (isScoreCorrect) current.scoreCount += 1;
+      counts.set(vote.username, current);
     });
   });
 
-  return Array.from(counts, ([username, correctCount]) => ({ username, correctCount }))
-    .sort((first, second) => second.correctCount - first.correctCount || first.username.localeCompare(second.username, 'ko'));
+  return Array.from(counts, ([username, count]) => ({ username, ...count }))
+    .filter((player) => player.outcomeCount > 0 || player.scoreCount > 0)
+    .sort((first, second) => second.outcomeCount - first.outcomeCount
+      || second.scoreCount - first.scoreCount
+      || first.username.localeCompare(second.username, 'ko'));
 }
 
 app.post('/prediction/setting', (req, res) => {
@@ -1540,6 +1611,11 @@ app.post('/photo-post', async (req, res) => {
           }
         )
         sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 사진을 등록하였습니다.`);
+        await sendPushNotification({
+          title: '오늘도골대FC',
+          body: `${req.user?.username || '누군가'}님이 새 사진을 등록했습니다.`,
+          url: '/photo'
+        });
         res.redirect('/photo')
       }
     } catch (e) {

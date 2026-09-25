@@ -25,6 +25,7 @@
     "passport": "^0.6.0",
     "passport-kakao": "^1.0.1",
     "passport-local": "^1.0.0",
+    "web-push": "^3.6.7",
     "ytdl-core": "^4.11.5"
   }
 }

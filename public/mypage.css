@@ -7,6 +7,18 @@
     padding-top: 50px;
 }
 
+.mypage-push-button {
+    display: block;
+    margin-top: 24px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 4px;
+    background-color: #ff3ca0;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 
 
 
