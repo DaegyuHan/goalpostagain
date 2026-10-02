@@ -252,8 +252,20 @@
     color: var(--management-ink);
 }
 
-.prediction-leaderboard-row b {
+.prediction-leaderboard-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 12px;
+    font-size: 13px;
+}
+
+.prediction-outcome-count {
     color: #18743d;
+}
+
+.prediction-score-count {
+    color: #1761b0;
 }
 
 .management-section > .management-container + .management-container {

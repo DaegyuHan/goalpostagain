@@ -150,7 +150,7 @@
             <% if (history.votes && history.votes.length > 0) { %>
               <div class="prediction-history-votes">
                 <% history.votes.forEach((vote) => { %>
-                  <span class="<%= vote.isCorrect ? 'prediction-correct-vote' : '' %>"><%= vote.username %> <b><%= vote.homeScore %> : <%= vote.awayScore %></b></span>
+                  <span class="<%= vote.isCorrect ? 'prediction-score-correct-vote' : vote.isOutcomeCorrect ? 'prediction-correct-vote' : '' %>"><%= vote.username %> <b><%= vote.homeScore %> : <%= vote.awayScore %></b></span>
                 <% }); %>
               </div>
             <% } %>

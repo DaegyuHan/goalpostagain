@@ -481,6 +481,12 @@ img {
   box-shadow: inset 0 0 0 1px #9bd6ae;
 }
 
+.prediction-history-votes .prediction-score-correct-vote {
+  background: #e8f2ff;
+  color: #1761b0;
+  box-shadow: inset 0 0 0 1px #a9c9f2;
+}
+
 @media (max-width: 700px) {
   .prediction-card {
     flex-direction: row;

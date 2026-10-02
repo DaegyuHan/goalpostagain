@@ -117,13 +117,6 @@
             return range;
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var myCarousel = new bootstrap.Carousel(document.querySelector('#carouselExampleIndicators'), {
-                interval: false, // 자동 슬라이드 비활성화
-                touch: true // 터치로 스와이프 활성화
-            });
-        });
-
         function openInputComment(index) {
             var expanded = document.getElementById("story-photo-add-comment-input-area0" + index);
 
@@ -217,19 +210,19 @@
 
         <div class="story-main">
 
-            <div class="notice-title">사진&영상</div>
+            <div class="notice-title story-photo-title">사진&영상</div>
             <div class="story-bt-area">
                 <button onclick="gotoPhoto()" class="story-photo-bt">PHOTO</button>
                 <button onclick="gotoVideo()" class="story-video-bt">VIDEO</button>
+                <a href="/photo-post" class="story-photo-post">작성하기</a>
             </div>
-            <div class="story-photo-post"><a href="/photo-post">작성하기</a></div>
             <hr>
 
             <%for (i=0; i<포토.length; i++) {%>
                 <% const photoLikes = Array.isArray(포토[i].likes) ? 포토[i].likes : []; %>
                 <% const photoIsLiked = photoLikes.includes(유저.username); %>
 
-                <div class="story-photo-area">
+                <div class="story-photo-area story-photo-card">
 
                     <div class="story-photo-info-area">
 <!-- TODO1 -->
@@ -345,7 +338,7 @@
 
 
 
-                    <div id="carouselExampleIndicators<%= i %>" class="carousel slide">
+                    <div id="carouselExampleIndicators<%= i %>" class="carousel slide story-photo-carousel">
 
                         <div class="carousel-indicators">
 
@@ -410,7 +403,7 @@
                     </div>
 
 
-                    <div style="text-align: left;">
+                    <div class="story-photo-details">
                         <div class="story-photo-content">
 
                             <p class="story-photo-content-writer">
@@ -470,7 +463,7 @@
 
                         <% if (typeof 포토[i].comments !=='undefined' ) {%>
                             <% for (let comment of 포토[i].comments) { %>
-                                <div style="display: flex; align-items: baseline;">
+                                <div class="story-photo-comment">
                                     <div class="story-photo-comment-writer">
                                         <strong>
                                             <%=comment.writer%>

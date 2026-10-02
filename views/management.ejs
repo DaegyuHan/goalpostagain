@@ -1129,7 +1129,11 @@
                     <div class="prediction-leaderboard-row">
                       <strong><%= index + 1 %>위</strong>
                       <span><%= player.username %></span>
-                      <b>승무패 <%= player.outcomeCount %>회 · 스코어 <%= player.scoreCount %>회</b>
+                      <div class="prediction-leaderboard-stats">
+                        <span class="prediction-outcome-count">승무패 <%= player.outcomeCount %>회</span>
+                        <span class="prediction-score-count">스코어 <%= player.scoreCount %>회</span>
+                        <span>총 예측 <%= player.attemptCount %>회</span>
+                      </div>
                     </div>
                   <% }); %>
                 <% } %>

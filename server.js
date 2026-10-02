@@ -300,17 +300,23 @@ async function getPredictionLeaderboard() {
       const isOutcomeCorrect = vote.pick === finalPick;
       const isScoreCorrect = Number(vote.homeScore) === finalHomeScore
         && Number(vote.awayScore) === finalAwayScore;
-      const current = counts.get(vote.username) || { outcomeCount: 0, scoreCount: 0 };
+      const current = counts.get(vote.username) || { outcomeCount: 0, scoreCount: 0, attemptCount: 0 };
 
+      current.attemptCount += 1;
       if (isOutcomeCorrect) current.outcomeCount += 1;
       if (isScoreCorrect) current.scoreCount += 1;
       counts.set(vote.username, current);
     });
   });
 
-  return Array.from(counts, ([username, count]) => ({ username, ...count }))
+  return Array.from(counts, ([username, count]) => ({
+    username,
+    ...count,
+    points: count.outcomeCount + count.scoreCount * 3
+  }))
     .filter((player) => player.outcomeCount > 0 || player.scoreCount > 0)
-    .sort((first, second) => second.outcomeCount - first.outcomeCount
+    .sort((first, second) => second.points - first.points
+      || second.outcomeCount - first.outcomeCount
       || second.scoreCount - first.scoreCount
       || first.username.localeCompare(second.username, 'ko'));
 }
@@ -373,10 +379,12 @@ app.get('/prediction', (req, res, next) => {
   const predictionHistory = storedHistory.map((history) => {
     const finalHomeScore = Number(history.finalHomeScore);
     const finalAwayScore = Number(history.finalAwayScore);
+    const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
     return {
       ...history,
       votes: (history.votes || []).map((vote) => ({
         ...vote,
+        isOutcomeCorrect: vote.pick === finalPick,
         isCorrect: Number(vote.homeScore) === finalHomeScore && Number(vote.awayScore) === finalAwayScore
       }))
     };
