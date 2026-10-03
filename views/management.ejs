@@ -661,8 +661,7 @@
   <%- include('nav.ejs') %>
     <div class="notice-title">관리</div>
     <div class="white-main">
-      <% if (typeof 유저 !=='undefined' ) { %>
-        <% if (유저.username == '한대규'||유저.username == '관리자'||유저.username == '양철진'||유저.username == '안태훈'||유저.username == '김정훈') {%>
+      <% if (canManage) { %>
 
       <div class="management-dashboard-head">
         <div>
@@ -678,8 +677,11 @@
         <a href="#management-mvp" data-management-tab="mvp">MVP</a>
         <a href="#management-score" data-management-tab="score">점수 보드</a>
         <a href="#management-tools-player" data-management-tab="tools">관리 도구</a>
-        <% if (유저.username == '한대규') { %>
+        <% if (canSeeStats) { %>
           <a href="#management-stats" data-management-tab="stats">통계</a>
+        <% } %>
+        <% if (isDeveloper) { %>
+          <a href="#management-developer" data-management-tab="developer">개발자 관리</a>
         <% } %>
       </nav>
 
@@ -995,10 +997,9 @@
         <button onclick="gotoNoticePost()" class="btn btn-primary">작성하기</button>
       </div>
       <%}%>
-      <%}%>
 
       <% if (typeof 유저 !=='undefined' ) { %>
-        <% if (유저.username=='한대규'||유저.username == '석범수'  ) { %>
+        <% if (isDeveloper || 유저.username=='한대규'||유저.username == '석범수') { %>
 
       <!-- TODO -->
       <div id="management-tools-player" class="management-container management-tools-item management-section management-tools-section">
@@ -1065,7 +1066,7 @@
       <%}%>
 
       <% if (typeof 유저 !=='undefined' ) { %>
-        <% if (유저.username=='한대규'||유저.username == '김정훈'  ) { %>
+        <% if (isDeveloper || 유저.username=='한대규'||유저.username == '김정훈') { %>
       <div style="padding-top: 100px; padding-bottom: 100px;" class="management-container management-tools-item management-section management-tools-section">
         <h4>동영상 업로드</h4>
         <div> youtube 영상 링크 입력</div>
@@ -1075,19 +1076,7 @@
       <%}%>
       <%}%>
 
-      <% if (typeof 유저 !=='undefined' ) { %>
-        <% if (유저.username=='한대규' ) { %>
-          <div class="management-container management-tools-item management-section management-tools-section" style="padding-bottom: 50px;">
-            <h4>승부차기 초기화</h4>
-            <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
-            <div style="padding-bottom: 50px;"></div>
-          </div>
-          <div class="management-container management-tools-item management-section management-tools-section">
-            <h4>업데이트공지 작성</h4>
-            <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
-          </div>
-
-
+      <% if (canSeeStats) { %>
               <div id="management-stats" class="management-stats-item management-section management-tools-section">
               <div class="management-section-heading">
                 <div><span class="management-section-kicker">04 / PERFORMANCE</span><h2>통계</h2></div>
@@ -1138,9 +1127,51 @@
                   <% }); %>
                 <% } %>
               </div>
+              <div class="developer-push-subscribers">
+                <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-bell"></i></span><h3>웹푸시 등록 사용자</h3></div>
+                <% if (!pushEnabledUsernames || pushEnabledUsernames.length === 0) { %>
+                  <div class="prediction-empty">등록된 웹푸시 사용자가 없습니다.</div>
+                <% } else { %>
+                  <ul class="developer-active-user-list">
+                    <% pushEnabledUsernames.forEach((username) => { %>
+                      <li><%= username %></li>
+                    <% }); %>
+                  </ul>
+                <% } %>
               </div>
-              <%}%>
-              <%}%>
+              <div class="developer-push-subscribers">
+                <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-users"></i></span><h3>오늘 접속한 사용자</h3></div>
+                <div class="management-section-note"><%= todayActiveUsernames.length %>명 · 한국 시간 기준</div>
+                <% if (todayActiveUsernames.length === 0) { %>
+                  <div class="prediction-empty">오늘 접속한 사용자가 아직 없습니다.</div>
+                <% } else { %>
+                  <ul class="developer-active-user-list">
+                    <% todayActiveUsernames.forEach((username) => { %>
+                      <li><%= username %></li>
+                    <% }); %>
+                  </ul>
+                <% } %>
+              </div>
+              </div>
+              <% } %>
+      <% if (isDeveloper) { %>
+        <section id="management-developer" class="management-section" data-management-panel="developer">
+          <div class="management-section-heading">
+            <div><span class="management-section-kicker">05 / DEVELOPER</span><h2>개발자 관리</h2></div>
+            <span class="management-section-note">개발자 전용 관리 기능</span>
+          </div>
+          <div class="developer-management-actions">
+            <div class="management-container management-section management-tools-section">
+              <h3>승부차기 초기화</h3>
+              <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
+            </div>
+            <div class="management-container management-section management-tools-section">
+              <h3>업데이트 공지 작성</h3>
+              <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
+            </div>
+          </div>
+        </section>
+      <% } %>
     </div>
 
   <%- include('footer.ejs') %>

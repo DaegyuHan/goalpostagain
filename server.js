@@ -1,5 +1,6 @@
 // express 라이브러리 사용위함
 const express = require('express')
+require('express-async-errors')
 const app = express()
 const { MongoClient, ObjectId } = require('mongodb')
 const methodOverride = require('method-override')
@@ -9,10 +10,15 @@ const crypto = require('crypto');
 require('dotenv').config()
 const https = require('https')
 const webpush = require('web-push')
+const { waitUntil } = require('@vercel/functions');
 
 const PUSH_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const PUSH_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 const PUSH_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@goalpostagain.com';
+const DEV_DISCORD_WEBHOOK = process.env.DEV_DISCORD_WEBHOOK;
+const DEVELOPER_USER_ID = 'bigstarhan33';
+const SEOUL_TIME_ZONE = 'Asia/Seoul';
+const CRON_SECRET = process.env.CRON_SECRET;
 
 if (PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY) {
   webpush.setVapidDetails(PUSH_SUBJECT, PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY);
@@ -22,61 +28,187 @@ function isPushConfigured() {
   return Boolean(PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY);
 }
 
+function getSeoulDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en', {
+    timeZone: SEOUL_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  const dateParts = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+}
+
 async function sendPushNotification(payload) {
-  if (!isPushConfigured()) return;
+  if (!isPushConfigured()) {
+    return { sentUsernames: [], unidentifiedSentCount: 0, attemptedCount: 0, failedCount: 0, configured: false };
+  }
 
   const subscriptions = await db.collection('push_subscription').find({}).toArray();
-  await Promise.allSettled(subscriptions.map(async (subscriptionRecord) => {
+  const deliveryResults = await Promise.all(subscriptions.map(async (subscriptionRecord) => {
     try {
       await webpush.sendNotification(subscriptionRecord.subscription, JSON.stringify(payload));
+      return { username: subscriptionRecord.username, sent: true };
     } catch (error) {
       if (error.statusCode === 404 || error.statusCode === 410) {
         await db.collection('push_subscription').deleteOne({ _id: subscriptionRecord._id });
       } else {
         console.error('Web push error:', error.message);
       }
+      return { username: subscriptionRecord.username, sent: false };
     }
   }));
+
+  return {
+    sentUsernames: [...new Set(deliveryResults.filter((result) => result.sent && result.username).map((result) => result.username))],
+    unidentifiedSentCount: deliveryResults.filter((result) => result.sent && !result.username).length,
+    attemptedCount: subscriptions.length,
+    failedCount: deliveryResults.filter((result) => !result.sent).length,
+    configured: true
+  };
+}
+
+async function sendDeveloperDiscordMessage(message) {
+  if (!DEV_DISCORD_WEBHOOK) return;
+
+  const url = new URL(DEV_DISCORD_WEBHOOK);
+  const postData = JSON.stringify({ content: message.slice(0, 1900), allowed_mentions: { parse: [] } });
+
+  return new Promise((resolve, reject) => {
+    const request = https.request({
+      hostname: url.hostname,
+      path: `${url.pathname}${url.search}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, (response) => {
+      response.resume();
+      response.on('end', () => {
+        if (response.statusCode >= 200 && response.statusCode < 300) return resolve();
+        reject(new Error(`Developer Discord webhook returned ${response.statusCode}`));
+      });
+    });
+    request.on('error', reject);
+    request.setTimeout(5000, () => request.destroy(new Error('Developer Discord webhook timed out')));
+    request.write(postData);
+    request.end();
+  });
+}
+
+function scheduleBackgroundTask(task, taskName) {
+  const guardedTask = Promise.resolve(task).catch((error) => {
+    console.error(`${taskName} failed:`, error.message);
+  });
+
+  if (process.env.VERCEL) {
+    try {
+      waitUntil(guardedTask);
+    } catch (error) {
+      console.error(`${taskName} scheduling failed:`, error.message);
+    }
+  } else {
+    void guardedTask;
+  }
+}
+
+function chunkDiscordNames(title, usernames) {
+  if (!usernames.length) return [`${title}\n없음`];
+
+  const messages = [];
+  let currentMessage = title;
+  for (const username of usernames) {
+    const line = `\n• ${username}`;
+    if (currentMessage.length + line.length > 1700) {
+      messages.push(currentMessage);
+      currentMessage = `${title} (계속)`;
+    }
+    currentMessage += line;
+  }
+  messages.push(currentMessage);
+  return messages;
+}
+
+function schedulePushNotification(payload) {
+  scheduleBackgroundTask(
+    sendPushNotification(payload).then(async (result) => {
+      const summary = [
+        '[웹푸시 발송 결과]',
+        `알림: ${(payload.body || '새로운 소식이 있습니다.').slice(0, 300)}`,
+        `푸시 서비스 접수 사용자 수: ${result.sentUsernames.length + result.unidentifiedSentCount}명`,
+        `전송 요청: ${result.attemptedCount}건 · 실패: ${result.failedCount}건`,
+        '※ 기기에서 실제 표시/확인한 여부가 아닌 푸시 서비스 접수 기준입니다.'
+      ].join('\n');
+      const recipientMessages = result.configured
+        ? chunkDiscordNames('[푸시 서비스 접수 사용자]', result.sentUsernames)
+        : ['[푸시 서비스 접수 사용자]\n발송 설정되지 않음'];
+      if (result.unidentifiedSentCount) {
+        recipientMessages[recipientMessages.length - 1] += `\n• 이름 미상 구독 ${result.unidentifiedSentCount}개`;
+      }
+      for (const message of [summary, ...recipientMessages]) {
+        await sendDeveloperDiscordMessage(message);
+      }
+    }),
+    'Web push notification'
+  );
+}
+
+function reportDeveloperError(error, req) {
+  if (!req || req._developerErrorReported) return;
+  req._developerErrorReported = true;
+
+  const username = req.user?.username || '비로그인';
+  const method = req.method || 'UNKNOWN';
+  const path = (req.originalUrl || req.url || '/').split('?')[0].slice(0, 160);
+  const message = String(error?.message || error || 'Unknown error').slice(0, 700);
+  scheduleBackgroundTask(
+    sendDeveloperDiscordMessage([
+      '[서비스 오류]',
+      `사용자: ${username}`,
+      `요청: ${method} ${path}`,
+      `오류: ${message}`
+    ].join('\n')),
+    'Developer error notification'
+  );
 }
 
 // Discord webhook (환경변수 우선)
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
 function sendDiscordNotification(message) {
-  void sendPushNotification({
+  if (DISCORD_WEBHOOK) {
+    try {
+      const url = new URL(DISCORD_WEBHOOK);
+      const body = { content: message || '' };
+      const postData = JSON.stringify(body);
+
+      const options = {
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        res.on('data', () => {});
+      });
+      req.on('error', (e) => console.error('Discord webhook error:', e));
+      req.write(postData);
+      req.end();
+    } catch (e) {
+      console.error('sendDiscordNotification error:', e);
+    }
+  }
+
+  schedulePushNotification({
     title: '오늘도골대FC',
     body: message || '새로운 소식이 있습니다.',
     url: '/'
-  }).catch((error) => {
-    console.error('Web push notification error:', error.message);
   });
-
-  if (!DISCORD_WEBHOOK) return;
-
-  try {
-    const url = new URL(DISCORD_WEBHOOK);
-    const body = { content: message || '' };
-    const postData = JSON.stringify(body);
-
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname + url.search,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      res.on('data', () => {});
-    });
-    req.on('error', (e) => console.error('Discord webhook error:', e));
-    req.write(postData);
-    req.end();
-  } catch (e) {
-    console.error('sendDiscordNotification error:', e);
-  }
 }
 
 app.use(methodOverride('_method'))
@@ -85,40 +217,6 @@ app.set('view engine', 'ejs') // ejs setting
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.set('trust proxy', 1);
-
-app.get('/push/public-key', (req, res) => {
-  if (!isPushConfigured()) {
-    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
-  }
-
-  res.json({ ok: true, publicKey: PUSH_PUBLIC_KEY });
-});
-
-app.post('/push/subscribe', async (req, res) => {
-  if (!isPushConfigured()) {
-    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
-  }
-
-  const subscription = req.body?.subscription;
-  if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
-    return res.status(400).json({ ok: false, message: '유효하지 않은 푸시 구독 정보입니다.' });
-  }
-
-  await db.collection('push_subscription').updateOne(
-    { endpoint: subscription.endpoint },
-    {
-      $set: {
-        endpoint: subscription.endpoint,
-        subscription,
-        username: req.user?.username || null,
-        updatedAt: new Date()
-      }
-    },
-    { upsert: true }
-  );
-
-  res.json({ ok: true, message: '알림이 설정되었습니다.' });
-});
 
 // passport 라이브러리 세팅
 const session = require('express-session')
@@ -186,6 +284,100 @@ app.use(async (req, res, next) => {
   }
 })
 
+app.use(async (req, res, next) => {
+  const username = req.user?.username;
+  if (!username || !req.session) return next();
+
+  const today = getSeoulDateKey();
+  if (req.session.lastActivityTrackedDate === today) return next();
+
+  try {
+    await db.collection('daily_active_users').updateOne(
+      { _id: today },
+      { $setOnInsert: { date: today }, $addToSet: { usernames: username } },
+      { upsert: true }
+    );
+    req.session.lastActivityTrackedDate = today;
+  } catch (error) {
+    reportDeveloperError(error, req);
+  }
+  next();
+});
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    if (res.statusCode >= 500) {
+      reportDeveloperError(new Error(`HTTP ${res.statusCode} response`), req);
+    }
+  });
+  next();
+});
+
+app.get('/push/public-key', (req, res) => {
+  if (!isPushConfigured()) {
+    reportDeveloperError(new Error('Web push VAPID keys are not configured'), req);
+    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
+  }
+
+  res.json({ ok: true, publicKey: PUSH_PUBLIC_KEY });
+});
+
+app.post('/push/subscribe', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+  if (!isPushConfigured()) {
+    reportDeveloperError(new Error('Web push VAPID keys are not configured'), req);
+    return res.status(503).json({ ok: false, message: '웹 푸시 환경변수가 설정되지 않았습니다.' });
+  }
+
+  const subscription = req.body?.subscription;
+  if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
+    return res.status(400).json({ ok: false, message: '유효하지 않은 푸시 구독 정보입니다.' });
+  }
+
+  await db.collection('push_subscription').updateOne(
+    { endpoint: subscription.endpoint },
+    {
+      $set: {
+        endpoint: subscription.endpoint,
+        subscription,
+        username: req.user?.username || null,
+        updatedAt: new Date()
+      }
+    },
+    { upsert: true }
+  );
+
+  res.json({ ok: true, message: '알림이 설정되었습니다.' });
+});
+
+app.post('/dev/client-error', (req, res) => {
+  const now = Date.now();
+  if (req.session?.lastClientErrorReportAt && now - req.session.lastClientErrorReportAt < 60_000) {
+    return res.status(204).end();
+  }
+  if (req.session) req.session.lastClientErrorReportAt = now;
+
+  const type = String(req.body?.type || 'Client').slice(0, 40);
+  const message = String(req.body?.message || 'Unknown client error').slice(0, 400);
+  const page = String(req.body?.page || '/').split('?')[0].slice(0, 120);
+  const source = String(req.body?.source || '').split('?')[0].slice(-160);
+  const line = Number.isInteger(req.body?.line) ? req.body.line : '알 수 없음';
+  scheduleBackgroundTask(
+    sendDeveloperDiscordMessage([
+      '[클라이언트 오류]',
+      `사용자: ${req.user?.username || '비로그인'}`,
+      `페이지: ${page}`,
+      `유형: ${type}`,
+      `오류: ${message}`,
+      `소스: ${source || '알 수 없음'}:${line}`
+    ].join('\n')),
+    'Client error notification'
+  );
+  res.status(202).end();
+});
+
 
 // 로깅 함수
 function logActivity(username, action, details = '') {
@@ -202,6 +394,39 @@ app.use((req, res, next) => {
   }
   next();
 })
+
+app.get('/api/cron/daily-active-users', async (req, res) => {
+  if (!CRON_SECRET || req.get('authorization') !== `Bearer ${CRON_SECRET}`) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized' });
+  }
+  if (!DEV_DISCORD_WEBHOOK) {
+    return res.status(503).json({ ok: false, message: 'Developer Discord webhook is not configured' });
+  }
+
+  const targetDate = getSeoulDateKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
+  const activity = await db.collection('daily_active_users').findOne({ _id: targetDate });
+  const usernames = activity?.usernames || [];
+  const header = `[전일 접속 사용자] ${targetDate} · ${usernames.length}명`;
+  const chunks = [];
+  let currentMessage = header;
+
+  for (const username of usernames) {
+    const line = `\n• ${username}`;
+    if (currentMessage.length + line.length > 1750) {
+      chunks.push(currentMessage);
+      currentMessage = `[전일 접속 사용자] ${targetDate} (계속)${line}`;
+    } else {
+      currentMessage += line;
+    }
+  }
+  chunks.push(currentMessage);
+
+  for (const message of chunks) {
+    await sendDeveloperDiscordMessage(message);
+  }
+
+  res.json({ ok: true, date: targetDate, activeUserCount: usernames.length });
+});
 
 
 
@@ -243,6 +468,9 @@ app.get('/', async (req, res) => {
 
 
 app.get('/management', async (req, res) => {
+  const isDeveloper = req.user?.userID === DEVELOPER_USER_ID;
+  const canSeeStats = isDeveloper || req.user?.username === '한대규';
+
   let result = await db.collection('notice').find().toArray();
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
   let latestResult = await db.collection('result').find().sort({ _id: -1 }).limit(1).toArray();
@@ -284,7 +512,15 @@ app.get('/management', async (req, res) => {
   // Extract the averages from the result
   let avgStatsResult = avgStats[0];
 
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory });
+  const pushEnabledUsernames = canSeeStats
+    ? (await db.collection('push_subscription').distinct('username', { username: { $type: 'string', $ne: '' } })).sort((first, second) => first.localeCompare(second, 'ko'))
+    : [];
+  const todayActiveRecord = canSeeStats
+    ? await db.collection('daily_active_users').findOne({ _id: getSeoulDateKey() })
+    : null;
+
+  const canManage = isDeveloper || ['한대규', '관리자', '양철진', '안태훈', '김정훈'].includes(req.user?.username);
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [] });
 });
 
 async function getPredictionLeaderboard() {
@@ -359,6 +595,7 @@ app.post('/prediction/setting', (req, res) => {
       sendDiscordNotification(`새로운 승부예측이 등록되었습니다.\n${homeTeam.trim()} vs ${awayTeam.trim()}\n경기 시간: ${matchTime.trim()}`);
       res.json({ ok: true });
     } catch (error) {
+      reportDeveloperError(error, req);
       console.error(error);
       res.status(500).json({ ok: false, message: '승부예측 설정 저장에 실패했습니다.' });
     }
@@ -467,6 +704,7 @@ app.post('/prediction/history/delete-one', async (req, res) => {
     logActivity(req.user.username, '승부예측 이력 개별 삭제', `- ${settingId}`);
     res.json({ ok: true, message: '선택한 승부예측 이력을 삭제했습니다.' });
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error(error);
     res.status(500).json({ ok: false, message: '승부예측 이력 삭제에 실패했습니다.' });
   }
@@ -782,7 +1020,10 @@ app.get('/login', exports.isNotLoggedIn, async (req, res, next) => {
 
 app.post('/login', async (req, res, next) => {
   passport.authenticate('local', (error, user, info) => {
-    if (error) return res.status(500).json({ success: false, message: '서버 에러' });
+    if (error) {
+      reportDeveloperError(error, req);
+      return res.status(500).json({ success: false, message: '서버 에러' });
+    }
     if (!user) return res.status(401).json({ success: false, message: info.message });
 
     req.logIn(user, (err) => {
@@ -909,6 +1150,7 @@ app.post('/notice-post', async (req, res) => {
         res.redirect('/notice/1')
       }
     } catch (e) {
+      reportDeveloperError(e, req);
       console.log(e)
       res.status(500).send('서버에러남')
     }
@@ -1035,6 +1277,7 @@ app.post('/update-note-post', async (req, res) => {
         res.redirect('/update-note')
       }
     } catch (e) {
+      reportDeveloperError(e, req);
       console.log(e)
       res.status(500).send('서버에러남')
     }
@@ -1157,6 +1400,7 @@ app.post('/statinfo', async (req, res) => {
       res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
     }
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error('데이터 조회 중 오류 발생:', error.message);
     res.status(500).json({ error: '데이터 조회 중 오류가 발생했습니다.' });
   }
@@ -1210,6 +1454,7 @@ app.post('/statinfo', async (req, res) => {
       res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
     }
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error('데이터 조회 중 오류 발생:', error.message);
     res.status(500).json({ error: '데이터 조회 중 오류가 발생했습니다.' });
   }
@@ -1259,6 +1504,7 @@ app.get('/savestat', async (req, res) => {
 
     res.redirect('/introduce');
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error('데이터 저장 중 오류 발생:', error.message);
     res.status(500).json({ error: '데이터 저장 중 오류가 발생했습니다.' });
   }
@@ -1434,6 +1680,7 @@ app.get('/ChrStat', async (req, res) => {
     logActivity(req.user.username, '선수 특성 부여', `- 대상: ${userID} (${chr.length}개 특성)`);
     res.redirect('back');
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error('stats_result 업데이트 중 오류 발생:', error.message);
     res.status(500).send('내부 서버 오류');
   }
@@ -1631,6 +1878,7 @@ app.post('/photo-post', async (req, res) => {
         res.redirect('/photo')
       }
     } catch (e) {
+      reportDeveloperError(e, req);
       console.log(e)
       res.status(500).send('서버에러남')
     }
@@ -1716,6 +1964,7 @@ app.get('/load-more-videos', this.isLoggedIn, async (req, res) => {
     const newVideos = await db.collection('youtubeURL').find().sort({ _id: -1 }).skip(3).toArray();
     res.json(newVideos); // JSON 형식으로 클라이언트에 응답
   } catch (error) {
+    reportDeveloperError(error, req);
     console.error('Error loading more videos:', error);
     res.status(500).send('Failed to load more videos');
   }
@@ -1752,6 +2001,13 @@ app.get('/user', async (req, res) => {
 app.get('/mypage/:userId', async (req, res) => {
 
   res.render('mypage.ejs')
+});
+
+app.use((error, req, res, next) => {
+  reportDeveloperError(error, req);
+  console.error('Unhandled request error:', error);
+  if (res.headersSent) return next(error);
+  res.status(500).send('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
 });
 
 if (require.main === module) {

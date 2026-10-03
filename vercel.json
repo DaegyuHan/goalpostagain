@@ -1,5 +1,11 @@
 {
   "version": 2,
+  "crons": [
+    {
+      "path": "/api/cron/daily-active-users",
+      "schedule": "0 3 * * *"
+    }
+  ],
   "builds": [
     {
       "src": "api/index.js",

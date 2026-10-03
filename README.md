@@ -88,6 +88,12 @@ Vercel 프로젝트의 Environment Variables에 `.env.example`의 다음 값을 
 - `SESSION_SECRET`
 - `S3_KEY`, `S3_SECRET`, `S3_BUCKET`
 - `DISCORD_WEBHOOK` (선택)
+- `DEV_DISCORD_WEBHOOK`: 개발자 전용 Discord 채널 웹훅
+- `CRON_SECRET`: 전일 접속 사용자 보고용 Vercel Cron 인증 키
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`: 웹푸시 발송 키
+- `VAPID_SUBJECT` (선택): VAPID 연락처, 기본값은 `mailto:admin@goalpostagain.com`
+
+전일 접속 사용자 목록은 Vercel Cron이 매일 UTC 03:00(한국시간 12:00)에 개발자 채널로 보냅니다. 접속 집계는 배포 이후 로그인된 사용자의 첫 요청부터 쌓입니다.
 
 MongoDB Atlas에서는 Vercel의 배포 IP가 고정되지 않으므로 Network Access를 적절히 설정하고, 기존 접속 문자열이 외부에 노출된 적이 있다면 비밀번호를 먼저 교체해야 합니다.
 

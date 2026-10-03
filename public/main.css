@@ -460,6 +460,63 @@ img {
   text-align: center;
 }
 
+.prediction-history-details {
+  margin-top: 12px;
+  border: 1px solid #e4edf0;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.prediction-history-details summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 12px;
+  color: #29464d;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.prediction-history-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.prediction-history-details summary::after {
+  position: absolute;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #6b7c80;
+  border-bottom: 2px solid #6b7c80;
+  content: '';
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.prediction-history-details[open] summary::after {
+  transform: rotate(225deg);
+}
+
+.prediction-history-toggle-label {
+  color: #1761b0;
+  font-size: 12px;
+}
+
+.prediction-history-details[open] .prediction-history-toggle-closed,
+.prediction-history-details:not([open]) .prediction-history-toggle-open {
+  display: none;
+}
+
+.prediction-history-no-votes {
+  padding: 10px 12px 14px;
+  color: #6b7c80;
+  font-size: 12px;
+}
+
 .prediction-history-votes {
   display: flex;
   flex-wrap: wrap;

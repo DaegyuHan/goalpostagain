@@ -7,6 +7,55 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+function reportClientError(type, message, source, line) {
+  fetch('/dev/client-error', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type,
+      message: String(message || 'Unknown client error').slice(0, 400),
+      source: String(source || '').split('?')[0].slice(-160),
+      line: Number.isInteger(line) ? line : null,
+      page: window.location.pathname
+    })
+  }).catch(() => {});
+}
+
+window.addEventListener('error', (event) => {
+  reportClientError('JavaScript', event.message, event.filename, event.lineno);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = event.reason;
+  const message = reason instanceof Error ? `${reason.name}: ${reason.message}` : String(reason);
+  reportClientError('Promise', message);
+});
+
+const nativeFetch = window.fetch.bind(window);
+window.fetch = async (...args) => {
+  const input = args[0];
+  let requestPath = '';
+  try {
+    const requestUrl = typeof input === 'string' ? input : input?.url || String(input);
+    requestPath = new URL(requestUrl, window.location.href).pathname;
+  } catch (error) {
+    requestPath = '';
+  }
+
+  try {
+    const response = await nativeFetch(...args);
+    if (response.status >= 500 && requestPath !== '/dev/client-error') {
+      reportClientError('HTTP', `HTTP ${response.status}`, requestPath);
+    }
+    return response;
+  } catch (error) {
+    if (error.name !== 'AbortError' && requestPath !== '/dev/client-error') {
+      reportClientError('Network', error.message, requestPath);
+    }
+    throw error;
+  }
+};
+
 function toggleMenu() {
     const sideMenu = document.querySelector('.side-menu');
     sideMenu.style.left = sideMenu.style.left === '0px' ? '-100%' : '0px';

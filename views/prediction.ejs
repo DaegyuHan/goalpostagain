@@ -66,6 +66,7 @@
         아직 운영진이 등록한 승부예측 경기가 없습니다.
       </div>
     <% } else { %>
+      <% const predictionFinished = prediction.isOpen === false && prediction.finalHomeScore != null && prediction.finalAwayScore != null; %>
       <div class="prediction-card">
         <div class="prediction-team">
           <img class="prediction-team-logo" src="<%= prediction.homeLogo || 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/match%20result/1.%20%EC%98%A4%EB%8A%98%EB%8F%84%EA%B3%A8%EB%8C%80%20%EB%A1%9C%EA%B3%A0.png?updatedAt=1702704522837' %>" alt="홈팀 로고">
@@ -103,29 +104,31 @@
         </div>
       <% } %>
 
-      <div class="prediction-list">
-        <h3>예측 현황</h3>
+      <% if (!predictionFinished) { %>
+        <div class="prediction-list">
+          <h3>예측 현황</h3>
 
-        <% if (!votes || votes.length === 0) { %>
-          <div class="prediction-empty">아직 예상 결과가 없습니다. 첫 예측을 남겨보세요.</div>
-        <% } else { %>
-          <% votes.forEach((vote) => { %>
-            <div class="prediction-row">
-              <div class="prediction-user"><%= vote.username %></div>
-              <div class="prediction-score-badge"><%= vote.homeScore %> : <%= vote.awayScore %></div>
-              <div class="prediction-pick-badge">
-                <% if (Number(vote.homeScore) > Number(vote.awayScore)) { %>
-                  <%= prediction.homeTeam %> 승
-                <% } else if (Number(vote.homeScore) === Number(vote.awayScore)) { %>
-                  무승부
-                <% } else { %>
-                  <%= prediction.awayTeam %> 승
-                <% } %>
+          <% if (!votes || votes.length === 0) { %>
+            <div class="prediction-empty">아직 예상 결과가 없습니다. 첫 예측을 남겨보세요.</div>
+          <% } else { %>
+            <% votes.forEach((vote) => { %>
+              <div class="prediction-row">
+                <div class="prediction-user"><%= vote.username %></div>
+                <div class="prediction-score-badge"><%= vote.homeScore %> : <%= vote.awayScore %></div>
+                <div class="prediction-pick-badge">
+                  <% if (Number(vote.homeScore) > Number(vote.awayScore)) { %>
+                    <%= prediction.homeTeam %> 승
+                  <% } else if (Number(vote.homeScore) === Number(vote.awayScore)) { %>
+                    무승부
+                  <% } else { %>
+                    <%= prediction.awayTeam %> 승
+                  <% } %>
+                </div>
               </div>
-            </div>
-          <% }); %>
-        <% } %>
-      </div>
+            <% }); %>
+          <% } %>
+        </div>
+      <% } %>
     <% } %>
 
     <div class="prediction-list prediction-history-list">
@@ -133,7 +136,7 @@
       <% if (!predictionHistory || predictionHistory.length === 0) { %>
         <div class="prediction-empty">종료된 승부예측이 아직 없습니다.</div>
       <% } else { %>
-        <% predictionHistory.forEach((history) => { %>
+        <% predictionHistory.forEach((history, index) => { %>
           <div class="prediction-history-item">
             <div class="prediction-history-match">
               <div class="prediction-history-team">
@@ -147,13 +150,21 @@
               </div>
             </div>
             <div class="prediction-history-meta">경기 시간: <%= history.matchTime %> · 참여 예측 <%= history.votes ? history.votes.length : 0 %>명</div>
-            <% if (history.votes && history.votes.length > 0) { %>
-              <div class="prediction-history-votes">
-                <% history.votes.forEach((vote) => { %>
-                  <span class="<%= vote.isCorrect ? 'prediction-score-correct-vote' : vote.isOutcomeCorrect ? 'prediction-correct-vote' : '' %>"><%= vote.username %> <b><%= vote.homeScore %> : <%= vote.awayScore %></b></span>
-                <% }); %>
-              </div>
-            <% } %>
+            <details class="prediction-history-details" <%= index === 0 ? 'open' : '' %>>
+              <summary>
+                <span class="prediction-history-toggle-label prediction-history-toggle-closed">예측 기록 보기</span>
+                <span class="prediction-history-toggle-label prediction-history-toggle-open">접기</span>
+              </summary>
+              <% if (history.votes && history.votes.length > 0) { %>
+                <div class="prediction-history-votes">
+                  <% history.votes.forEach((vote) => { %>
+                    <span class="<%= vote.isCorrect ? 'prediction-score-correct-vote' : vote.isOutcomeCorrect ? 'prediction-correct-vote' : '' %>"><%= vote.username %> <b><%= vote.homeScore %> : <%= vote.awayScore %></b></span>
+                  <% }); %>
+                </div>
+              <% } else { %>
+                <div class="prediction-history-no-votes">예측 참여 기록이 없습니다.</div>
+              <% } %>
+            </details>
           </div>
         <% }); %>
       <% } %>
