@@ -1757,12 +1757,14 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   let score = parseInt(req.query.score);
   let username = req.user.username;
 
-  // 같은 월이면 update, 아니면 insert
+  // Keep the best monthly score and use the update result to detect a new record.
   let result = await db.collection('gamezone_shooting').updateOne(
     { name: username, yearMonth: yearMonth },
-    { $set: { top_score: score, yearMonth: yearMonth } },
+    { $max: { top_score: score }, $set: { yearMonth: yearMonth } },
     { upsert: true }
   );
+  const isPersonalRecord = Number.isInteger(score) && score > 0
+    && (result.modifiedCount > 0 || result.upsertedCount > 0);
 
   // 업데이트 후 현재 월의 1등을 확인하여 조건(점수 >= 10 && 1등) 만족 시 알림 전송
   const topList = await db.collection('gamezone_shooting')
@@ -1776,6 +1778,13 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
     if (score >= 10 && topEntry.name === username && topEntry.top_score === score) {
       sendDiscordNotification(`[${username}] 님이 승부차기에서 ${score}점으로 1위를 기록했습니다.`);
     }
+  }
+
+  if (isPersonalRecord) {
+    scheduleBackgroundTask(
+      sendDeveloperDiscordMessage(`[승부차기 신기록]\n사용자: ${username}\n기록: ${score}점\n기준 월: ${yearMonth}`),
+      'Shooting game record notification'
+    );
   }
 
   logActivity(username, '승부차기 점수 저장', `- 점수: ${score}점 (${yearMonth})`);

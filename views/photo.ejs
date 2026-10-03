@@ -210,13 +210,17 @@
 
         <div class="story-main">
 
-            <div class="notice-title story-photo-title">사진&영상</div>
-            <div class="story-bt-area">
-                <button onclick="gotoPhoto()" class="story-photo-bt">PHOTO</button>
-                <button onclick="gotoVideo()" class="story-video-bt">VIDEO</button>
-                <a href="/photo-post" class="story-photo-post">작성하기</a>
+            <div class="story-page-header">
+                <h1 class="story-page-title">사진&영상</h1>
+                <div class="story-toolbar">
+                    <div class="story-tabs">
+                        <button type="button" onclick="gotoPhoto()" class="story-tab-button is-active" aria-current="page">PHOTO</button>
+                        <button type="button" onclick="gotoVideo()" class="story-tab-button">VIDEO</button>
+                    </div>
+                    <a href="/photo-post" class="story-photo-post">작성하기</a>
+                </div>
             </div>
-            <hr>
+            <hr class="story-header-divider">
 
             <%for (i=0; i<포토.length; i++) {%>
                 <% const photoLikes = Array.isArray(포토[i].likes) ? 포토[i].likes : []; %>

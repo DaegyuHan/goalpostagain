@@ -244,12 +244,21 @@
 
 .prediction-leaderboard-row {
     display: grid;
-    grid-template-columns: 60px 1fr auto;
+    grid-template-columns: 60px minmax(0, 1fr) auto;
     gap: 12px;
     align-items: center;
     padding: 11px 10px;
     border-top: 1px solid var(--management-line);
     color: var(--management-ink);
+}
+
+.prediction-leaderboard-row > span {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .prediction-leaderboard-stats {
@@ -506,6 +515,25 @@
 }
 
 @media (max-width: 700px) {
+    .prediction-leaderboard-row {
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 5px 8px;
+        align-items: start;
+        padding: 10px 4px;
+    }
+
+    .prediction-leaderboard-row > span {
+        align-self: center;
+        font-size: 12px;
+    }
+
+    .prediction-leaderboard-stats {
+        grid-column: 2;
+        justify-content: flex-start;
+        gap: 3px 8px;
+        font-size: 11px;
+    }
+
     .developer-management-actions {
         grid-template-columns: 1fr;
     }

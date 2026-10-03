@@ -41,50 +41,6 @@ p {
 
 
 
-.story-photo-bt {
-    width: 47%;
-    height: 6vh;
-    background-color: #ff3ca0;
-    color: white;
-    font-size: 130%;
-    border: 0px solid transparent;
-}
-
-.story-video-bt {
-    width: 47%;
-    height: 6vh;
-    background-color: #02313d;
-    color: white;
-    font-size: 130%;
-    border: 0px solid transparent;
-
-}
-
-.story-video-bt:hover {
-    background-color: #ff3ca0;
-}
-
-.story-photo-post {
-    justify-content: right;
-    font-size: 75%;
-    /* width: 25%; */
-    margin-top: 10px;
-    margin-left: 80%;
-    padding-top: 3px;
-}
-
-.story-photo-post a {
-    color: #e6e6e6ce;
-}
-
-.story-photo-title {
-    margin-bottom: 18px;
-    padding-left: 16px;
-    text-align: left;
-    font-size: 28px;
-    letter-spacing: 0.02em;
-}
-
 .story-photo-card {
     overflow: hidden;
     margin-bottom: 36px;

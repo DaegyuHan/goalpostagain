@@ -71,11 +71,16 @@
     <%- include('nav.ejs') %>
 
         <div class="story-main">
-            <div class="notice-title">사진&영상</div>
-            <div class="story-bt-area">
-                <button onclick="gotoPhoto()" class="story-change-photo-bt">PHOTO</button>
-                <button onclick="gotoVideo()" class="story-change-video-bt">VIDEO</button>
+            <div class="story-page-header">
+                <h1 class="story-page-title">사진&영상</h1>
+                <div class="story-toolbar story-toolbar--video">
+                    <div class="story-tabs">
+                        <button type="button" onclick="gotoPhoto()" class="story-tab-button">PHOTO</button>
+                        <button type="button" onclick="gotoVideo()" class="story-tab-button is-active" aria-current="page">VIDEO</button>
+                    </div>
+                </div>
             </div>
+            <hr class="story-header-divider">
 
             <% for ( i=0; i<URL3.length; i++) {%>
                 <div class="story-photo-area">
