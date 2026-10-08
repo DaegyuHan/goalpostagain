@@ -378,6 +378,10 @@ app.post('/dev/client-error', (req, res) => {
   res.status(202).end();
 });
 
+app.get('/error', (req, res) => {
+  res.status(500).render('error.ejs');
+});
+
 
 // 로깅 함수
 function logActivity(username, action, details = '') {
