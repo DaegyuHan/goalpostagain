@@ -173,6 +173,39 @@ function reportDeveloperError(error, req) {
   );
 }
 
+const clientErrorReportTimes = new Map();
+
+function reportClientError(req) {
+  const now = Date.now();
+  const requester = req.ip || req.socket.remoteAddress || 'unknown';
+  const lastReportAt = clientErrorReportTimes.get(requester);
+  if (lastReportAt && now - lastReportAt < 60_000) return;
+  clientErrorReportTimes.set(requester, now);
+
+  if (clientErrorReportTimes.size > 500) {
+    for (const [ip, reportAt] of clientErrorReportTimes) {
+      if (now - reportAt >= 60_000) clientErrorReportTimes.delete(ip);
+    }
+  }
+
+  const type = String(req.body?.type || 'Client').slice(0, 40);
+  const message = String(req.body?.message || 'Unknown client error').slice(0, 400);
+  const page = String(req.body?.page || '/').split('?')[0].slice(0, 120);
+  const source = String(req.body?.source || '').split('?')[0].slice(-160);
+  const line = Number.isInteger(req.body?.line) ? req.body.line : '알 수 없음';
+  scheduleBackgroundTask(
+    sendDeveloperDiscordMessage([
+      '[클라이언트 오류]',
+      `사용자: ${req.user?.username || '비로그인'}`,
+      `페이지: ${page}`,
+      `유형: ${type}`,
+      `오류: ${message}`,
+      `소스: ${source || '알 수 없음'}:${line}`
+    ].join('\n')),
+    'Client error notification'
+  );
+}
+
 // Discord webhook (환경변수 우선)
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
@@ -241,6 +274,14 @@ app.use(session({
   })
 }))
 app.use(passport.session())
+
+app.use((error, req, res, next) => {
+  if (req.path !== '/dev/client-error') return next(error);
+
+  reportDeveloperError(error, req);
+  reportClientError(req);
+  res.status(202).end();
+});
 //
 
 const { S3Client } = require('@aws-sdk/client-s3')
@@ -276,6 +317,8 @@ const dbReady = connectDB.then((client) => {
 // mongoDB library 연결 코드
 
 app.use(async (req, res, next) => {
+  if (req.path === '/dev/client-error') return next();
+
   try {
     await dbReady
     next()
@@ -285,6 +328,8 @@ app.use(async (req, res, next) => {
 })
 
 app.use(async (req, res, next) => {
+  if (req.path === '/dev/client-error') return next();
+
   const username = req.user?.username;
   if (!username || !req.session) return next();
 
@@ -353,28 +398,7 @@ app.post('/push/subscribe', async (req, res) => {
 });
 
 app.post('/dev/client-error', (req, res) => {
-  const now = Date.now();
-  if (req.session?.lastClientErrorReportAt && now - req.session.lastClientErrorReportAt < 60_000) {
-    return res.status(204).end();
-  }
-  if (req.session) req.session.lastClientErrorReportAt = now;
-
-  const type = String(req.body?.type || 'Client').slice(0, 40);
-  const message = String(req.body?.message || 'Unknown client error').slice(0, 400);
-  const page = String(req.body?.page || '/').split('?')[0].slice(0, 120);
-  const source = String(req.body?.source || '').split('?')[0].slice(-160);
-  const line = Number.isInteger(req.body?.line) ? req.body.line : '알 수 없음';
-  scheduleBackgroundTask(
-    sendDeveloperDiscordMessage([
-      '[클라이언트 오류]',
-      `사용자: ${req.user?.username || '비로그인'}`,
-      `페이지: ${page}`,
-      `유형: ${type}`,
-      `오류: ${message}`,
-      `소스: ${source || '알 수 없음'}:${line}`
-    ].join('\n')),
-    'Client error notification'
-  );
+  reportClientError(req);
   res.status(202).end();
 });
 
