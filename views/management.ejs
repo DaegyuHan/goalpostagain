@@ -1114,14 +1114,22 @@
                 <% if (!predictionLeaderboard || predictionLeaderboard.length === 0) { %>
                   <div class="prediction-empty">아직 적중한 예측 기록이 없습니다.</div>
                 <% } else { %>
-                  <% predictionLeaderboard.forEach((player, index) => { %>
+                  <% let currentRank = 0; let previousPoints = null; predictionLeaderboard.forEach((player, index) => {
+                    const points = Number(player.points);
+                    if (index === 0 || points !== previousPoints) currentRank = index + 1;
+                    previousPoints = points;
+                    const attemptCount = Number(player.attemptCount) || 0;
+                    const outcomeCount = Number(player.outcomeCount) || 0;
+                    const outcomeAccuracy = attemptCount ? Math.round(outcomeCount / attemptCount * 100) : 0;
+                  %>
                     <div class="prediction-leaderboard-row">
-                      <strong><%= index + 1 %>위</strong>
+                      <strong><%= currentRank %>위</strong>
                       <span><%= player.username %></span>
                       <div class="prediction-leaderboard-stats">
                         <span class="prediction-outcome-count">승무패 <%= player.outcomeCount %>회</span>
                         <span class="prediction-score-count">스코어 <%= player.scoreCount %>회</span>
                         <span>총 예측 <%= player.attemptCount %>회</span>
+                        <span>승무패 적중률 <%= outcomeAccuracy %>%</span>
                       </div>
                     </div>
                   <% }); %>

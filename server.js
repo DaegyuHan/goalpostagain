@@ -72,7 +72,8 @@ async function sendDeveloperDiscordMessage(message) {
   if (!DEV_DISCORD_WEBHOOK) return;
 
   const url = new URL(DEV_DISCORD_WEBHOOK);
-  const postData = JSON.stringify({ content: message.slice(0, 1900), allowed_mentions: { parse: [] } });
+  const formattedMessage = `\`\`\`${message.slice(0, 1900)}\`\`\``;
+  const postData = JSON.stringify({ content: formattedMessage, allowed_mentions: { parse: [] } });
 
   return new Promise((resolve, reject) => {
     const request = https.request({
@@ -573,7 +574,7 @@ async function getPredictionLeaderboard() {
     });
   });
 
-  return Array.from(counts, ([username, count]) => ({
+  const leaderboard = Array.from(counts, ([username, count]) => ({
     username,
     ...count,
     points: count.outcomeCount + count.scoreCount * 3
@@ -583,6 +584,8 @@ async function getPredictionLeaderboard() {
       || second.outcomeCount - first.outcomeCount
       || second.scoreCount - first.scoreCount
       || first.username.localeCompare(second.username, 'ko'));
+
+  return leaderboard;
 }
 
 app.post('/prediction/setting', (req, res) => {

@@ -354,21 +354,27 @@
                     <div class="MvpBoard-bar"></div>
                     <div style="width: 20%; text-align: center;">SCORE</div>
                 </div>
-                <% if (typeof ShootingScore !=='undefined' ) { const shootingScoreArray=Object.entries(ShootingScore);
-                    shootingScoreArray.sort((a, b)=> b[1].top_score - a[1].top_score);
-                    for (let i = 0; i < shootingScoreArray.length; i++) { %>
+                <% if (typeof ShootingScore !=='undefined' ) {
+                    const shootingScoreArray = [...ShootingScore].sort((first, second) => Number(second.top_score) - Number(first.top_score));
+                    let currentRank = 0;
+                    let previousScore = null;
+                    shootingScoreArray.forEach((shootingRecord, index) => {
+                        const score = Number(shootingRecord.top_score);
+                        if (index === 0 || score !== previousScore) currentRank = index + 1;
+                        previousScore = score;
+                    %>
                         <div class="MvpBoard-area">
                             <div class="MvpBoard-area-rank">
-                                <%= i + 1 %>
+                                <%= currentRank %>
                             </div>
                             <div class="MvpBoard-area-name">
-                                <%= shootingScoreArray[i][1].name %>
+                                <%= shootingRecord.name %>
                             </div>
                             <div class="MvpBoard-area-rank">
-                                <%= shootingScoreArray[i][1].top_score %>
+                                <%= shootingRecord.top_score %>
                             </div>
                         </div>
-                        <% } %>
+                        <% }); %>
                             <% } %>
 
                         <div class="gamezone-board-links">
