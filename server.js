@@ -3,6 +3,8 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 const { MongoClient, ObjectId } = require('mongodb')
+const { performance } = require('node:perf_hooks')
+const { createRetryingDatabase, requestMetricsStorage } = require('./mongo-read-retry')
 const methodOverride = require('method-override')
 const bcrypt = require('bcryptjs')
 const ytdl = require('ytdl-core');
@@ -19,6 +21,13 @@ const DEV_DISCORD_WEBHOOK = process.env.DEV_DISCORD_WEBHOOK;
 const DEVELOPER_USER_ID = 'bigstarhan33';
 const SEOUL_TIME_ZONE = 'Asia/Seoul';
 const CRON_SECRET = process.env.CRON_SECRET;
+const DEVELOPER_ALERT_COLORS = [
+  { prefix: '[서비스 오류]', color: 0xD64545 },
+  { prefix: '[클라이언트 오류]', color: 0xE67E22 },
+  { prefix: '[웹푸시 발송 결과]', color: 0x2E8B57 },
+  { prefix: '[푸시 서비스 접수 사용자]', color: 0x2980B9 },
+  { prefix: '[전일 접속 사용자]', color: 0x168C83 }
+];
 
 if (PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY) {
   webpush.setVapidDetails(PUSH_SUBJECT, PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY);
@@ -72,8 +81,17 @@ async function sendDeveloperDiscordMessage(message) {
   if (!DEV_DISCORD_WEBHOOK) return;
 
   const url = new URL(DEV_DISCORD_WEBHOOK);
-  const formattedMessage = `\`\`\`${message.slice(0, 1900)}\`\`\``;
-  const postData = JSON.stringify({ content: formattedMessage, allowed_mentions: { parse: [] } });
+  const [titleLine, ...bodyLines] = String(message).split('\n');
+  const title = (titleLine || '[개발자 알림]').slice(0, 256);
+  const color = DEVELOPER_ALERT_COLORS.find(({ prefix }) => title.startsWith(prefix))?.color || 0x5865F2;
+  const embed = {
+    title,
+    description: bodyLines.join('\n').slice(0, 4000) || '\u200b',
+    color,
+    timestamp: new Date().toISOString(),
+    footer: { text: '오늘도골대 · DEV 알림' }
+  };
+  const postData = JSON.stringify({ embeds: [embed], allowed_mentions: { parse: [] } });
 
   return new Promise((resolve, reject) => {
     const request = https.request({
@@ -162,7 +180,21 @@ function reportDeveloperError(error, req) {
   const username = req.user?.username || '비로그인';
   const method = req.method || 'UNKNOWN';
   const path = (req.originalUrl || req.url || '/').split('?')[0].slice(0, 160);
-  const message = String(error?.message || error || 'Unknown error').slice(0, 700);
+  const requestMetrics = req._requestMetrics;
+  const requestElapsedMs = requestMetrics
+    ? Math.round(performance.now() - requestMetrics.startedAt)
+    : null;
+  const retryInfo = error?.mongoReadRetry;
+  const timingSummary = requestElapsedMs === null
+    ? ''
+    : `\n요청 ID: ${requestMetrics.requestId}`
+      + `\n오류 시점까지 요청 경과: ${(requestElapsedMs / 1000).toFixed(2)}초`;
+  const retrySummary = retryInfo
+    ? `\nMongoDB 읽기: ${retryInfo.operationName} (${retryInfo.attempts}/${retryInfo.maxAttempts}회 시도)`
+      + `\nDB 작업 경과: ${(retryInfo.operationElapsedMs / 1000).toFixed(2)}초`
+      + `\n재시도 대기: ${(retryInfo.backoffWaitMs / 1000).toFixed(2)}초`
+    : '';
+  const message = `${String(error?.message || error || 'Unknown error')}${timingSummary}${retrySummary}`.slice(0, 700);
   scheduleBackgroundTask(
     sendDeveloperDiscordMessage([
       '[서비스 오류]',
@@ -245,6 +277,42 @@ function sendDiscordNotification(message) {
   });
 }
 
+app.use((req, res, next) => {
+  const requestMetrics = {
+    requestId: crypto.randomUUID(),
+    method: req.method,
+    path: (req.originalUrl || req.url || '/').split('?')[0].slice(0, 160),
+    startedAt: performance.now(),
+    mongoRetryCount: 0,
+    mongoRetryWaitMs: 0,
+    mongoRetryOperationElapsedMs: 0,
+    mongoRetryRecoveredOperations: 0,
+    mongoRetryFailedOperations: 0,
+    mongoRetryOperations: new Set()
+  };
+  req._requestMetrics = requestMetrics;
+  res.on('finish', () => {
+    if (requestMetrics.mongoRetryCount === 0) return;
+    const requestDurationMs = Math.round(performance.now() - requestMetrics.startedAt);
+    console.info('[MongoDB retry request summary]', JSON.stringify({
+      requestId: requestMetrics.requestId,
+      method: requestMetrics.method,
+      path: requestMetrics.path,
+      statusCode: res.statusCode,
+      requestDurationMs,
+      requestDurationSeconds: Number((requestDurationMs / 1000).toFixed(3)),
+      mongoRetryOperations: [...requestMetrics.mongoRetryOperations],
+      mongoRetryCount: requestMetrics.mongoRetryCount,
+      mongoRetryWaitMs: requestMetrics.mongoRetryWaitMs,
+      mongoRetryWaitSeconds: Number((requestMetrics.mongoRetryWaitMs / 1000).toFixed(3)),
+      mongoRetryOperationElapsedMs: requestMetrics.mongoRetryOperationElapsedMs,
+      recoveredOperations: requestMetrics.mongoRetryRecoveredOperations,
+      failedOperations: requestMetrics.mongoRetryFailedOperations
+    }));
+  });
+  requestMetricsStorage.run(requestMetrics, next);
+});
+
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public')) // public 폴더 내의 파일을 사용할 수 있게 함 css,js,jpg 파일들(static 파일들)
 app.set('view engine', 'ejs') // ejs setting
@@ -309,7 +377,7 @@ const upload = multer({
 let db
 const dbReady = connectDB.then((client) => {
   console.log('DB연결성공')
-  db = client.db(process.env.DB_NAME || 'goalpostagain')
+  db = createRetryingDatabase(client.db(process.env.DB_NAME || 'goalpostagain'))
   return db
 }).catch((err) => {
   console.error('DB 연결 실패:', err)
@@ -1183,7 +1251,7 @@ app.post('/notice-post', async (req, res) => {
     } catch (e) {
       reportDeveloperError(e, req);
       console.log(e)
-      res.status(500).send('서버에러남')
+      res.status(500).render('error.ejs')
     }
   })
 
@@ -1310,7 +1378,7 @@ app.post('/update-note-post', async (req, res) => {
     } catch (e) {
       reportDeveloperError(e, req);
       console.log(e)
-      res.status(500).send('서버에러남')
+      res.status(500).render('error.ejs')
     }
   })
 
@@ -1713,7 +1781,7 @@ app.get('/ChrStat', async (req, res) => {
   } catch (error) {
     reportDeveloperError(error, req);
     console.error('stats_result 업데이트 중 오류 발생:', error.message);
-    res.status(500).send('내부 서버 오류');
+    res.status(500).render('error.ejs');
   }
 });
 
@@ -1920,7 +1988,7 @@ app.post('/photo-post', async (req, res) => {
     } catch (e) {
       reportDeveloperError(e, req);
       console.log(e)
-      res.status(500).send('서버에러남')
+      res.status(500).render('error.ejs')
     }
   })
 
@@ -2006,7 +2074,7 @@ app.get('/load-more-videos', this.isLoggedIn, async (req, res) => {
   } catch (error) {
     reportDeveloperError(error, req);
     console.error('Error loading more videos:', error);
-    res.status(500).send('Failed to load more videos');
+    res.status(500).json({ error: 'Failed to load more videos' });
   }
 });
 
@@ -2047,7 +2115,7 @@ app.use((error, req, res, next) => {
   reportDeveloperError(error, req);
   console.error('Unhandled request error:', error);
   if (res.headersSent) return next(error);
-  res.status(500).send('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+  res.status(500).render('error.ejs');
 });
 
 if (require.main === module) {
