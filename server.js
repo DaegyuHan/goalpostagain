@@ -24,6 +24,7 @@ const CRON_SECRET = process.env.CRON_SECRET;
 const DEVELOPER_ALERT_COLORS = [
   { prefix: '[서비스 오류]', color: 0xD64545 },
   { prefix: '[클라이언트 오류]', color: 0xE67E22 },
+  { prefix: '[웹푸시 구독 추가]', color: 0x168C83 },
   { prefix: '[웹푸시 발송 결과]', color: 0x2E8B57 },
   { prefix: '[푸시 서비스 접수 사용자]', color: 0x2980B9 },
   { prefix: '[전일 접속 사용자]', color: 0x168C83 }
@@ -497,7 +498,7 @@ app.post('/push/subscribe', async (req, res) => {
     return res.status(400).json({ ok: false, message: '유효하지 않은 푸시 구독 정보입니다.' });
   }
 
-  await db.collection('push_subscription').updateOne(
+  const subscriptionResult = await db.collection('push_subscription').updateOne(
     { endpoint: subscription.endpoint },
     {
       $set: {
@@ -514,7 +515,42 @@ app.post('/push/subscribe', async (req, res) => {
     { $set: { pushNotificationsEnabled: true } }
   );
 
+  if (subscriptionResult.upsertedCount > 0) {
+    const deviceCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
+    scheduleBackgroundTask(
+      sendDeveloperDiscordMessage([
+        '[웹푸시 구독 추가]',
+        `사용자: ${req.user.username}`,
+        `등록 기기 수: ${deviceCount}대`
+      ].join('\n')),
+      'New push subscription notification'
+    );
+  }
+
   res.json({ ok: true, message: '알림이 설정되었습니다.' });
+});
+
+app.delete('/push/subscribe', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+
+  const endpoint = req.body?.endpoint;
+  if (typeof endpoint !== 'string' || !endpoint.startsWith('https://') || endpoint.length > 4096) {
+    return res.status(400).json({ ok: false, message: '유효하지 않은 기기 구독 정보입니다.' });
+  }
+
+  try {
+    const result = await db.collection('push_subscription').deleteOne({
+      endpoint,
+      username: req.user.username
+    });
+    res.json({ ok: true, removed: result.deletedCount > 0 });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('현재 기기 푸시 구독 해제 실패:', error);
+    res.status(500).json({ ok: false, message: '이 기기의 알림 구독을 해제하지 못했습니다.' });
+  }
 });
 
 app.post('/dev/client-error', (req, res) => {

@@ -93,13 +93,19 @@
       <section class="mypage-notification-settings" aria-labelledby="mypage-push-title">
         <div>
           <h2 id="mypage-push-title">웹 푸시 알림</h2>
-          <p id="mypage-push-status" aria-live="polite"><%= pushEnabled ? '알림을 받고 있습니다.' : '알림이 꺼져 있습니다.' %></p>
+          <p id="mypage-push-status" aria-live="polite"><%= pushEnabled ? '모든 기기에서 알림을 받고 있습니다.' : '모든 기기의 알림이 꺼져 있습니다.' %></p>
         </div>
-        <label class="mypage-push-switch">
-          <span class="visually-hidden">웹 푸시 알림 설정</span>
-          <input type="checkbox" role="switch" <%= pushEnabled ? 'checked' : '' %> onchange="togglePushNotifications(this)">
-          <span class="mypage-push-slider" aria-hidden="true"></span>
-        </label>
+        <div class="mypage-push-actions">
+          <button id="mypage-device-push-toggle" class="mypage-push-device-button" type="button" disabled>
+            <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+            <span id="mypage-device-push-label">기기 상태 확인 중...</span>
+          </button>
+          <label class="mypage-push-switch">
+            <span class="visually-hidden">모든 기기 웹 푸시 알림 설정</span>
+            <input id="mypage-push-enabled" type="checkbox" role="switch" <%= pushEnabled ? 'checked' : '' %> onchange="togglePushNotifications(this)">
+            <span class="mypage-push-slider" aria-hidden="true"></span>
+          </label>
+        </div>
       </section>
 
  
@@ -108,6 +114,76 @@
 
   <%- include('footer.ejs') %>
   <script>
+    const devicePushButton = document.getElementById('mypage-device-push-toggle');
+    const devicePushLabel = document.getElementById('mypage-device-push-label');
+    const devicePushIcon = devicePushButton?.querySelector('i');
+    const accountPushToggle = document.getElementById('mypage-push-enabled');
+      const status = document.getElementById('mypage-push-status');
+
+    async function syncDevicePushButton() {
+      if (!devicePushButton) return;
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        devicePushLabel.textContent = '이 브라우저는 미지원';
+        devicePushButton.disabled = true;
+        return null;
+      }
+
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        const isSubscribed = Boolean(subscription);
+        devicePushButton.dataset.subscribed = String(isSubscribed);
+        devicePushLabel.textContent = isSubscribed ? '이 기기 구독 해제' : '이 기기에서도 받기';
+        devicePushIcon.className = isSubscribed
+          ? 'fa-solid fa-bell-slash'
+          : 'fa-solid fa-mobile-screen-button';
+        devicePushButton.disabled = false;
+        return subscription;
+      } catch (error) {
+        devicePushLabel.textContent = '기기 상태 확인 실패';
+        devicePushButton.disabled = false;
+        throw error;
+      }
+    }
+
+    void syncDevicePushButton().catch((error) => {
+      console.error('Current device push status failed:', error);
+    });
+
+    devicePushButton?.addEventListener('click', async () => {
+      devicePushButton.disabled = true;
+      const wasSubscribed = devicePushButton.dataset.subscribed === 'true';
+      status.textContent = wasSubscribed ? '이 기기 구독을 해제하는 중...' : '이 기기를 등록하는 중...';
+
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          const response = await fetch('/push/subscribe', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: subscription.endpoint })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '이 기기 구독을 해제하지 못했습니다.');
+          await subscription.unsubscribe();
+          status.textContent = '이 기기의 구독을 해제했습니다. 다른 기기 설정은 유지됩니다.';
+        } else {
+          await enablePushNotifications();
+          accountPushToggle.checked = true;
+          status.textContent = '이 기기를 알림 수신 기기로 등록했습니다.';
+        }
+      } catch (error) {
+        status.textContent = error.message || '기기 알림 설정을 변경하지 못했습니다.';
+      } finally {
+        try {
+          await syncDevicePushButton();
+        } catch (error) {
+          console.error('Current device push status refresh failed:', error);
+        }
+      }
+    });
+
     document.querySelectorAll('.mypage-badge').forEach((badge) => {
       badge.addEventListener('click', () => {
         const isExpanded = badge.getAttribute('aria-expanded') === 'true';

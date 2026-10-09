@@ -245,6 +245,40 @@
     font-size: 13px;
 }
 
+.mypage-push-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mypage-push-device-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #cddfd7;
+    border-radius: 5px;
+    background: #fff;
+    color: var(--mypage-green);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mypage-push-device-button:hover,
+.mypage-push-device-button:focus-visible {
+    border-color: var(--mypage-green);
+    background: #edf5f1;
+}
+
+.mypage-push-device-button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
 .mypage-push-switch {
     position: relative;
     display: inline-flex;
@@ -316,4 +350,17 @@
 
 
 
+}
+
+@media only screen and (max-width: 560px) {
+    .mypage-notification-settings {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .mypage-push-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
