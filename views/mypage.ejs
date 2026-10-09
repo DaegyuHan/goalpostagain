@@ -35,6 +35,14 @@
 
       <h1><%= 유저.username %> 님의 페이지</h1>
 
+      <section class="mypage-mvp-summary" aria-labelledby="mypage-mvp-title">
+        <div>
+          <h2 id="mypage-mvp-title">받은 MVP</h2>
+          <p>지금까지 선정된 횟수</p>
+        </div>
+        <strong><%= mvpAwardCount %>회</strong>
+      </section>
+
       <section class="mypage-notification-settings" aria-labelledby="mypage-push-title">
         <div>
           <h2 id="mypage-push-title">웹 푸시 알림</h2>

@@ -7,6 +7,33 @@
     padding-top: 50px;
 }
 
+.mypage-mvp-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 32px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mypage-mvp-summary h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.mypage-mvp-summary p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.mypage-mvp-summary strong {
+    color: #65d6a5;
+    font-size: 30px;
+    white-space: nowrap;
+}
+
 .mypage-notification-settings {
     display: flex;
     align-items: center;

@@ -277,6 +277,11 @@
     color: #1761b0;
 }
 
+.mvp-award-count {
+    color: #a66a00;
+    font-weight: 800;
+}
+
 .developer-push-subscribers {
     margin-top: 28px;
     padding-top: 20px;
@@ -297,6 +302,47 @@
     margin-bottom: 12px;
     color: var(--management-ink);
     font-size: 17px;
+}
+
+.developer-notification-control {
+    text-align: left;
+}
+
+.developer-notification-control > p {
+    margin: 8px 0 18px;
+    color: var(--management-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.developer-notification-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--management-ink);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.developer-notification-toggle input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #23845d;
+}
+
+.developer-notification-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.developer-notification-actions [role="status"] {
+    color: var(--management-muted);
+    font-size: 13px;
 }
 
 .developer-active-user-list {

@@ -247,39 +247,41 @@ function reportClientError(req) {
 // Discord webhook (환경변수 우선)
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
-function sendDiscordNotification(message) {
-  if (DISCORD_WEBHOOK) {
-    try {
-      const url = new URL(DISCORD_WEBHOOK);
-      const body = { content: message || '' };
-      const postData = JSON.stringify(body);
-
-      const options = {
-        hostname: url.hostname,
-        path: url.pathname + url.search,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
-        }
-      };
-
-      const req = https.request(options, (res) => {
-        res.on('data', () => {});
-      });
-      req.on('error', (e) => console.error('Discord webhook error:', e));
-      req.write(postData);
-      req.end();
-    } catch (e) {
-      console.error('sendDiscordNotification error:', e);
-    }
-  }
-
+async function sendDiscordNotification(message) {
   schedulePushNotification({
     title: '오늘도골대FC',
     body: message || '새로운 소식이 있습니다.',
     url: '/'
   });
+
+  if (!DISCORD_WEBHOOK) return;
+
+  try {
+    const settings = await db.collection('app_settings').findOne({ _id: 'general-discord-notifications' });
+    if (settings?.enabled === false) return;
+
+    const url = new URL(DISCORD_WEBHOOK);
+    const body = { content: message || '' };
+    const postData = JSON.stringify(body);
+    const options = {
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const request = https.request(options, (response) => {
+      response.resume();
+    });
+    request.on('error', (error) => console.error('Discord webhook error:', error));
+    request.write(postData);
+    request.end();
+  } catch (error) {
+    console.error('sendDiscordNotification error:', error);
+  }
 }
 
 app.use((req, res, next) => {
@@ -603,6 +605,10 @@ app.get('/', async (req, res) => {
 app.get('/management', async (req, res) => {
   const isDeveloper = req.user?.userID === DEVELOPER_USER_ID;
   const canSeeStats = isDeveloper || req.user?.username === '한대규';
+  const generalDiscordSettings = isDeveloper
+    ? await db.collection('app_settings').findOne({ _id: 'general-discord-notifications' })
+    : null;
+  const generalDiscordNotificationsEnabled = generalDiscordSettings?.enabled !== false;
 
   let result = await db.collection('notice').find().toArray();
   let matchplan = await db.collection('matchplan').find().sort({ _id: -1 }).toArray();
@@ -651,9 +657,42 @@ app.get('/management', async (req, res) => {
   const todayActiveRecord = canSeeStats
     ? await db.collection('daily_active_users').findOne({ _id: getSeoulDateKey() })
     : null;
+  const mvpAwardLeaderboard = canSeeStats
+    ? await db.collection('mvp').aggregate([
+      { $match: { mvp_name: { $type: 'string', $ne: '' } } },
+      { $group: { _id: '$mvp_name', awardCount: { $sum: 1 } } },
+      { $sort: { awardCount: -1, _id: 1 } },
+      { $limit: 10 },
+      { $project: { _id: 0, username: '$_id', awardCount: 1 } }
+    ]).toArray()
+    : [];
 
   const canManage = isDeveloper || ['한대규', '관리자', '양철진', '안태훈', '김정훈'].includes(req.user?.username);
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [] });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard });
+});
+
+app.post('/developer/general-discord-notifications', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+
+  const { enabled } = req.body || {};
+  if (typeof enabled !== 'boolean') {
+    return res.status(400).json({ ok: false, message: '알림 상태가 올바르지 않습니다.' });
+  }
+
+  try {
+    await db.collection('app_settings').updateOne(
+      { _id: 'general-discord-notifications' },
+      { $set: { enabled, updatedAt: new Date(), updatedBy: req.user.username } },
+      { upsert: true }
+    );
+    res.json({ ok: true, enabled });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('일반 Discord 알림 설정 저장 실패:', error);
+    res.status(500).json({ ok: false, message: '알림 설정을 저장하지 못했습니다.' });
+  }
 });
 
 async function getPredictionLeaderboard() {
@@ -2146,8 +2185,9 @@ app.get('/mypage/:userId', async (req, res) => {
   if (!req.user) return res.redirect('/login');
 
   const subscriptionCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
+  const mvpAwardCount = await db.collection('mvp').countDocuments({ mvp_name: req.user.username });
   const pushEnabled = req.user.pushNotificationsEnabled !== false && subscriptionCount > 0;
-  res.render('mypage.ejs', { 유저: req.user, pushEnabled });
+  res.render('mypage.ejs', { 유저: req.user, pushEnabled, mvpAwardCount });
 });
 
 app.use((error, req, res, next) => {

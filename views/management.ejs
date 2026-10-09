@@ -30,6 +30,7 @@
       const managementPanels = document.querySelectorAll('[data-management-panel]');
       const managementTools = document.querySelectorAll('.management-tools-item');
       const managementStats = document.querySelectorAll('.management-stats-item');
+      const discordNotificationForm = document.getElementById('general-discord-notification-form');
 
       function selectManagementTab(selectedTab) {
         managementTabs.forEach((tab) => {
@@ -51,6 +52,33 @@
           event.preventDefault();
           selectManagementTab(tab.dataset.managementTab);
         });
+      });
+
+      discordNotificationForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const checkbox = document.getElementById('general-discord-notifications-enabled');
+        const saveButton = document.getElementById('general-discord-notification-save');
+        const status = document.getElementById('general-discord-notification-status');
+        const previousValue = !checkbox.checked;
+
+        saveButton.disabled = true;
+        status.textContent = '저장 중...';
+
+        try {
+          const response = await fetch('/developer/general-discord-notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: checkbox.checked })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '설정을 저장하지 못했습니다.');
+          status.textContent = data.enabled ? '일반 알림이 켜졌습니다.' : '일반 알림이 꺼졌습니다.';
+        } catch (error) {
+          checkbox.checked = previousValue;
+          status.textContent = error.message || '설정을 저장하지 못했습니다.';
+        } finally {
+          saveButton.disabled = false;
+        }
       });
 
       selectManagementTab('schedule');
@@ -1110,6 +1138,26 @@
 
               </ul>
               <div class="prediction-leaderboard">
+                <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-trophy"></i></span><h3>역대 MVP 수상 순위</h3></div>
+                <% if (!mvpAwardLeaderboard || mvpAwardLeaderboard.length === 0) { %>
+                  <div class="prediction-empty">아직 MVP 수상 기록이 없습니다.</div>
+                <% } else { %>
+                  <% let currentMvpRank = 0; let previousAwardCount = null; mvpAwardLeaderboard.forEach((player, index) => {
+                    const awardCount = Number(player.awardCount) || 0;
+                    if (index === 0 || awardCount !== previousAwardCount) currentMvpRank = index + 1;
+                    previousAwardCount = awardCount;
+                  %>
+                    <div class="prediction-leaderboard-row">
+                      <strong><%= currentMvpRank %>위</strong>
+                      <span><%= player.username %></span>
+                      <div class="prediction-leaderboard-stats">
+                        <span class="mvp-award-count">MVP <%= awardCount %>회</span>
+                      </div>
+                    </div>
+                  <% }); %>
+                <% } %>
+              </div>
+              <div class="prediction-leaderboard">
                 <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-ranking-star"></i></span><h3>승부예측 적중 순위</h3></div>
                 <% if (!predictionLeaderboard || predictionLeaderboard.length === 0) { %>
                   <div class="prediction-empty">아직 적중한 예측 기록이 없습니다.</div>
@@ -1169,6 +1217,18 @@
             <span class="management-section-note">개발자 전용 관리 기능</span>
           </div>
           <div class="developer-management-actions">
+            <form id="general-discord-notification-form" class="management-container management-section developer-notification-control">
+              <div class="management-card-title"><span class="management-icon"><i class="fa-brands fa-discord"></i></span><h3>일반 디스코드 알림</h3></div>
+              <p>경기 일정, 결과, 공지 등 일반 사용자용 디스코드 알림을 제어합니다. 개발자 오류 알림에는 영향을 주지 않습니다.</p>
+              <label class="developer-notification-toggle" for="general-discord-notifications-enabled">
+                <input id="general-discord-notifications-enabled" type="checkbox" <%= generalDiscordNotificationsEnabled ? 'checked' : '' %>>
+                <span>일반 알림 사용</span>
+              </label>
+              <div class="developer-notification-actions">
+                <button id="general-discord-notification-save" class="btn btn-primary" type="submit">설정 저장</button>
+                <span id="general-discord-notification-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
             <div class="management-container management-section management-tools-section">
               <h3>승부차기 초기화</h3>
               <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
