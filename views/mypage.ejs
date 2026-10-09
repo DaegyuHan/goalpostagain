@@ -35,7 +35,7 @@
 
       <header class="mypage-heading">
         <p class="mypage-eyebrow">MEMBER PROFILE</p>
-        <h1><%= 유저.username %><span>님의 페이지</span></h1>
+        <h1><%= 프로필유저.username %><span>님의 페이지</span></h1>
       </header>
 
       <section class="mypage-badges" aria-labelledby="mypage-badges-title">
@@ -90,6 +90,7 @@
         </div>
       </section>
 
+      <% if (isOwnProfile) { %>
       <section class="mypage-notification-settings" aria-labelledby="mypage-push-title">
         <div>
           <h2 id="mypage-push-title">웹 푸시 알림</h2>
@@ -107,6 +108,7 @@
           </label>
         </div>
       </section>
+      <% } %>
 
  
 

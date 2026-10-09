@@ -31,6 +31,7 @@
       const managementTools = document.querySelectorAll('.management-tools-item');
       const managementStats = document.querySelectorAll('.management-stats-item');
       const discordNotificationForm = document.getElementById('general-discord-notification-form');
+      const profileAccessForm = document.getElementById('developer-profile-access-form');
       const badgeGrantForm = document.getElementById('developer-badge-grant-form');
       const badgeImageInput = document.getElementById('developer-badge-image');
       const badgeImageName = document.getElementById('developer-badge-image-name');
@@ -55,6 +56,13 @@
           event.preventDefault();
           selectManagementTab(tab.dataset.managementTab);
         });
+      });
+
+      profileAccessForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const userID = document.getElementById('developer-profile-user').value;
+        if (!userID) return;
+        window.location.href = `/mypage/${encodeURIComponent(userID)}`;
       });
 
       discordNotificationForm?.addEventListener('submit', async (event) => {
@@ -110,6 +118,44 @@
         } finally {
           submitButton.disabled = false;
         }
+      });
+
+      document.querySelectorAll('[data-edit-developer-badge-form]').forEach((form) => {
+        const imageInput = form.querySelector('[data-edit-badge-image]');
+        const imageName = form.querySelector('[data-edit-badge-image-name]');
+
+        imageInput?.addEventListener('change', () => {
+          imageName.textContent = imageInput.files[0]?.name || '이미지는 변경하지 않습니다';
+        });
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const submitButton = form.querySelector('[data-edit-badge-submit]');
+          const status = form.querySelector('[data-edit-badge-status]');
+          const row = form.closest('[data-developer-badge-row]');
+          submitButton.disabled = true;
+          status.textContent = '뱃지를 수정하는 중...';
+
+          try {
+            const response = await fetch(`/developer/badges/${encodeURIComponent(form.dataset.badgeId)}`, {
+              method: 'PUT',
+              body: new FormData(form)
+            });
+            const data = await response.json();
+            if (!response.ok || !data.ok) throw new Error(data.message || '뱃지를 수정하지 못했습니다.');
+
+            row.querySelector('[data-badge-description]').textContent = data.badge.description;
+            row.querySelector('.developer-badge-row > img').src = data.badge.imageUrl;
+            status.textContent = '변경 내용을 저장했습니다.';
+            form.closest('details').open = false;
+            imageInput.value = '';
+            imageName.textContent = '이미지는 변경하지 않습니다';
+          } catch (error) {
+            status.textContent = error.message || '뱃지를 수정하지 못했습니다.';
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
       });
 
       document.querySelectorAll('[data-remove-developer-badge]').forEach((button) => {
@@ -1418,6 +1464,20 @@
               </div>
             </form>
           </div>
+          <form id="developer-profile-access-form" class="management-container management-section developer-profile-access-form">
+            <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-address-card"></i></span><h3>회원 마이페이지 보기</h3></div>
+            <p class="developer-profile-access-note">개발자 권한으로 회원의 공개 프로필과 활동 기록을 확인합니다. 개인 푸시 설정은 본인에게만 표시됩니다.</p>
+            <div class="developer-profile-access-controls">
+              <label class="visually-hidden" for="developer-profile-user">조회할 회원</label>
+              <select id="developer-profile-user" class="form-select developer-badge-select" required>
+                <option value="">회원을 선택하세요</option>
+                <% developerBadgeUsers.forEach((member) => { %>
+                  <option value="<%= member.userID %>"><%= member.username %></option>
+                <% }); %>
+              </select>
+              <button class="btn btn-primary" type="submit">마이페이지 보기</button>
+            </div>
+          </form>
           <form id="developer-badge-grant-form" class="management-container management-section developer-badge-form" enctype="multipart/form-data">
               <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>회원 뱃지 부여</h3></div>
               <label class="developer-badge-field-label" for="developer-badge-user">회원</label>
@@ -1455,7 +1515,23 @@
                     <img src="<%= badge.imageUrl %>" alt="" loading="lazy">
                     <div class="developer-badge-row-info">
                       <strong><%= badge.username %></strong>
-                      <span><%= badge.description %></span>
+                      <span data-badge-description><%= badge.description %></span>
+                      <details class="developer-badge-edit">
+                        <summary>뱃지 수정</summary>
+                        <form class="developer-badge-edit-form" data-edit-developer-badge-form data-badge-id="<%= badge._id %>">
+                          <label class="developer-badge-field-label" for="developer-badge-description-<%= badge._id %>">뱃지 설명</label>
+                          <input id="developer-badge-description-<%= badge._id %>" class="form-control developer-badge-description" name="description" type="text" maxlength="200" value="<%= badge.description %>" required>
+                          <div class="developer-badge-upload-row">
+                            <input id="developer-badge-edit-image-<%= badge._id %>" class="visually-hidden" name="badgeImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-edit-badge-image>
+                            <label class="btn btn-secondary developer-badge-file-button" for="developer-badge-edit-image-<%= badge._id %>"><i class="fa-solid fa-paperclip" aria-hidden="true"></i> 이미지 변경</label>
+                            <span class="developer-badge-image-name" data-edit-badge-image-name>이미지는 변경하지 않습니다</span>
+                          </div>
+                          <div class="developer-notification-actions">
+                            <button class="btn btn-primary" type="submit" data-edit-badge-submit>변경 저장</button>
+                            <span role="status" aria-live="polite" data-edit-badge-status></span>
+                          </div>
+                        </form>
+                      </details>
                     </div>
                     <button class="developer-badge-remove" type="button" data-remove-developer-badge="<%= badge._id %>" aria-label="<%= badge.username %> 회원의 뱃지 제거" title="뱃지 제거">
                       <i class="fa-solid fa-trash" aria-hidden="true"></i>

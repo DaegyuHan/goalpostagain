@@ -311,6 +311,35 @@
     text-align: left;
 }
 
+.developer-profile-access-form {
+    margin: 0 0 16px;
+    text-align: left;
+}
+
+.developer-profile-access-note {
+    margin: -6px 0 12px;
+    color: var(--management-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.developer-profile-access-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.developer-profile-access-controls .developer-badge-select {
+    width: min(420px, 100%);
+}
+
+@media (max-width: 560px) {
+    .developer-profile-access-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
 .developer-badge-form .management-card-title {
     margin-bottom: 18px;
 }
@@ -430,6 +459,38 @@
 .developer-badge-row-info span {
     color: var(--management-muted);
     font-size: 12px;
+}
+
+.developer-badge-edit {
+    margin-top: 4px;
+}
+
+.developer-badge-edit > summary {
+    width: fit-content;
+    color: #287a60;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.developer-badge-edit-form {
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid var(--management-line);
+    border-radius: 5px;
+    background: #f7faf8;
+}
+
+.developer-badge-edit-form .developer-badge-field-label {
+    margin-top: 0;
+}
+
+.developer-badge-edit-form .developer-badge-description {
+    width: 100%;
+}
+
+.developer-badge-edit-form .developer-notification-actions {
+    margin-top: 12px;
 }
 
 .developer-badge-remove {
