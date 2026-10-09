@@ -1506,6 +1506,9 @@
               <span id="developer-badge-count" class="management-section-note"><%= developerBadges.length %>개</span>
             </div>
             <div id="developer-badge-removal-status" class="developer-badge-removal-status" role="status" aria-live="polite"></div>
+            <details class="developer-list-panel">
+              <summary><span class="developer-list-panel-closed">목록 보기</span><span class="developer-list-panel-opened">목록 접기</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+              <div class="developer-list-scroll">
             <div id="developer-badge-list">
               <% if (developerBadges.length === 0) { %>
                 <p class="developer-badge-empty">부여된 뱃지가 없습니다.</p>
@@ -1540,6 +1543,8 @@
                 <% }); %>
               <% } %>
             </div>
+              </div>
+            </details>
           </div>
           <section class="management-container management-section developer-badge-form developer-club-library" aria-labelledby="developer-club-library-title">
             <div class="developer-badge-records-heading">
@@ -1561,7 +1566,12 @@
               <p class="developer-badge-hint">PNG, JPEG, WebP, GIF · 최대 5MB · 배경이 투명한 이미지를 권장합니다. 이미지를 수정하면 등록한 모든 회원의 마이페이지에 바로 반영됩니다.</p>
             </form>
             <div id="developer-club-logo-status" class="developer-badge-removal-status" role="status" aria-live="polite"></div>
-            <div id="developer-club-logo-list" class="developer-club-logo-list"></div>
+            <details class="developer-list-panel">
+              <summary><span class="developer-list-panel-closed">로고 목록 보기</span><span class="developer-list-panel-opened">로고 목록 접기</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+              <div class="developer-list-scroll">
+                <div id="developer-club-logo-list" class="developer-club-logo-list"></div>
+              </div>
+            </details>
           </section>
           <section id="developer-club-assign" class="management-container management-section developer-badge-form developer-club-assign" aria-labelledby="developer-club-assign-title">
             <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-user-tag"></i></span><h3 id="developer-club-assign-title">회원 클럽 엠블럼 일괄 등록</h3></div>
@@ -1587,7 +1597,12 @@
               <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-list"></i></span><h3 id="developer-club-overview-title">회원별 등록 현황</h3></div>
               <span id="developer-club-overview-count" class="management-section-note">0명</span>
             </div>
-            <div id="developer-club-overview"></div>
+            <details class="developer-list-panel">
+              <summary><span class="developer-list-panel-closed">목록 보기</span><span class="developer-list-panel-opened">목록 접기</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+              <div class="developer-list-scroll">
+                <div id="developer-club-overview"></div>
+              </div>
+            </details>
           </section>
           <script type="application/json" id="developer-club-data"><%- JSON.stringify({
             maxClubs: clubFavoriteLimit,

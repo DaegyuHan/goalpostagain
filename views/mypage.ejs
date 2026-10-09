@@ -113,6 +113,7 @@
             <span id="mypage-device-push-label">기기 상태 확인 중...</span>
           </button>
           <label class="mypage-push-switch">
+            <span class="mypage-push-switch-text" aria-hidden="true">전체 알림</span>
             <span class="visually-hidden">모든 기기 웹 푸시 알림 설정</span>
             <input id="mypage-push-enabled" type="checkbox" role="switch" <%= pushEnabled ? 'checked' : '' %> onchange="togglePushNotifications(this)">
             <span class="mypage-push-slider" aria-hidden="true"></span>

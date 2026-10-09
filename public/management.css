@@ -538,6 +538,67 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
     gap: 8px;
+    max-height: 292px;
+    padding: 2px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.developer-list-panel {
+    margin-top: 10px;
+}
+
+.developer-list-panel > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #b9cdc6;
+    border-radius: 6px;
+    background: #f2f7f5;
+    color: #153d37;
+    font-size: 13px;
+    font-weight: 800;
+    list-style: none;
+    cursor: pointer;
+}
+
+.developer-list-panel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.developer-list-panel > summary:hover,
+.developer-list-panel > summary:focus-visible {
+    border-color: #287a60;
+    background: #e6f2ed;
+}
+
+.developer-list-panel > summary i {
+    font-size: 12px;
+    transition: transform 0.15s ease;
+}
+
+.developer-list-panel[open] > summary i {
+    transform: rotate(180deg);
+}
+
+.developer-list-panel-opened,
+.developer-list-panel[open] .developer-list-panel-closed {
+    display: none;
+}
+
+.developer-list-panel[open] .developer-list-panel-opened {
+    display: inline;
+}
+
+.developer-list-scroll {
+    max-height: 420px;
+    margin-top: 8px;
+    padding-right: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .developer-club-picker-item {
@@ -634,18 +695,20 @@
     place-items: center;
     width: 36px;
     height: 36px;
-    border: 0;
+    border: 1px solid #b9cdc6;
     border-radius: 5px;
-    background: transparent;
-    color: var(--management-muted);
+    background: #e8f1ee;
+    color: #153d37;
+    font-size: 16px;
     cursor: grab;
     touch-action: none;
 }
 
 .developer-club-drag-handle:hover,
 .developer-club-drag-handle:focus-visible {
-    background: #f0f5f3;
-    color: var(--management-ink);
+    border-color: #287a60;
+    background: #287a60;
+    color: #ffffff;
 }
 
 .developer-club-selection-item.is-dragging .developer-club-drag-handle {
@@ -653,7 +716,7 @@
 }
 
 .developer-club-selection-order {
-    color: var(--management-muted);
+    color: var(--management-ink);
     font-size: 12px;
     font-weight: 800;
     text-align: center;
@@ -769,15 +832,20 @@
     place-items: center;
     width: 36px;
     aspect-ratio: 1;
-    border: 1px solid #efd1cd;
+    border: 1px solid #d9796c;
     border-radius: 5px;
-    background: #fff8f6;
-    color: #b34235;
+    background: #fde8e4;
+    color: #b3261e;
+    font-size: 15px;
     cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.developer-badge-remove:hover {
-    background: #fbe7e3;
+.developer-badge-remove:hover,
+.developer-badge-remove:focus-visible {
+    border-color: #b3261e;
+    background: #b3261e;
+    color: #ffffff;
 }
 
 .developer-badge-remove:disabled {
