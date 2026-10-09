@@ -360,7 +360,7 @@ app.use((error, req, res, next) => {
 });
 //
 
-const { S3Client } = require('@aws-sdk/client-s3')
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const multer = require('multer')
 const multerS3 = require('multer-s3')
 const s3 = new S3Client({
@@ -379,6 +379,19 @@ const upload = multer({
       cb(null, `${Date.now()}-${crypto.randomUUID()}`) // 파일마다 고유한 S3 키 생성
     }
   })
+})
+
+const badgeUpload = multer({
+  storage: multerS3({
+    s3,
+    bucket: process.env.S3_BUCKET,
+    key: (_req, _file, cb) => cb(null, `badges/${Date.now()}-${crypto.randomUUID()}`)
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^image\/(png|jpeg|webp|gif)$/.test(file.mimetype)) return cb(null, true);
+    cb(new Error('PNG, JPEG, WebP, GIF 이미지만 업로드할 수 있습니다.'));
+  }
 })
 
 let db
@@ -605,6 +618,14 @@ app.get('/', async (req, res) => {
 app.get('/management', async (req, res) => {
   const isDeveloper = req.user?.userID === DEVELOPER_USER_ID;
   const canSeeStats = isDeveloper || req.user?.username === '한대규';
+  const developerBadgeUsers = isDeveloper
+    ? await db.collection('user').find({}, { projection: { userID: 1, username: 1 } }).sort({ username: 1 }).toArray()
+    : [];
+  const developerBadges = isDeveloper
+    ? await db.collection('user_badges').find({}, {
+      projection: { userID: 1, username: 1, imageUrl: 1, description: 1, createdAt: 1 }
+    }).sort({ createdAt: -1 }).toArray()
+    : [];
   const generalDiscordSettings = isDeveloper
     ? await db.collection('app_settings').findOne({ _id: 'general-discord-notifications' })
     : null;
@@ -668,7 +689,104 @@ app.get('/management', async (req, res) => {
     : [];
 
   const canManage = isDeveloper || ['한대규', '관리자', '양철진', '안태훈', '김정훈'].includes(req.user?.username);
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges });
+});
+
+app.post('/developer/badges', (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+
+  badgeUpload.single('badgeImage')(req, res, async (uploadError) => {
+    if (uploadError) {
+      const isUploadLimitError = uploadError instanceof multer.MulterError;
+      const isUnsupportedImage = uploadError.message.includes('이미지만');
+      const statusCode = isUploadLimitError || isUnsupportedImage ? 400 : 500;
+      if (statusCode === 500) reportDeveloperError(uploadError, req);
+      return res.status(statusCode).json({
+        ok: false,
+        message: isUploadLimitError && uploadError.code === 'LIMIT_FILE_SIZE'
+          ? '이미지는 5MB 이하로 업로드해주세요.'
+          : uploadError.message
+      });
+    }
+
+    const { userID, description } = req.body || {};
+    const normalizedDescription = String(description || '').trim();
+    const uploadedFile = req.file;
+    const removeUploadedFile = async () => {
+      if (!uploadedFile?.key) return;
+      try {
+        await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: uploadedFile.key }));
+      } catch (error) {
+        console.error('업로드한 뱃지 이미지 정리 실패:', error.message);
+      }
+    };
+
+    if (!userID || !normalizedDescription || normalizedDescription.length > 200 || !uploadedFile) {
+      await removeUploadedFile();
+      return res.status(400).json({ ok: false, message: '회원, 이미지, 1~200자 설명을 모두 입력해주세요.' });
+    }
+
+    try {
+      const targetUser = await db.collection('user').findOne({ userID }, { projection: { username: 1 } });
+      if (!targetUser) {
+        await removeUploadedFile();
+        return res.status(404).json({ ok: false, message: '선택한 회원을 찾을 수 없습니다.' });
+      }
+
+      await db.collection('user_badges').insertOne({
+        userID,
+        username: targetUser.username,
+        imageUrl: uploadedFile.location,
+        imageKey: uploadedFile.key,
+        description: normalizedDescription,
+        createdAt: new Date(),
+        createdBy: req.user.userID
+      });
+      logActivity(req.user.username, '회원 뱃지 부여', `- 대상: ${targetUser.username}`);
+      res.json({ ok: true, message: `${targetUser.username}님에게 뱃지를 부여했습니다.` });
+    } catch (error) {
+      await removeUploadedFile();
+      reportDeveloperError(error, req);
+      console.error('회원 뱃지 저장 실패:', error);
+      res.status(500).json({ ok: false, message: '뱃지를 저장하지 못했습니다.' });
+    }
+  });
+});
+
+app.delete('/developer/badges/:id', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ ok: false, message: '뱃지 정보가 올바르지 않습니다.' });
+  }
+
+  try {
+    const badgeCollection = db.collection('user_badges');
+    const badge = await badgeCollection.findOne({ _id: new ObjectId(req.params.id) });
+    if (!badge) return res.status(404).json({ ok: false, message: '뱃지를 찾을 수 없습니다.' });
+
+    let imageKey = badge.imageKey;
+    if (!imageKey && badge.imageUrl) {
+      const imageUrl = new URL(badge.imageUrl);
+      imageKey = decodeURIComponent(imageUrl.pathname.replace(/^\/+/, ''));
+      const bucketPrefix = `${process.env.S3_BUCKET}/`;
+      if (imageKey.startsWith(bucketPrefix)) imageKey = imageKey.slice(bucketPrefix.length);
+    }
+
+    if (imageKey) {
+      await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: imageKey }));
+    }
+    await badgeCollection.deleteOne({ _id: badge._id });
+    logActivity(req.user.username, '회원 뱃지 제거', `- 대상: ${badge.username || badge.userID}`);
+    res.json({ ok: true });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('회원 뱃지 제거 실패:', error);
+    res.status(500).json({ ok: false, message: '뱃지를 제거하지 못했습니다.' });
+  }
 });
 
 app.post('/developer/general-discord-notifications', async (req, res) => {
@@ -2089,9 +2207,9 @@ app.put('/photo-edit', async (req, res) => {
 })
 
 app.get('/photo-delete/:id', async (req, res) => {
-  let result = await db.collection('photo').deleteOne({
-    _id: new ObjectId(req.params.id)
-  })
+  const photoId = new ObjectId(req.params.id);
+  await db.collection('photo-comment').deleteMany({ parentId: photoId });
+  await db.collection('photo').deleteOne({ _id: photoId });
   res.redirect('/photo')
 })
 
@@ -2155,7 +2273,6 @@ app.get('/load-more-videos', this.isLoggedIn, async (req, res) => {
 
 
 app.get('/UploadURL', async (req, res) => {
-
   let result = await db.collection('youtubeURL').insertOne({
     URL: req.query.URL
   })
@@ -2186,8 +2303,21 @@ app.get('/mypage/:userId', async (req, res) => {
 
   const subscriptionCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
   const mvpAwardCount = await db.collection('mvp').countDocuments({ mvp_name: req.user.username });
+  const badges = await db.collection('user_badges').find({ userID: req.user.userID }).sort({ createdAt: -1 }).toArray();
+  const [photoPostCount, commentCount, likedPhotoCount] = await Promise.all([
+    db.collection('photo').countDocuments({ user: req.user._id }),
+    db.collection('photo-comment').countDocuments({
+      $or: [{ writerId: req.user._id }, { writer: req.user.username }]
+    }),
+    db.collection('photo').countDocuments({ likes: req.user.username })
+  ]);
+  const activityStats = {
+    photoPostCount,
+    commentCount,
+    likedPhotoCount
+  };
   const pushEnabled = req.user.pushNotificationsEnabled !== false && subscriptionCount > 0;
-  res.render('mypage.ejs', { 유저: req.user, pushEnabled, mvpAwardCount });
+  res.render('mypage.ejs', { 유저: req.user, pushEnabled, mvpAwardCount, badges, activityStats });
 });
 
 app.use((error, req, res, next) => {

@@ -31,6 +31,9 @@
       const managementTools = document.querySelectorAll('.management-tools-item');
       const managementStats = document.querySelectorAll('.management-stats-item');
       const discordNotificationForm = document.getElementById('general-discord-notification-form');
+      const badgeGrantForm = document.getElementById('developer-badge-grant-form');
+      const badgeImageInput = document.getElementById('developer-badge-image');
+      const badgeImageName = document.getElementById('developer-badge-image-name');
 
       function selectManagementTab(selectedTab) {
         managementTabs.forEach((tab) => {
@@ -79,6 +82,63 @@
         } finally {
           saveButton.disabled = false;
         }
+      });
+
+      badgeImageInput?.addEventListener('change', () => {
+        badgeImageName.textContent = badgeImageInput.files[0]?.name || '선택된 이미지 없음';
+      });
+
+      badgeGrantForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submitButton = document.getElementById('developer-badge-submit');
+        const status = document.getElementById('developer-badge-status');
+        submitButton.disabled = true;
+        status.textContent = '뱃지를 부여하는 중...';
+
+        try {
+          const response = await fetch('/developer/badges', {
+            method: 'POST',
+            body: new FormData(badgeGrantForm)
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '뱃지를 부여하지 못했습니다.');
+          status.textContent = data.message;
+          badgeGrantForm.reset();
+          badgeImageName.textContent = '선택된 이미지 없음';
+        } catch (error) {
+          status.textContent = error.message || '뱃지를 부여하지 못했습니다.';
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+
+      document.querySelectorAll('[data-remove-developer-badge]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          if (!window.confirm('이 뱃지를 회원의 뱃지함에서 제거할까요?')) return;
+
+          const row = button.closest('[data-developer-badge-row]');
+          const status = document.getElementById('developer-badge-removal-status');
+          button.disabled = true;
+          status.textContent = '뱃지를 제거하는 중...';
+
+          try {
+            const response = await fetch(`/developer/badges/${encodeURIComponent(button.dataset.removeDeveloperBadge)}`, {
+              method: 'DELETE'
+            });
+            const data = await response.json();
+            if (!response.ok || !data.ok) throw new Error(data.message || '뱃지를 제거하지 못했습니다.');
+            row.remove();
+            const count = document.querySelectorAll('[data-developer-badge-row]').length;
+            document.getElementById('developer-badge-count').textContent = `${count}개`;
+            status.textContent = '뱃지를 제거했습니다.';
+            if (count === 0) {
+              document.getElementById('developer-badge-list').innerHTML = '<p class="developer-badge-empty">부여된 뱃지가 없습니다.</p>';
+            }
+          } catch (error) {
+            status.textContent = error.message || '뱃지를 제거하지 못했습니다.';
+            button.disabled = false;
+          }
+        });
       });
 
       selectManagementTab('schedule');
@@ -1217,6 +1277,28 @@
             <span class="management-section-note">개발자 전용 관리 기능</span>
           </div>
           <div class="developer-management-actions">
+            <form id="developer-badge-grant-form" class="management-container management-section developer-badge-form" enctype="multipart/form-data">
+              <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>회원 뱃지 부여</h3></div>
+              <label class="developer-badge-field-label" for="developer-badge-user">회원</label>
+              <select id="developer-badge-user" class="form-select developer-badge-select" name="userID" required>
+                <option value="">회원을 선택하세요</option>
+                <% developerBadgeUsers.forEach((member) => { %>
+                  <option value="<%= member.userID %>"><%= member.username %></option>
+                <% }); %>
+              </select>
+              <label class="developer-badge-field-label" for="developer-badge-description">뱃지 설명</label>
+              <input id="developer-badge-description" class="form-control developer-badge-description" name="description" type="text" maxlength="200" placeholder="뱃지에 표시할 설명" required>
+              <div class="developer-badge-upload-row">
+                <input id="developer-badge-image" class="visually-hidden" name="badgeImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                <label class="btn btn-secondary developer-badge-file-button" for="developer-badge-image"><i class="fa-solid fa-paperclip" aria-hidden="true"></i> 이미지 첨부</label>
+                <span id="developer-badge-image-name" class="developer-badge-image-name">선택된 이미지 없음</span>
+              </div>
+              <div class="developer-notification-actions">
+                <button id="developer-badge-submit" class="btn btn-primary" type="submit">뱃지 부여</button>
+                <span id="developer-badge-status" role="status" aria-live="polite"></span>
+              </div>
+              <p class="developer-badge-hint">PNG, JPEG, WebP, GIF · 최대 5MB</p>
+            </form>
             <form id="general-discord-notification-form" class="management-container management-section developer-notification-control">
               <div class="management-card-title"><span class="management-icon"><i class="fa-brands fa-discord"></i></span><h3>일반 디스코드 알림</h3></div>
               <p>경기 일정, 결과, 공지 등 일반 사용자용 디스코드 알림을 제어합니다. 개발자 오류 알림에는 영향을 주지 않습니다.</p>
@@ -1236,6 +1318,31 @@
             <div class="management-container management-section management-tools-section">
               <h3>업데이트 공지 작성</h3>
               <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
+            </div>
+          </div>
+          <div class="management-container management-section developer-badge-records">
+            <div class="developer-badge-records-heading">
+              <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>부여된 뱃지</h3></div>
+              <span id="developer-badge-count" class="management-section-note"><%= developerBadges.length %>개</span>
+            </div>
+            <div id="developer-badge-removal-status" class="developer-badge-removal-status" role="status" aria-live="polite"></div>
+            <div id="developer-badge-list">
+              <% if (developerBadges.length === 0) { %>
+                <p class="developer-badge-empty">부여된 뱃지가 없습니다.</p>
+              <% } else { %>
+                <% developerBadges.forEach((badge) => { %>
+                  <div class="developer-badge-row" data-developer-badge-row>
+                    <img src="<%= badge.imageUrl %>" alt="" loading="lazy">
+                    <div class="developer-badge-row-info">
+                      <strong><%= badge.username %></strong>
+                      <span><%= badge.description %></span>
+                    </div>
+                    <button class="developer-badge-remove" type="button" data-remove-developer-badge="<%= badge._id %>" aria-label="<%= badge.username %> 회원의 뱃지 제거" title="뱃지 제거">
+                      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                <% }); %>
+              <% } %>
             </div>
           </div>
         </section>

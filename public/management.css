@@ -304,6 +304,152 @@
     font-size: 17px;
 }
 
+.developer-badge-form {
+    text-align: left;
+}
+
+.developer-badge-form .management-card-title {
+    margin-bottom: 18px;
+}
+
+.developer-badge-field-label {
+    display: block;
+    margin: 14px 0 6px;
+    color: var(--management-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.developer-badge-select,
+.developer-badge-description {
+    max-width: 520px;
+    min-height: 42px;
+    border-color: var(--management-line);
+    border-radius: 5px;
+    color: var(--management-ink);
+}
+
+.developer-badge-upload-row,
+.developer-badge-form .developer-notification-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.developer-badge-file-button {
+    margin: 0;
+    cursor: pointer;
+}
+
+.developer-badge-image-name,
+.developer-badge-hint {
+    color: var(--management-muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.developer-badge-hint {
+    margin: 12px 0 0;
+}
+
+.developer-badge-records {
+    margin-top: 18px;
+    text-align: left;
+}
+
+.developer-badge-records-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.developer-badge-records-heading .management-card-title {
+    margin: 0;
+}
+
+.developer-badge-removal-status {
+    min-height: 18px;
+    margin-top: 8px;
+    color: var(--management-muted);
+    font-size: 12px;
+}
+
+.developer-badge-empty {
+    margin: 14px 0 0;
+    color: var(--management-muted);
+    font-size: 13px;
+}
+
+.developer-badge-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 38px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 2px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.developer-badge-row:last-child {
+    border-bottom: 0;
+}
+
+.developer-badge-row > img {
+    display: block;
+    width: 52px;
+    aspect-ratio: 1;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: #f4f7f7;
+    object-fit: contain;
+}
+
+.developer-badge-row-info {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.developer-badge-row-info strong,
+.developer-badge-row-info span {
+    overflow-wrap: anywhere;
+}
+
+.developer-badge-row-info strong {
+    color: var(--management-ink);
+    font-size: 13px;
+}
+
+.developer-badge-row-info span {
+    color: var(--management-muted);
+    font-size: 12px;
+}
+
+.developer-badge-remove {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    aspect-ratio: 1;
+    border: 1px solid #efd1cd;
+    border-radius: 5px;
+    background: #fff8f6;
+    color: #b34235;
+    cursor: pointer;
+}
+
+.developer-badge-remove:hover {
+    background: #fbe7e3;
+}
+
+.developer-badge-remove:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
 .developer-notification-control {
     text-align: left;
 }

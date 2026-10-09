@@ -33,7 +33,31 @@
 
     <div class="mypage-main">
 
-      <h1><%= 유저.username %> 님의 페이지</h1>
+      <header class="mypage-heading">
+        <p class="mypage-eyebrow">MEMBER PROFILE</p>
+        <h1><%= 유저.username %><span>님의 페이지</span></h1>
+      </header>
+
+      <section class="mypage-badges" aria-labelledby="mypage-badges-title">
+        <div class="mypage-badges-heading">
+          <div>
+            <h2 id="mypage-badges-title">뱃지함</h2>
+            <p><%= badges.length %>개의 뱃지</p>
+          </div>
+        </div>
+        <% if (badges.length === 0) { %>
+          <p class="mypage-badges-empty">아직 받은 뱃지가 없습니다.</p>
+        <% } else { %>
+          <div class="mypage-badge-grid">
+            <% badges.forEach((badge, index) => { %>
+              <button class="mypage-badge" type="button" aria-label="뱃지 설명: <%= badge.description %>" aria-expanded="false" aria-controls="mypage-badge-caption-<%= index %>">
+                <img src="<%= badge.imageUrl %>" alt="" loading="lazy">
+                <span id="mypage-badge-caption-<%= index %>" class="mypage-badge-caption"><%= badge.description %></span>
+              </button>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
 
       <section class="mypage-mvp-summary" aria-labelledby="mypage-mvp-title">
         <div>
@@ -41,6 +65,29 @@
           <p>지금까지 선정된 횟수</p>
         </div>
         <strong><%= mvpAwardCount %>회</strong>
+      </section>
+
+      <section class="mypage-activity" aria-labelledby="mypage-activity-title">
+        <div class="mypage-activity-heading">
+          <h2 id="mypage-activity-title">사진 활동</h2>
+        </div>
+        <div class="mypage-activity-grid">
+          <div class="mypage-activity-stat">
+            <span>작성한 사진</span>
+            <strong><%= activityStats.photoPostCount %></strong>
+            <small>사진 게시글</small>
+          </div>
+          <div class="mypage-activity-stat">
+            <span>작성한 댓글</span>
+            <strong><%= activityStats.commentCount %></strong>
+            <small>사진 탭</small>
+          </div>
+          <div class="mypage-activity-stat">
+            <span>좋아요한 사진</span>
+            <strong><%= activityStats.likedPhotoCount %></strong>
+            <small>현재 좋아요 상태</small>
+          </div>
+        </div>
       </section>
 
       <section class="mypage-notification-settings" aria-labelledby="mypage-push-title">
@@ -60,6 +107,15 @@
     </div>
 
   <%- include('footer.ejs') %>
+  <script>
+    document.querySelectorAll('.mypage-badge').forEach((badge) => {
+      badge.addEventListener('click', () => {
+        const isExpanded = badge.getAttribute('aria-expanded') === 'true';
+        badge.setAttribute('aria-expanded', String(!isExpanded));
+        badge.classList.toggle('is-revealed', !isExpanded);
+      });
+    });
+  </script>
 </body>
 
 </html>

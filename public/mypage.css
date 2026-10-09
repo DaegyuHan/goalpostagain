@@ -1,10 +1,48 @@
 .mypage-main {
-    width: 800px;
-    min-height: 320px;
-    background-color: #002832;
-    margin: 10% auto 0px auto;
-    color: white;
-    padding-top: 50px;
+    --mypage-ink: #153d37;
+    --mypage-muted: #667b76;
+    --mypage-line: #dce8e3;
+    --mypage-accent: #e56b4c;
+    --mypage-green: #287a60;
+    width: min(980px, calc(100% - 36px));
+    min-height: 420px;
+    margin: 122px auto 64px;
+    padding: 38px clamp(20px, 4vw, 48px) 48px;
+    border-top: 4px solid var(--mypage-accent);
+    border-radius: 8px;
+    background: #f8fbf9;
+    box-shadow: 0 18px 48px rgba(0, 16, 18, 0.18);
+    color: var(--mypage-ink);
+}
+
+.mypage-heading {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--mypage-line);
+}
+
+.mypage-eyebrow {
+    margin: 0 0 8px;
+    color: var(--mypage-accent);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.mypage-heading h1 {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    color: var(--mypage-ink);
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.mypage-heading h1 span {
+    color: var(--mypage-muted);
+    font-size: 17px;
+    font-weight: 500;
 }
 
 .mypage-mvp-summary {
@@ -12,26 +50,177 @@
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    margin-top: 32px;
-    padding: 20px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 0;
+    padding: 22px 0;
+    border-top: 1px solid var(--mypage-line);
+    border-bottom: 1px solid var(--mypage-line);
 }
 
 .mypage-mvp-summary h2 {
     margin: 0;
-    font-size: 20px;
+    color: var(--mypage-ink);
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .mypage-mvp-summary p {
-    margin: 6px 0 0;
-    color: rgba(255, 255, 255, 0.75);
+    margin: 4px 0 0;
+    color: var(--mypage-muted);
+    font-size: 13px;
 }
 
 .mypage-mvp-summary strong {
-    color: #65d6a5;
-    font-size: 30px;
+    color: var(--mypage-green);
+    font-size: 26px;
+    font-weight: 800;
     white-space: nowrap;
+}
+
+.mypage-activity {
+    padding: 22px 0 20px;
+    border-bottom: 1px solid var(--mypage-line);
+}
+
+.mypage-activity-heading h2 {
+    margin: 0;
+    color: var(--mypage-ink);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.mypage-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 16px;
+}
+
+.mypage-activity-stat {
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    min-width: 0;
+    padding: 0 20px;
+}
+
+.mypage-activity-stat:first-child {
+    padding-left: 0;
+}
+
+.mypage-activity-stat:not(:last-child) {
+    border-right: 1px solid var(--mypage-line);
+}
+
+.mypage-activity-stat > span {
+    color: var(--mypage-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mypage-activity-stat strong {
+    color: var(--mypage-ink);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.mypage-activity-stat small,
+.mypage-activity-note {
+    color: var(--mypage-muted);
+    font-size: 11px;
+}
+
+.mypage-activity-note {
+    margin: 14px 0 0;
+}
+
+.mypage-badges {
+    padding: 24px 0 28px;
+}
+
+.mypage-badges-heading,
+.mypage-badges-heading > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.mypage-badges h2 {
+    margin: 0;
+    color: var(--mypage-ink);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.mypage-badges-heading p,
+.mypage-badges-empty {
+    margin: 5px 0 0;
+    color: var(--mypage-muted);
+    font-size: 13px;
+}
+
+.mypage-badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 144px);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.mypage-badge {
+    position: relative;
+    width: 144px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #dce8e3;
+    border-radius: 7px;
+    background: #fff;
+    color: var(--mypage-ink);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(21, 61, 55, 0.08);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.mypage-badge img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.mypage-badge-caption {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    place-items: center;
+    min-height: 48px;
+    padding: 8px 10px;
+    background: rgba(21, 61, 55, 0.94);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.mypage-badge:hover .mypage-badge-caption,
+.mypage-badge:focus-visible .mypage-badge-caption,
+.mypage-badge.is-revealed .mypage-badge-caption {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mypage-badge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(21, 61, 55, 0.15);
+}
+
+.mypage-badge:focus-visible {
+    outline: 2px solid var(--mypage-green);
+    outline-offset: 3px;
 }
 
 .mypage-notification-settings {
@@ -39,20 +228,21 @@
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    margin-top: 32px;
-    padding: 20px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 22px 0 0;
+    border-top: 1px solid var(--mypage-line);
 }
 
 .mypage-notification-settings h2 {
     margin: 0;
-    font-size: 20px;
+    color: var(--mypage-ink);
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .mypage-notification-settings p {
-    margin: 6px 0 0;
-    color: rgba(255, 255, 255, 0.75);
+    margin: 4px 0 0;
+    color: var(--mypage-muted);
+    font-size: 13px;
 }
 
 .mypage-push-switch {
@@ -75,7 +265,7 @@
     position: absolute;
     inset: 0;
     border-radius: 15px;
-    background-color: #68767a;
+    background-color: #a7b5b0;
     transition: background-color 160ms ease;
 }
 
@@ -92,7 +282,7 @@
 }
 
 .mypage-push-switch input:checked + .mypage-push-slider {
-    background-color: #19a974;
+    background-color: var(--mypage-green);
 }
 
 .mypage-push-switch input:checked + .mypage-push-slider::before {
@@ -100,7 +290,7 @@
 }
 
 .mypage-push-switch input:focus-visible + .mypage-push-slider {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--mypage-green);
     outline-offset: 3px;
 }
 
@@ -115,7 +305,13 @@
 
 @media only screen and (max-width: 1000px) {
     .mypage-main {
-        width: 100%;
+        width: calc(100% - 28px);
+        margin-top: 112px;
+        padding: 30px 24px 36px;
+    }
+
+    .mypage-activity-stat {
+        padding: 0 12px;
     }
 
 
