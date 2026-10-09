@@ -33,11 +33,19 @@
 
     <div class="mypage-main">
 
-      <%=유저.username%> 님의 페이지
+      <h1><%= 유저.username %> 님의 페이지</h1>
 
-      <button class="mypage-push-button" type="button" onclick="enablePushNotifications()">
-        알림 받기
-      </button>
+      <section class="mypage-notification-settings" aria-labelledby="mypage-push-title">
+        <div>
+          <h2 id="mypage-push-title">웹 푸시 알림</h2>
+          <p id="mypage-push-status" aria-live="polite"><%= pushEnabled ? '알림을 받고 있습니다.' : '알림이 꺼져 있습니다.' %></p>
+        </div>
+        <label class="mypage-push-switch">
+          <span class="visually-hidden">웹 푸시 알림 설정</span>
+          <input type="checkbox" role="switch" <%= pushEnabled ? 'checked' : '' %> onchange="togglePushNotifications(this)">
+          <span class="mypage-push-slider" aria-hidden="true"></span>
+        </label>
+      </section>
 
  
 

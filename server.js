@@ -53,8 +53,13 @@ async function sendPushNotification(payload) {
     return { sentUsernames: [], unidentifiedSentCount: 0, attemptedCount: 0, failedCount: 0, configured: false };
   }
 
-  const subscriptions = await db.collection('push_subscription').find({}).toArray();
-  const deliveryResults = await Promise.all(subscriptions.map(async (subscriptionRecord) => {
+  const [subscriptions, disabledUsers] = await Promise.all([
+    db.collection('push_subscription').find({}).toArray(),
+    db.collection('user').find({ pushNotificationsEnabled: false }, { projection: { username: 1 } }).toArray()
+  ]);
+  const disabledUsernames = new Set(disabledUsers.map((user) => user.username));
+  const enabledSubscriptions = subscriptions.filter((record) => !disabledUsernames.has(record.username));
+  const deliveryResults = await Promise.all(enabledSubscriptions.map(async (subscriptionRecord) => {
     try {
       await webpush.sendNotification(subscriptionRecord.subscription, JSON.stringify(payload));
       return { username: subscriptionRecord.username, sent: true };
@@ -71,7 +76,7 @@ async function sendPushNotification(payload) {
   return {
     sentUsernames: [...new Set(deliveryResults.filter((result) => result.sent && result.username).map((result) => result.username))],
     unidentifiedSentCount: deliveryResults.filter((result) => result.sent && !result.username).length,
-    attemptedCount: subscriptions.length,
+    attemptedCount: enabledSubscriptions.length,
     failedCount: deliveryResults.filter((result) => !result.sent).length,
     configured: true
   };
@@ -436,6 +441,33 @@ app.get('/push/public-key', (req, res) => {
   res.json({ ok: true, publicKey: PUSH_PUBLIC_KEY });
 });
 
+app.get('/push/preferences', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+
+  const subscriptionCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
+  res.json({
+    ok: true,
+    enabled: req.user.pushNotificationsEnabled !== false && subscriptionCount > 0
+  });
+});
+
+app.put('/push/preferences', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+  if (typeof req.body?.enabled !== 'boolean') {
+    return res.status(400).json({ ok: false, message: '알림 설정값이 올바르지 않습니다.' });
+  }
+
+  await db.collection('user').updateOne(
+    { _id: req.user._id },
+    { $set: { pushNotificationsEnabled: req.body.enabled } }
+  );
+  res.json({ ok: true, enabled: req.body.enabled });
+});
+
 app.post('/push/subscribe', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
@@ -461,6 +493,10 @@ app.post('/push/subscribe', async (req, res) => {
       }
     },
     { upsert: true }
+  );
+  await db.collection('user').updateOne(
+    { _id: req.user._id },
+    { $set: { pushNotificationsEnabled: true } }
   );
 
   res.json({ ok: true, message: '알림이 설정되었습니다.' });
@@ -2107,8 +2143,11 @@ app.get('/user', async (req, res) => {
 });
 
 app.get('/mypage/:userId', async (req, res) => {
+  if (!req.user) return res.redirect('/login');
 
-  res.render('mypage.ejs')
+  const subscriptionCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
+  const pushEnabled = req.user.pushNotificationsEnabled !== false && subscriptionCount > 0;
+  res.render('mypage.ejs', { 유저: req.user, pushEnabled });
 });
 
 app.use((error, req, res, next) => {

@@ -113,26 +113,26 @@ function urlBase64ToUint8Array(base64String) {
 
 async function enablePushNotifications() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-    alert('이 브라우저에서는 웹 알림을 지원하지 않습니다.');
-    return;
+    throw new Error('이 브라우저에서는 웹 알림을 지원하지 않습니다.');
   }
 
   try {
-    const keyResponse = await fetch('/push/public-key');
-    const keyData = await keyResponse.json();
-    if (!keyResponse.ok) throw new Error(keyData.message || '웹 푸시 설정이 필요합니다.');
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      alert('알림 권한이 허용되지 않았습니다.');
-      return;
-    }
-
     const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
-    });
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') throw new Error('알림 권한이 허용되지 않았습니다.');
+
+      const keyResponse = await fetch('/push/public-key');
+      const keyData = await keyResponse.json();
+      if (!keyResponse.ok) throw new Error(keyData.message || '웹 푸시 설정이 필요합니다.');
+
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+      });
+    }
 
     const subscribeResponse = await fetch('/push/subscribe', {
       method: 'POST',
@@ -142,10 +142,39 @@ async function enablePushNotifications() {
     const subscribeData = await subscribeResponse.json();
     if (!subscribeResponse.ok) throw new Error(subscribeData.message || '알림 설정에 실패했습니다.');
 
-    alert('알림이 설정되었습니다. 사진 등록 알림을 받을 수 있습니다.');
+    return '알림을 받도록 설정했습니다.';
   } catch (error) {
     console.error('Push subscription failed:', error);
-    alert(error.message || '알림 설정에 실패했습니다.');
+    throw error;
+  }
+}
+
+async function togglePushNotifications(toggle) {
+  const previousValue = !toggle.checked;
+  const status = document.getElementById('mypage-push-status');
+  toggle.disabled = true;
+
+  try {
+    let message;
+    if (toggle.checked) {
+      message = await enablePushNotifications();
+    } else {
+      const response = await fetch('/push/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: false })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || '알림 설정을 변경하지 못했습니다.');
+      message = '알림을 받지 않도록 설정했습니다.';
+    }
+
+    if (status) status.textContent = message;
+  } catch (error) {
+    toggle.checked = previousValue;
+    if (status) status.textContent = error.message || '알림 설정을 변경하지 못했습니다.';
+  } finally {
+    toggle.disabled = false;
   }
 }
 

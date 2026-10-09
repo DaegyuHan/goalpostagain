@@ -1,22 +1,84 @@
 .mypage-main {
     width: 800px;
-    height: 90%;
+    min-height: 320px;
     background-color: #002832;
     margin: 10% auto 0px auto;
     color: white;
     padding-top: 50px;
 }
 
-.mypage-push-button {
-    display: block;
-    margin-top: 24px;
-    padding: 10px 18px;
-    border: 0;
-    border-radius: 4px;
-    background-color: #ff3ca0;
-    color: white;
+.mypage-notification-settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 32px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mypage-notification-settings h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.mypage-notification-settings p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.mypage-push-switch {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 30px;
     cursor: pointer;
-    font-size: 16px;
+}
+
+.mypage-push-switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.mypage-push-slider {
+    position: absolute;
+    inset: 0;
+    border-radius: 15px;
+    background-color: #68767a;
+    transition: background-color 160ms ease;
+}
+
+.mypage-push-slider::before {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #fff;
+    content: '';
+    transition: transform 160ms ease;
+}
+
+.mypage-push-switch input:checked + .mypage-push-slider {
+    background-color: #19a974;
+}
+
+.mypage-push-switch input:checked + .mypage-push-slider::before {
+    transform: translateX(22px);
+}
+
+.mypage-push-switch input:focus-visible + .mypage-push-slider {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+.mypage-push-switch input:disabled + .mypage-push-slider {
+    opacity: 0.6;
 }
 
 
