@@ -288,17 +288,20 @@
     border-top: 1px solid var(--management-line);
 }
 
-.developer-management-actions {
+.developer-priority-actions,
+.developer-account-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
 }
 
-.developer-management-actions .management-section {
+.developer-priority-actions .management-section,
+.developer-account-actions .management-section {
     margin: 0;
 }
 
-.developer-management-actions h3 {
+.developer-priority-actions h3,
+.developer-account-actions h3 {
     margin-bottom: 12px;
     color: var(--management-ink);
     font-size: 17px;
@@ -448,6 +451,65 @@
 .developer-badge-remove:disabled {
     cursor: wait;
     opacity: 0.55;
+}
+
+.developer-withdraw-desc {
+    margin: -6px 0 4px;
+    color: var(--management-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.developer-withdraw-desc strong {
+    color: #b34235;
+}
+
+.developer-withdraw-icon {
+    color: #b34235;
+}
+
+.developer-withdraw-button {
+    border: 1px solid #b34235;
+    background: #b34235;
+    color: #fff;
+}
+
+.developer-withdraw-button:hover,
+.developer-withdraw-button:focus-visible {
+    border-color: #96362b;
+    background: #96362b;
+    color: #fff;
+}
+
+.developer-withdraw-button:disabled {
+    border-color: #efd1cd;
+    background: #fff8f6;
+    color: #b34235;
+    opacity: 1;
+}
+
+.developer-restore-icon {
+    color: #287a60;
+}
+
+.developer-restore-button {
+    border: 1px solid #287a60;
+    background: #287a60;
+    color: #fff;
+}
+
+.developer-restore-button:hover,
+.developer-restore-button:focus-visible {
+    border-color: #1d604a;
+    background: #1d604a;
+    color: #fff;
+}
+
+.developer-restore-button:disabled {
+    border-color: #cddfd7;
+    background: #edf5f1;
+    color: #287a60;
+    opacity: 1;
 }
 
 .developer-notification-control {
@@ -726,7 +788,8 @@
         font-size: 11px;
     }
 
-    .developer-management-actions {
+    .developer-priority-actions,
+    .developer-account-actions {
         grid-template-columns: 1fr;
     }
 

@@ -141,6 +141,130 @@
         });
       });
 
+      const withdrawForm = document.getElementById('developer-withdraw-form');
+      const withdrawSelect = document.getElementById('developer-withdraw-user');
+      const withdrawConfirm = document.getElementById('developer-withdraw-confirm');
+      const withdrawSubmit = document.getElementById('developer-withdraw-submit');
+      const withdrawStatus = document.getElementById('developer-withdraw-status');
+      const restoreForm = document.getElementById('developer-restore-form');
+      const restoreSelect = document.getElementById('developer-restore-user');
+      const restoreConfirm = document.getElementById('developer-restore-confirm');
+      const restoreSubmit = document.getElementById('developer-restore-submit');
+      const restoreStatus = document.getElementById('developer-restore-status');
+
+      function getSelectedWithdrawName() {
+        return withdrawSelect?.selectedOptions[0]?.dataset.username || '';
+      }
+
+      function syncWithdrawForm() {
+        const username = getSelectedWithdrawName();
+        withdrawConfirm.disabled = !username;
+        withdrawConfirm.placeholder = username ? username : '회원을 먼저 선택하세요';
+        withdrawSubmit.disabled = !username || withdrawConfirm.value.trim() !== username;
+      }
+
+      withdrawSelect?.addEventListener('change', () => {
+        withdrawConfirm.value = '';
+        withdrawStatus.textContent = '';
+        syncWithdrawForm();
+      });
+      withdrawConfirm?.addEventListener('input', syncWithdrawForm);
+
+      withdrawForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const userID = withdrawSelect.value;
+        const username = getSelectedWithdrawName();
+        if (!userID || withdrawConfirm.value.trim() !== username) return;
+        if (!window.confirm(`${username}님을 탈퇴 상태로 전환할까요?\n로그인과 푸시는 중단되며 게시글·경기 기록·뱃지는 보존됩니다.`)) return;
+
+        withdrawSubmit.disabled = true;
+        withdrawSelect.disabled = true;
+        withdrawConfirm.disabled = true;
+        withdrawStatus.textContent = '탈퇴 처리 중...';
+
+        try {
+          const response = await fetch(`/developer/users/${encodeURIComponent(userID)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmUsername: withdrawConfirm.value.trim() })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '회원 탈퇴를 처리하지 못했습니다.');
+
+          // 선택 목록(탈퇴/뱃지 부여)에서 해당 회원 제거
+          document.querySelectorAll('#developer-withdraw-user option, #developer-badge-user option').forEach((option) => {
+            if (option.value === userID) option.remove();
+          });
+          withdrawForm.reset();
+          withdrawStatus.textContent = data.message;
+        } catch (error) {
+          withdrawStatus.textContent = error.message || '회원 탈퇴를 처리하지 못했습니다.';
+        } finally {
+          withdrawSelect.disabled = false;
+          syncWithdrawForm();
+        }
+      });
+
+      function getSelectedRestoreName() {
+        return restoreSelect?.selectedOptions[0]?.dataset.username || '';
+      }
+
+      function syncRestoreForm() {
+        const username = getSelectedRestoreName();
+        restoreConfirm.disabled = !username;
+        restoreConfirm.placeholder = username ? username : '회원을 먼저 선택하세요';
+        restoreSubmit.disabled = !username || restoreConfirm.value.trim() !== username;
+      }
+
+      restoreSelect?.addEventListener('change', () => {
+        restoreConfirm.value = '';
+        restoreStatus.textContent = '';
+        syncRestoreForm();
+      });
+      restoreConfirm?.addEventListener('input', syncRestoreForm);
+
+      restoreForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const userID = restoreSelect.value;
+        const username = getSelectedRestoreName();
+        if (!userID || restoreConfirm.value.trim() !== username) return;
+        if (!window.confirm(`${username}님을 복원할까요?\n기존 기록과 뱃지는 유지되며 푸시는 다시 구독해야 합니다.`)) return;
+
+        restoreSubmit.disabled = true;
+        restoreSelect.disabled = true;
+        restoreConfirm.disabled = true;
+        restoreStatus.textContent = '회원 복원 중...';
+
+        try {
+          const response = await fetch(`/developer/users/${encodeURIComponent(userID)}/restore`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmUsername: restoreConfirm.value.trim() })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '회원 복원을 처리하지 못했습니다.');
+
+          restoreSelect.querySelector(`option[value="${CSS.escape(userID)}"]`)?.remove();
+          const badgeUserSelect = document.getElementById('developer-badge-user');
+          const withdrawUserSelect = document.getElementById('developer-withdraw-user');
+          if (!badgeUserSelect.querySelector(`option[value="${CSS.escape(userID)}"]`)) {
+            badgeUserSelect.add(new Option(data.username, userID));
+          }
+          if (!withdrawUserSelect.querySelector(`option[value="${CSS.escape(userID)}"]`)) {
+            const option = new Option(`${data.username} (${userID})`, userID);
+            option.dataset.username = data.username;
+            withdrawUserSelect.add(option);
+          }
+          restoreForm.reset();
+          restoreStatus.textContent = data.message;
+        } catch (error) {
+          restoreStatus.textContent = error.message || '회원 복원을 처리하지 못했습니다.';
+        } finally {
+          restoreSelect.disabled = false;
+          syncRestoreForm();
+        }
+      });
+
       selectManagementTab('schedule');
     });
 
@@ -1276,8 +1400,25 @@
             <div><span class="management-section-kicker">05 / DEVELOPER</span><h2>개발자 관리</h2></div>
             <span class="management-section-note">개발자 전용 관리 기능</span>
           </div>
-          <div class="developer-management-actions">
-            <form id="developer-badge-grant-form" class="management-container management-section developer-badge-form" enctype="multipart/form-data">
+          <div class="developer-priority-actions">
+            <div class="management-container management-section management-tools-section developer-update-post">
+              <h3>업데이트 공지 작성</h3>
+              <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
+            </div>
+            <form id="general-discord-notification-form" class="management-container management-section developer-notification-control">
+              <div class="management-card-title"><span class="management-icon"><i class="fa-brands fa-discord"></i></span><h3>일반 디스코드 알림</h3></div>
+              <p>경기 일정, 결과, 공지 등 일반 사용자용 디스코드 알림을 제어합니다. 개발자 오류 알림에는 영향을 주지 않습니다.</p>
+              <label class="developer-notification-toggle" for="general-discord-notifications-enabled">
+                <input id="general-discord-notifications-enabled" type="checkbox" <%= generalDiscordNotificationsEnabled ? 'checked' : '' %>>
+                <span>일반 알림 사용</span>
+              </label>
+              <div class="developer-notification-actions">
+                <button id="general-discord-notification-save" class="btn btn-primary" type="submit">설정 저장</button>
+                <span id="general-discord-notification-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
+          </div>
+          <form id="developer-badge-grant-form" class="management-container management-section developer-badge-form" enctype="multipart/form-data">
               <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>회원 뱃지 부여</h3></div>
               <label class="developer-badge-field-label" for="developer-badge-user">회원</label>
               <select id="developer-badge-user" class="form-select developer-badge-select" name="userID" required>
@@ -1298,28 +1439,7 @@
                 <span id="developer-badge-status" role="status" aria-live="polite"></span>
               </div>
               <p class="developer-badge-hint">PNG, JPEG, WebP, GIF · 최대 5MB</p>
-            </form>
-            <form id="general-discord-notification-form" class="management-container management-section developer-notification-control">
-              <div class="management-card-title"><span class="management-icon"><i class="fa-brands fa-discord"></i></span><h3>일반 디스코드 알림</h3></div>
-              <p>경기 일정, 결과, 공지 등 일반 사용자용 디스코드 알림을 제어합니다. 개발자 오류 알림에는 영향을 주지 않습니다.</p>
-              <label class="developer-notification-toggle" for="general-discord-notifications-enabled">
-                <input id="general-discord-notifications-enabled" type="checkbox" <%= generalDiscordNotificationsEnabled ? 'checked' : '' %>>
-                <span>일반 알림 사용</span>
-              </label>
-              <div class="developer-notification-actions">
-                <button id="general-discord-notification-save" class="btn btn-primary" type="submit">설정 저장</button>
-                <span id="general-discord-notification-status" role="status" aria-live="polite"></span>
-              </div>
-            </form>
-            <div class="management-container management-section management-tools-section">
-              <h3>승부차기 초기화</h3>
-              <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
-            </div>
-            <div class="management-container management-section management-tools-section">
-              <h3>업데이트 공지 작성</h3>
-              <button onclick="gotoUpdatePost()" class="btn btn-primary">작성하기</button>
-            </div>
-          </div>
+          </form>
           <div class="management-container management-section developer-badge-records">
             <div class="developer-badge-records-heading">
               <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>부여된 뱃지</h3></div>
@@ -1344,6 +1464,46 @@
                 <% }); %>
               <% } %>
             </div>
+          </div>
+          <div class="management-container management-section management-tools-section developer-shooting-reset">
+            <h3>승부차기 초기화</h3>
+            <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
+          </div>
+          <div class="developer-account-actions">
+            <form id="developer-withdraw-form" class="management-container management-section developer-badge-form developer-withdraw-form">
+              <div class="management-card-title"><span class="management-icon developer-withdraw-icon"><i class="fa-solid fa-user-minus"></i></span><h3>회원 탈퇴 처리</h3></div>
+              <p class="developer-withdraw-desc">계정은 삭제하지 않고 탈퇴 상태로 전환합니다. 로그인은 차단되고 푸시 구독은 제거되며, 게시글·경기 기록·MVP·스탯·뱃지는 보존됩니다.</p>
+              <label class="developer-badge-field-label" for="developer-withdraw-user">회원</label>
+              <select id="developer-withdraw-user" class="form-select developer-badge-select" name="userID" required>
+                <option value="">회원을 선택하세요</option>
+                <% developerBadgeUsers.filter((member) => member.userID !== 유저.userID).forEach((member) => { %>
+                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
+                <% }); %>
+              </select>
+              <label class="developer-badge-field-label" for="developer-withdraw-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
+              <input id="developer-withdraw-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
+              <div class="developer-notification-actions">
+                <button id="developer-withdraw-submit" class="btn developer-withdraw-button" type="submit" disabled>탈퇴 처리</button>
+                <span id="developer-withdraw-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
+            <form id="developer-restore-form" class="management-container management-section developer-badge-form developer-restore-form">
+              <div class="management-card-title"><span class="management-icon developer-restore-icon"><i class="fa-solid fa-user-check"></i></span><h3>회원 복원</h3></div>
+              <p class="developer-withdraw-desc">탈퇴 처리된 회원을 다시 활성화합니다. 기존 게시글·기록·뱃지는 유지되며 푸시 알림은 다시 구독해야 합니다.</p>
+              <label class="developer-badge-field-label" for="developer-restore-user">탈퇴 회원</label>
+              <select id="developer-restore-user" class="form-select developer-badge-select" name="userID" required>
+                <option value="">회원을 선택하세요</option>
+                <% withdrawnUsers.forEach((member) => { %>
+                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
+                <% }); %>
+              </select>
+              <label class="developer-badge-field-label" for="developer-restore-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
+              <input id="developer-restore-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
+              <div class="developer-notification-actions">
+                <button id="developer-restore-submit" class="btn developer-restore-button" type="submit" disabled>회원 복원</button>
+                <span id="developer-restore-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
           </div>
         </section>
       <% } %>

@@ -619,7 +619,10 @@ app.get('/management', async (req, res) => {
   const isDeveloper = req.user?.userID === DEVELOPER_USER_ID;
   const canSeeStats = isDeveloper || req.user?.username === '한대규';
   const developerBadgeUsers = isDeveloper
-    ? await db.collection('user').find({}, { projection: { userID: 1, username: 1 } }).sort({ username: 1 }).toArray()
+    ? await db.collection('user').find({ isWithdrawn: { $ne: true } }, { projection: { userID: 1, username: 1 } }).sort({ username: 1 }).toArray()
+    : [];
+  const withdrawnUsers = isDeveloper
+    ? await db.collection('user').find({ isWithdrawn: true }, { projection: { userID: 1, username: 1, withdrawnAt: 1 } }).sort({ username: 1 }).toArray()
     : [];
   const developerBadges = isDeveloper
     ? await db.collection('user_badges').find({}, {
@@ -689,7 +692,7 @@ app.get('/management', async (req, res) => {
     : [];
 
   const canManage = isDeveloper || ['한대규', '관리자', '양철진', '안태훈', '김정훈'].includes(req.user?.username);
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges, withdrawnUsers });
 });
 
 app.post('/developer/badges', (req, res) => {
@@ -786,6 +789,110 @@ app.delete('/developer/badges/:id', async (req, res) => {
     reportDeveloperError(error, req);
     console.error('회원 뱃지 제거 실패:', error);
     res.status(500).json({ ok: false, message: '뱃지를 제거하지 못했습니다.' });
+  }
+});
+
+app.delete('/developer/users/:userID', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+
+  const targetUserID = String(req.params.userID || '').trim();
+  const confirmUsername = String(req.body?.confirmUsername || '').trim();
+  if (!targetUserID) {
+    return res.status(400).json({ ok: false, message: '탈퇴시킬 회원을 선택해주세요.' });
+  }
+  if (targetUserID === DEVELOPER_USER_ID || targetUserID === req.user.userID) {
+    return res.status(400).json({ ok: false, message: '개발자 계정은 탈퇴시킬 수 없습니다.' });
+  }
+
+  try {
+    const userCollection = db.collection('user');
+    const targetUser = await userCollection.findOne({ userID: targetUserID }, { projection: { userID: 1, username: 1 } });
+    if (!targetUser) {
+      return res.status(404).json({ ok: false, message: '회원을 찾을 수 없습니다. 이미 탈퇴 처리되었을 수 있습니다.' });
+    }
+    if (confirmUsername !== targetUser.username) {
+      return res.status(400).json({ ok: false, message: '확인용 이름이 회원 이름과 일치하지 않습니다.' });
+    }
+
+    const withdrawalResult = await userCollection.updateOne(
+      { _id: targetUser._id, isWithdrawn: { $ne: true } },
+      {
+        $set: {
+          isWithdrawn: true,
+          withdrawnAt: new Date(),
+          withdrawnBy: req.user.userID,
+          pushNotificationsEnabled: false
+        }
+      }
+    );
+    if (withdrawalResult.modifiedCount === 0) {
+      return res.status(409).json({ ok: false, message: '이미 탈퇴 처리된 회원입니다.' });
+    }
+
+    if (targetUser.username) {
+      try {
+        await db.collection('push_subscription').deleteMany({ username: targetUser.username });
+      } catch (error) {
+        console.error('탈퇴 회원 푸시 구독 정리 실패:', error.message);
+      }
+    }
+
+    logActivity(req.user.username, '회원 탈퇴 처리', `- 대상: ${targetUser.username} (${targetUserID})`);
+    res.json({ ok: true, userID: targetUserID, message: `${targetUser.username}님을 탈퇴 처리했습니다. 회원 기록과 뱃지는 보존됩니다.` });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('회원 탈퇴 처리 실패:', error);
+    res.status(500).json({ ok: false, message: '회원 탈퇴를 처리하지 못했습니다.' });
+  }
+});
+
+app.post('/developer/users/:userID/restore', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+
+  const targetUserID = String(req.params.userID || '').trim();
+  const confirmUsername = String(req.body?.confirmUsername || '').trim();
+  if (!targetUserID || targetUserID === DEVELOPER_USER_ID) {
+    return res.status(400).json({ ok: false, message: '복원할 회원을 선택해주세요.' });
+  }
+
+  try {
+    const userCollection = db.collection('user');
+    const targetUser = await userCollection.findOne(
+      { userID: targetUserID, isWithdrawn: true },
+      { projection: { userID: 1, username: 1 } }
+    );
+    if (!targetUser) {
+      return res.status(404).json({ ok: false, message: '탈퇴 처리된 회원을 찾을 수 없습니다.' });
+    }
+    if (confirmUsername !== targetUser.username) {
+      return res.status(400).json({ ok: false, message: '확인용 이름이 회원 이름과 일치하지 않습니다.' });
+    }
+
+    const restoreResult = await userCollection.updateOne(
+      { _id: targetUser._id, isWithdrawn: true },
+      {
+        $set: {
+          isWithdrawn: false,
+          restoredAt: new Date(),
+          restoredBy: req.user.userID,
+          pushNotificationsEnabled: false
+        }
+      }
+    );
+    if (restoreResult.modifiedCount === 0) {
+      return res.status(409).json({ ok: false, message: '이미 복원된 회원입니다.' });
+    }
+
+    logActivity(req.user.username, '회원 복원 처리', `- 대상: ${targetUser.username} (${targetUserID})`);
+    res.json({ ok: true, userID: targetUserID, username: targetUser.username, message: `${targetUser.username}님을 복원했습니다. 푸시 알림은 다시 구독해야 합니다.` });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('회원 복원 처리 실패:', error);
+    res.status(500).json({ ok: false, message: '회원 복원을 처리하지 못했습니다.' });
   }
 });
 
@@ -1229,7 +1336,7 @@ app.get('/match-result-delete/:id', async (req, res) => {
 
 
 passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
-  let result = await db.collection('user').findOne({ userID: 입력한아이디 })
+  let result = await db.collection('user').findOne({ userID: 입력한아이디, isWithdrawn: { $ne: true } })
   if (!result) {
     return cb(null, false, { message: '아이디잘못침' })
   }
@@ -1253,7 +1360,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (user, done) => {
   try {
-    let result = await db.collection('user').findOne({ _id: new ObjectId(user.id) });
+    let result = await db.collection('user').findOne({ _id: new ObjectId(user.id), isWithdrawn: { $ne: true } });
 
     // Check if result exists before attempting to delete password
     if (result) {
@@ -1657,7 +1764,8 @@ app.post('/statinfo', async (req, res) => {
     let result = await db.collection('user').aggregate([
       {
         $match: {
-          userID: playerInfo
+          userID: playerInfo,
+          isWithdrawn: { $ne: true }
         }
       },
       {
@@ -1715,7 +1823,8 @@ app.post('/statinfo', async (req, res) => {
     let result = await db.collection('user').aggregate([
       {
         $match: {
-          userID: playerInfo
+          userID: playerInfo,
+          isWithdrawn: { $ne: true }
         }
       },
       {
