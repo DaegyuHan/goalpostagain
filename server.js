@@ -402,6 +402,21 @@ const badgeUpload = multer({
   }
 })
 
+const clubLogoUpload = multer({
+  storage: multerS3({
+    s3,
+    bucket: process.env.S3_BUCKET,
+    key: (_req, _file, cb) => cb(null, `club-logos/${Date.now()}-${crypto.randomUUID()}`)
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^image\/(png|jpeg|webp|gif)$/.test(file.mimetype)) return cb(null, true);
+    cb(new Error('PNG, JPEG, WebP, GIF 이미지만 업로드할 수 있습니다.'));
+  }
+})
+
+const MAX_FAVORITE_CLUBS = 12;
+
 function getBadgeImageKey(badge) {
   if (badge.imageKey) return badge.imageKey;
   if (!badge.imageUrl) return null;
@@ -423,6 +438,21 @@ const dbReady = connectDB.then((client) => {
   throw err
 })
 // mongoDB library 연결 코드
+
+async function getUserClubEmblems(userID) {
+  const favorites = await db.collection('user_club_favorites').findOne({ userID }, { projection: { clubLogoIds: 1 } });
+  if (!favorites?.clubLogoIds?.length) return [];
+
+  const logos = await db.collection('club_logos').find(
+    { _id: { $in: favorites.clubLogoIds } },
+    { projection: { name: 1, imageUrl: 1 } }
+  ).toArray();
+  const logoById = new Map(logos.map((logo) => [String(logo._id), logo]));
+  return favorites.clubLogoIds
+    .map((id) => logoById.get(String(id)))
+    .filter(Boolean)
+    .map((logo) => ({ clubName: logo.name, imageUrl: logo.imageUrl }));
+}
 
 app.use(async (req, res, next) => {
   if (req.path === '/dev/client-error') return next();
@@ -683,6 +713,12 @@ app.get('/management', async (req, res) => {
       projection: { userID: 1, username: 1, imageUrl: 1, description: 1, createdAt: 1 }
     }).sort({ createdAt: -1 }).toArray()
     : [];
+  const [developerClubLogos, developerClubFavorites] = isDeveloper
+    ? await Promise.all([
+      db.collection('club_logos').find({}, { projection: { name: 1, imageUrl: 1 } }).sort({ name: 1 }).toArray(),
+      db.collection('user_club_favorites').find({}, { projection: { userID: 1, clubLogoIds: 1 } }).toArray()
+    ])
+    : [[], []];
   const generalDiscordSettings = isDeveloper
     ? await db.collection('app_settings').findOne({ _id: 'general-discord-notifications' })
     : null;
@@ -746,7 +782,7 @@ app.get('/management', async (req, res) => {
     : [];
 
   const canManage = isDeveloper || ['한대규', '관리자', '양철진', '안태훈', '김정훈'].includes(req.user?.username);
-  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges, withdrawnUsers });
+  res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges, withdrawnUsers, developerClubLogos, developerClubFavorites, clubFavoriteLimit: MAX_FAVORITE_CLUBS });
 });
 
 app.post('/developer/badges', (req, res) => {
@@ -923,6 +959,200 @@ app.delete('/developer/badges/:id', async (req, res) => {
     reportDeveloperError(error, req);
     console.error('회원 뱃지 제거 실패:', error);
     res.status(500).json({ ok: false, message: '뱃지를 제거하지 못했습니다.' });
+  }
+});
+
+function clubLogoDeveloperOnly(req, res, next) {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+  next();
+}
+
+function receiveClubLogoImage(req, res, next) {
+  clubLogoUpload.single('clubLogoImage')(req, res, (uploadError) => {
+    if (!uploadError) return next();
+    const isUploadLimitError = uploadError instanceof multer.MulterError;
+    const isUnsupportedImage = uploadError.message.includes('이미지만');
+    const statusCode = isUploadLimitError || isUnsupportedImage ? 400 : 500;
+    if (statusCode === 500) reportDeveloperError(uploadError, req);
+    res.status(statusCode).json({
+      ok: false,
+      message: isUploadLimitError && uploadError.code === 'LIMIT_FILE_SIZE'
+        ? '로고 이미지는 5MB 이하로 업로드해주세요.'
+        : uploadError.message
+    });
+  });
+}
+
+async function deleteClubLogoImageQuietly(imageKey) {
+  if (!imageKey) return;
+  try {
+    await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: imageKey }));
+  } catch (error) {
+    console.error('클럽 로고 이미지 정리 실패:', error.message);
+  }
+}
+
+function parseClubLogoIds(value) {
+  if (!Array.isArray(value) || value.length > MAX_FAVORITE_CLUBS) return null;
+  const ids = value.map(String);
+  if (new Set(ids).size !== ids.length || !ids.every((id) => ObjectId.isValid(id))) return null;
+  return ids.map((id) => new ObjectId(id));
+}
+
+app.post('/developer/club-logos', clubLogoDeveloperOnly, receiveClubLogoImage, async (req, res) => {
+  const name = String(req.body?.name || '').trim();
+  const uploadedFile = req.file;
+  if (!name || name.length > 60 || !uploadedFile) {
+    await deleteClubLogoImageQuietly(uploadedFile?.key);
+    return res.status(400).json({ ok: false, message: '클럽 이름과 로고 이미지를 입력해주세요. 클럽 이름은 60자 이내여야 합니다.' });
+  }
+
+  try {
+    const logos = db.collection('club_logos');
+    const nameKey = name.toLowerCase();
+    if (await logos.findOne({ nameKey }, { projection: { _id: 1 } })) {
+      await deleteClubLogoImageQuietly(uploadedFile.key);
+      return res.status(409).json({ ok: false, message: '같은 이름의 클럽 로고가 이미 목록에 있습니다.' });
+    }
+
+    const now = new Date();
+    const result = await logos.insertOne({
+      name,
+      nameKey,
+      imageUrl: uploadedFile.location,
+      imageKey: uploadedFile.key,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: req.user.userID
+    });
+    logActivity(req.user.username, '클럽 로고 추가', `- ${name}`);
+    res.json({
+      ok: true,
+      message: `${name} 로고를 목록에 추가했습니다.`,
+      logo: { _id: result.insertedId, name, imageUrl: uploadedFile.location }
+    });
+  } catch (error) {
+    await deleteClubLogoImageQuietly(uploadedFile.key);
+    reportDeveloperError(error, req);
+    console.error('클럽 로고 추가 실패:', error);
+    res.status(500).json({ ok: false, message: '클럽 로고를 추가하지 못했습니다.' });
+  }
+});
+
+app.put('/developer/club-logos/:id', clubLogoDeveloperOnly, receiveClubLogoImage, async (req, res) => {
+  const uploadedFile = req.file;
+  const name = String(req.body?.name || '').trim();
+  if (!ObjectId.isValid(req.params.id) || !name || name.length > 60) {
+    await deleteClubLogoImageQuietly(uploadedFile?.key);
+    return res.status(400).json({ ok: false, message: '클럽 이름은 1~60자로 입력해주세요.' });
+  }
+
+  try {
+    const logos = db.collection('club_logos');
+    const logo = await logos.findOne({ _id: new ObjectId(req.params.id) });
+    if (!logo) {
+      await deleteClubLogoImageQuietly(uploadedFile?.key);
+      return res.status(404).json({ ok: false, message: '클럽 로고를 찾을 수 없습니다.' });
+    }
+
+    const nameKey = name.toLowerCase();
+    if (await logos.findOne({ nameKey, _id: { $ne: logo._id } }, { projection: { _id: 1 } })) {
+      await deleteClubLogoImageQuietly(uploadedFile?.key);
+      return res.status(409).json({ ok: false, message: '같은 이름의 클럽 로고가 이미 목록에 있습니다.' });
+    }
+
+    const update = { name, nameKey, updatedAt: new Date() };
+    if (uploadedFile) {
+      update.imageUrl = uploadedFile.location;
+      update.imageKey = uploadedFile.key;
+    }
+    await logos.updateOne({ _id: logo._id }, { $set: update });
+    if (uploadedFile) await deleteClubLogoImageQuietly(getBadgeImageKey(logo));
+
+    const changes = [logo.name !== name ? `${logo.name} → ${name}` : name, uploadedFile ? '(이미지 변경)' : ''].join(' ').trim();
+    logActivity(req.user.username, '클럽 로고 수정', `- ${changes}`);
+    res.json({
+      ok: true,
+      message: `${name} 로고를 수정했습니다.`,
+      logo: { _id: logo._id, name, imageUrl: update.imageUrl || logo.imageUrl }
+    });
+  } catch (error) {
+    await deleteClubLogoImageQuietly(uploadedFile?.key);
+    reportDeveloperError(error, req);
+    console.error('클럽 로고 수정 실패:', error);
+    res.status(500).json({ ok: false, message: '클럽 로고를 수정하지 못했습니다.' });
+  }
+});
+
+app.delete('/developer/club-logos/:id', clubLogoDeveloperOnly, async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ ok: false, message: '클럽 로고 정보가 올바르지 않습니다.' });
+  }
+
+  try {
+    const logos = db.collection('club_logos');
+    const logo = await logos.findOne({ _id: new ObjectId(req.params.id) });
+    if (!logo) return res.status(404).json({ ok: false, message: '클럽 로고를 찾을 수 없습니다.' });
+
+    await db.collection('user_club_favorites').updateMany(
+      { clubLogoIds: logo._id },
+      { $pull: { clubLogoIds: logo._id } }
+    );
+    await logos.deleteOne({ _id: logo._id });
+    await deleteClubLogoImageQuietly(getBadgeImageKey(logo));
+    logActivity(req.user.username, '클럽 로고 삭제', `- ${logo.name}`);
+    res.json({ ok: true, message: `${logo.name} 로고를 목록에서 삭제했습니다.` });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('클럽 로고 삭제 실패:', error);
+    res.status(500).json({ ok: false, message: '클럽 로고를 삭제하지 못했습니다.' });
+  }
+});
+
+app.put('/developer/club-favorites/:userID', clubLogoDeveloperOnly, async (req, res) => {
+  const clubLogoIds = parseClubLogoIds(req.body?.clubLogoIds);
+  if (!clubLogoIds) {
+    return res.status(400).json({ ok: false, message: `클럽 목록이 올바르지 않습니다. 한 회원당 최대 ${MAX_FAVORITE_CLUBS}개까지 등록할 수 있습니다.` });
+  }
+
+  try {
+    const targetUser = await db.collection('user').findOne(
+      { userID: req.params.userID, isWithdrawn: { $ne: true } },
+      { projection: { userID: 1, username: 1 } }
+    );
+    if (!targetUser) return res.status(404).json({ ok: false, message: '활성 회원을 찾을 수 없습니다.' });
+
+    if (clubLogoIds.length > 0) {
+      const existingCount = await db.collection('club_logos').countDocuments({ _id: { $in: clubLogoIds } });
+      if (existingCount !== clubLogoIds.length) {
+        return res.status(400).json({ ok: false, message: '목록에 없는 클럽이 포함되어 있습니다. 새로고침 후 다시 시도해주세요.' });
+      }
+    }
+
+    const favorites = db.collection('user_club_favorites');
+    if (clubLogoIds.length === 0) {
+      await favorites.deleteOne({ userID: targetUser.userID });
+    } else {
+      await favorites.updateOne(
+        { userID: targetUser.userID },
+        { $set: { username: targetUser.username, clubLogoIds, updatedAt: new Date(), updatedBy: req.user.userID } },
+        { upsert: true }
+      );
+    }
+    logActivity(req.user.username, '클럽 엠블럼 일괄 등록', `- 대상: ${targetUser.username} / ${clubLogoIds.length}개`);
+    res.json({
+      ok: true,
+      message: clubLogoIds.length > 0
+        ? `${targetUser.username}님의 클럽 엠블럼 ${clubLogoIds.length}개를 저장했습니다.`
+        : `${targetUser.username}님의 클럽 엠블럼을 모두 해제했습니다.`,
+      clubLogoIds: clubLogoIds.map(String)
+    });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('클럽 엠블럼 일괄 등록 실패:', error);
+    res.status(500).json({ ok: false, message: '클럽 엠블럼을 저장하지 못했습니다.' });
   }
 });
 
@@ -2552,9 +2782,10 @@ app.get('/mypage/:userId', async (req, res) => {
   if (!canViewMemberProfile(req.user, profileOwner)) return res.status(403).render('error.ejs');
 
   const isOwnProfile = req.user.userID === profileOwner.userID;
-  const [mvpAwardCount, badges, photoPostCount, commentCount, likedPhotoCount] = await Promise.all([
+  const [mvpAwardCount, badges, clubEmblems, photoPostCount, commentCount, likedPhotoCount] = await Promise.all([
     db.collection('mvp').countDocuments({ mvp_name: profileOwner.username }),
     db.collection('user_badges').find({ userID: profileOwner.userID }).sort({ createdAt: -1 }).toArray(),
+    getUserClubEmblems(profileOwner.userID),
     db.collection('photo').countDocuments({ user: profileOwner._id }),
     db.collection('photo-comment').countDocuments({
       $or: [{ writerId: profileOwner._id }, { writer: profileOwner.username }]
@@ -2579,6 +2810,7 @@ app.get('/mypage/:userId', async (req, res) => {
     pushEnabled,
     mvpAwardCount,
     badges,
+    clubEmblems,
     activityStats
   });
 });

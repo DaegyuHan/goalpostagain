@@ -39,10 +39,40 @@
     font-weight: 800;
 }
 
-.mypage-heading h1 span {
-    color: var(--mypage-muted);
-    font-size: 17px;
-    font-weight: 500;
+.mypage-profile-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+}
+
+.mypage-profile-line h1 {
+    line-height: 1.2;
+}
+
+.mypage-club-emblems {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mypage-club-emblems li {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+}
+
+.mypage-club-emblems img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 3px rgba(0, 16, 18, 0.16));
 }
 
 .mypage-mvp-summary {
@@ -362,5 +392,18 @@
     .mypage-push-actions {
         width: 100%;
         justify-content: space-between;
+    }
+
+    .mypage-heading h1 {
+        font-size: 26px;
+    }
+
+    .mypage-club-emblems {
+        gap: 6px;
+    }
+
+    .mypage-club-emblems li {
+        width: 30px;
+        height: 30px;
     }
 }

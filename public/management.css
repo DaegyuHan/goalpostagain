@@ -361,6 +361,10 @@
     color: var(--management-ink);
 }
 
+.developer-badge-form .form-select.developer-badge-select {
+    margin: 0;
+}
+
 .developer-badge-upload-row,
 .developer-badge-form .developer-notification-actions {
     display: flex;
@@ -459,6 +463,273 @@
 .developer-badge-row-info span {
     color: var(--management-muted);
     font-size: 12px;
+}
+
+.developer-club-emblem-records {
+    margin-top: 18px;
+    text-align: left;
+}
+
+.developer-club-emblem-icon {
+    background: #287a60;
+}
+
+.developer-club-emblem-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 38px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 2px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.developer-club-emblem-row:last-child {
+    border-bottom: 0;
+}
+
+.developer-club-emblem-row > img {
+    display: block;
+    width: 44px;
+    height: 44px;
+    padding: 4px;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: #f4f7f7;
+    object-fit: contain;
+}
+
+.developer-club-emblem-info {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.developer-club-emblem-info strong,
+.developer-club-emblem-info span {
+    overflow-wrap: anywhere;
+}
+
+.developer-club-emblem-info strong {
+    color: var(--management-ink);
+    font-size: 13px;
+}
+
+.developer-club-emblem-info span {
+    color: var(--management-muted);
+    font-size: 12px;
+}
+
+.developer-club-logo-add {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.developer-club-logo-list {
+    margin-top: 2px;
+}
+
+.developer-club-label-note {
+    margin-left: 6px;
+    color: var(--management-muted);
+    font-weight: 500;
+}
+
+.developer-club-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+}
+
+.developer-club-picker-item {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 6px;
+    min-width: 0;
+    padding: 10px 6px 8px;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--management-ink);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.developer-club-picker-item img {
+    display: block;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.developer-club-picker-item span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.developer-club-picker-item:hover:not(:disabled) {
+    border-color: #287a60;
+}
+
+.developer-club-picker-item.is-selected {
+    border-color: #287a60;
+    background: #eaf5f0;
+    box-shadow: inset 0 0 0 1px #287a60;
+}
+
+.developer-club-picker-item:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.developer-club-selection {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.developer-club-selection-empty {
+    padding: 14px;
+    border: 1px dashed var(--management-line);
+    border-radius: 6px;
+    color: var(--management-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.developer-club-selection-item {
+    display: grid;
+    grid-template-columns: 36px 18px 36px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 6px 4px;
+    border: 1px solid var(--management-line);
+    border-radius: 6px;
+    background: #ffffff;
+    user-select: none;
+}
+
+.developer-club-selection-item.is-dragging {
+    position: relative;
+    z-index: 1;
+    border-color: #287a60;
+    background: #f2faf6;
+    box-shadow: 0 6px 16px rgba(0, 16, 18, 0.14);
+}
+
+.developer-club-selection-item > img {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.developer-club-drag-handle {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--management-muted);
+    cursor: grab;
+    touch-action: none;
+}
+
+.developer-club-drag-handle:hover,
+.developer-club-drag-handle:focus-visible {
+    background: #f0f5f3;
+    color: var(--management-ink);
+}
+
+.developer-club-selection-item.is-dragging .developer-club-drag-handle {
+    cursor: grabbing;
+}
+
+.developer-club-selection-order {
+    color: var(--management-muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.developer-club-selection-name {
+    min-width: 0;
+    color: var(--management-ink);
+    font-size: 13px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.developer-club-overview-row {
+    display: grid;
+    grid-template-columns: minmax(64px, auto) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--management-line);
+}
+
+.developer-club-overview-row:last-child {
+    border-bottom: 0;
+}
+
+.developer-club-overview-row strong {
+    color: var(--management-ink);
+    font-size: 13px;
+}
+
+.developer-club-overview-logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.developer-club-overview-logos img {
+    display: block;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.developer-club-overview-row .btn.developer-club-overview-edit {
+    min-width: 0;
+    min-height: 32px;
+    margin: 0;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+@media only screen and (max-width: 560px) {
+    .developer-club-picker {
+        grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    }
+
+    .developer-club-selection-item {
+        grid-template-columns: 36px 14px 32px minmax(0, 1fr) 36px;
+        gap: 6px;
+    }
+
+    .developer-club-selection-item > img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .developer-club-overview-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 8px;
+    }
+
+    .developer-club-overview-logos {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
 }
 
 .developer-badge-edit {

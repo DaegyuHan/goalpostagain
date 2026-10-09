@@ -1541,6 +1541,466 @@
               <% } %>
             </div>
           </div>
+          <section class="management-container management-section developer-badge-form developer-club-library" aria-labelledby="developer-club-library-title">
+            <div class="developer-badge-records-heading">
+              <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-futbol"></i></span><h3 id="developer-club-library-title">클럽 로고 목록</h3></div>
+              <span id="developer-club-logo-count" class="management-section-note"><%= developerClubLogos.length %>개</span>
+            </div>
+            <form id="developer-club-logo-form" class="developer-club-logo-add" enctype="multipart/form-data">
+              <label class="developer-badge-field-label" for="developer-club-logo-name">축구클럽 이름</label>
+              <input id="developer-club-logo-name" class="form-control developer-badge-description" name="name" type="text" maxlength="60" placeholder="예: FC Barcelona" required>
+              <div class="developer-badge-upload-row">
+                <input id="developer-club-logo-image" class="visually-hidden" name="clubLogoImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                <label class="btn btn-secondary developer-badge-file-button" for="developer-club-logo-image"><i class="fa-solid fa-paperclip" aria-hidden="true"></i> 로고 이미지 첨부</label>
+                <span id="developer-club-logo-image-name" class="developer-badge-image-name">선택된 이미지 없음</span>
+              </div>
+              <div class="developer-notification-actions">
+                <button id="developer-club-logo-submit" class="btn btn-primary" type="submit">목록에 추가</button>
+                <span id="developer-club-logo-form-status" role="status" aria-live="polite"></span>
+              </div>
+              <p class="developer-badge-hint">PNG, JPEG, WebP, GIF · 최대 5MB · 배경이 투명한 이미지를 권장합니다. 이미지를 수정하면 등록한 모든 회원의 마이페이지에 바로 반영됩니다.</p>
+            </form>
+            <div id="developer-club-logo-status" class="developer-badge-removal-status" role="status" aria-live="polite"></div>
+            <div id="developer-club-logo-list" class="developer-club-logo-list"></div>
+          </section>
+          <section id="developer-club-assign" class="management-container management-section developer-badge-form developer-club-assign" aria-labelledby="developer-club-assign-title">
+            <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-user-tag"></i></span><h3 id="developer-club-assign-title">회원 클럽 엠블럼 일괄 등록</h3></div>
+            <label class="developer-badge-field-label" for="developer-club-member">회원</label>
+            <select id="developer-club-member" class="form-select developer-badge-select">
+              <option value="">회원을 선택하세요</option>
+              <% developerBadgeUsers.forEach((member) => { %>
+                <option value="<%= member.userID %>"><%= member.username %></option>
+              <% }); %>
+            </select>
+            <p class="developer-badge-field-label">목록에서 선택 <span class="developer-club-label-note">누르면 추가되고, 다시 누르면 빠집니다</span></p>
+            <div id="developer-club-picker" class="developer-club-picker" role="group" aria-label="클럽 로고 목록에서 선택"></div>
+            <p id="developer-club-selection-label" class="developer-badge-field-label">등록할 클럽 <span id="developer-club-selection-count" class="developer-club-label-note">0/<%= clubFavoriteLimit %></span></p>
+            <ol id="developer-club-selection" class="developer-club-selection" aria-labelledby="developer-club-selection-label"></ol>
+            <div class="developer-notification-actions">
+              <button id="developer-club-save" class="btn btn-primary" type="button" disabled>일괄 등록</button>
+              <span id="developer-club-save-status" role="status" aria-live="polite"></span>
+            </div>
+            <p class="developer-badge-hint">왼쪽 손잡이를 드래그하거나, 손잡이를 선택한 뒤 방향키 ↑↓로 순서를 바꿀 수 있어요. 마이페이지에 이 순서대로 표시됩니다.</p>
+          </section>
+          <section class="management-container management-section developer-club-emblem-records" aria-labelledby="developer-club-overview-title">
+            <div class="developer-badge-records-heading">
+              <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-list"></i></span><h3 id="developer-club-overview-title">회원별 등록 현황</h3></div>
+              <span id="developer-club-overview-count" class="management-section-note">0명</span>
+            </div>
+            <div id="developer-club-overview"></div>
+          </section>
+          <script type="application/json" id="developer-club-data"><%- JSON.stringify({
+            maxClubs: clubFavoriteLimit,
+            logos: developerClubLogos.map((logo) => ({ id: String(logo._id), name: logo.name, imageUrl: logo.imageUrl })),
+            favorites: Object.fromEntries(developerClubFavorites.map((favorite) => [favorite.userID, (favorite.clubLogoIds || []).map(String)]))
+          }).replace(/</g, '\\u003c') %></script>
+          <script>
+            (() => {
+              const dataElement = document.getElementById('developer-club-data');
+              if (!dataElement) return;
+              const initialData = JSON.parse(dataElement.textContent);
+              const maxClubs = initialData.maxClubs;
+              const imageAccept = 'image/png,image/jpeg,image/webp,image/gif';
+              let logos = initialData.logos;
+              const favorites = new Map(Object.entries(initialData.favorites));
+              let currentMember = '';
+              let selection = [];
+              let savedSelection = [];
+              let dragState = null;
+
+              const logoForm = document.getElementById('developer-club-logo-form');
+              const logoImageInput = document.getElementById('developer-club-logo-image');
+              const logoImageName = document.getElementById('developer-club-logo-image-name');
+              const logoFormStatus = document.getElementById('developer-club-logo-form-status');
+              const logoSubmit = document.getElementById('developer-club-logo-submit');
+              const logoStatus = document.getElementById('developer-club-logo-status');
+              const logoList = document.getElementById('developer-club-logo-list');
+              const logoCount = document.getElementById('developer-club-logo-count');
+              const memberSelect = document.getElementById('developer-club-member');
+              const picker = document.getElementById('developer-club-picker');
+              const selectionList = document.getElementById('developer-club-selection');
+              const selectionCount = document.getElementById('developer-club-selection-count');
+              const saveButton = document.getElementById('developer-club-save');
+              const saveStatus = document.getElementById('developer-club-save-status');
+              const overview = document.getElementById('developer-club-overview');
+              const overviewCount = document.getElementById('developer-club-overview-count');
+              const memberNames = new Map([...memberSelect.options].filter((option) => option.value).map((option) => [option.value, option.textContent.trim()]));
+
+              function el(tag, props = {}, children = []) {
+                const node = document.createElement(tag);
+                Object.entries(props).forEach(([key, value]) => {
+                  if (key === 'className') node.className = value;
+                  else if (key === 'text') node.textContent = value;
+                  else if (key === 'dataset') Object.assign(node.dataset, value);
+                  else node.setAttribute(key, value);
+                });
+                node.append(...children);
+                return node;
+              }
+
+              function logoImage(logo, withAlt = false) {
+                const image = el('img', { src: logo.imageUrl, alt: withAlt ? logo.name : '', loading: 'lazy' });
+                if (withAlt) image.title = logo.name;
+                return image;
+              }
+
+              function logoMap() {
+                return new Map(logos.map((logo) => [logo.id, logo]));
+              }
+
+              function sortLogos() {
+                logos.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+              }
+
+              async function readJson(response) {
+                try {
+                  return await response.json();
+                } catch (_error) {
+                  return {};
+                }
+              }
+
+              function isDirty() {
+                return Boolean(currentMember) && selection.join(',') !== savedSelection.join(',');
+              }
+
+              function renderLibrary() {
+                logoCount.textContent = `${logos.length}개`;
+                logoList.replaceChildren();
+                if (logos.length === 0) {
+                  logoList.append(el('p', { className: 'developer-badge-empty', text: '목록에 등록된 클럽 로고가 없습니다.' }));
+                  return;
+                }
+                logos.forEach((logo) => logoList.append(buildLibraryRow(logo)));
+              }
+
+              function buildLibraryRow(logo) {
+                const nameInputId = `developer-club-logo-edit-name-${logo.id}`;
+                const imageInputId = `developer-club-logo-edit-image-${logo.id}`;
+                const nameInput = el('input', { id: nameInputId, className: 'form-control developer-badge-description', name: 'name', type: 'text', maxlength: '60', required: '' });
+                nameInput.value = logo.name;
+                const imageInput = el('input', { id: imageInputId, className: 'visually-hidden', name: 'clubLogoImage', type: 'file', accept: imageAccept });
+                const imageName = el('span', { className: 'developer-badge-image-name', text: '이미지는 변경하지 않습니다' });
+                const submitButton = el('button', { className: 'btn btn-primary', type: 'submit', text: '변경 저장' });
+                const formStatus = el('span', { role: 'status', 'aria-live': 'polite' });
+                const editForm = el('form', { className: 'developer-badge-edit-form' }, [
+                  el('label', { className: 'developer-badge-field-label', for: nameInputId, text: '클럽 이름' }),
+                  nameInput,
+                  el('div', { className: 'developer-badge-upload-row' }, [
+                    imageInput,
+                    el('label', { className: 'btn btn-secondary developer-badge-file-button', for: imageInputId }, [
+                      el('i', { className: 'fa-solid fa-paperclip', 'aria-hidden': 'true' }),
+                      ' 이미지 변경'
+                    ]),
+                    imageName
+                  ]),
+                  el('div', { className: 'developer-notification-actions' }, [submitButton, formStatus])
+                ]);
+
+                imageInput.addEventListener('change', () => {
+                  imageName.textContent = imageInput.files[0]?.name || '이미지는 변경하지 않습니다';
+                });
+
+                editForm.addEventListener('submit', async (event) => {
+                  event.preventDefault();
+                  const formData = new FormData(editForm);
+                  if (!imageInput.files.length) formData.delete('clubLogoImage');
+                  submitButton.disabled = true;
+                  formStatus.textContent = '수정하는 중...';
+                  try {
+                    const response = await fetch(`/developer/club-logos/${encodeURIComponent(logo.id)}`, { method: 'PUT', body: formData });
+                    const data = await readJson(response);
+                    if (!response.ok || !data.ok) throw new Error(data.message || '클럽 로고를 수정하지 못했습니다.');
+                    logo.name = data.logo.name;
+                    logo.imageUrl = data.logo.imageUrl;
+                    sortLogos();
+                    renderAll();
+                    logoStatus.textContent = data.message;
+                  } catch (error) {
+                    formStatus.textContent = error.message || '클럽 로고를 수정하지 못했습니다.';
+                    submitButton.disabled = false;
+                  }
+                });
+
+                const removeButton = el('button', {
+                  className: 'developer-badge-remove',
+                  type: 'button',
+                  'aria-label': `${logo.name} 로고 삭제`,
+                  title: '로고 삭제'
+                }, [el('i', { className: 'fa-solid fa-trash', 'aria-hidden': 'true' })]);
+
+                removeButton.addEventListener('click', async () => {
+                  if (!window.confirm(`${logo.name} 로고를 목록에서 삭제할까요?\n이 클럽을 등록한 회원의 마이페이지에서도 사라집니다.`)) return;
+                  removeButton.disabled = true;
+                  logoStatus.textContent = '로고를 삭제하는 중...';
+                  try {
+                    const response = await fetch(`/developer/club-logos/${encodeURIComponent(logo.id)}`, { method: 'DELETE' });
+                    const data = await readJson(response);
+                    if (!response.ok || !data.ok) throw new Error(data.message || '클럽 로고를 삭제하지 못했습니다.');
+                    logos = logos.filter((item) => item.id !== logo.id);
+                    favorites.forEach((ids, userID) => {
+                      const remaining = ids.filter((id) => id !== logo.id);
+                      if (remaining.length) favorites.set(userID, remaining);
+                      else favorites.delete(userID);
+                    });
+                    selection = selection.filter((id) => id !== logo.id);
+                    savedSelection = savedSelection.filter((id) => id !== logo.id);
+                    renderAll();
+                    logoStatus.textContent = data.message;
+                  } catch (error) {
+                    logoStatus.textContent = error.message || '클럽 로고를 삭제하지 못했습니다.';
+                    removeButton.disabled = false;
+                  }
+                });
+
+                return el('div', { className: 'developer-club-emblem-row' }, [
+                  logoImage(logo),
+                  el('div', { className: 'developer-club-emblem-info' }, [
+                    el('strong', { text: logo.name }),
+                    el('details', { className: 'developer-badge-edit' }, [
+                      el('summary', { text: '로고 수정' }),
+                      editForm
+                    ])
+                  ]),
+                  removeButton
+                ]);
+              }
+
+              function renderPicker() {
+                picker.replaceChildren();
+                if (logos.length === 0) {
+                  picker.append(el('p', { className: 'developer-badge-empty', text: '먼저 위의 클럽 로고 목록에 로고를 추가해주세요.' }));
+                  return;
+                }
+                logos.forEach((logo) => {
+                  const isSelected = selection.includes(logo.id);
+                  const button = el('button', {
+                    type: 'button',
+                    className: `developer-club-picker-item${isSelected ? ' is-selected' : ''}`,
+                    'aria-pressed': String(isSelected),
+                    title: logo.name
+                  }, [logoImage(logo), el('span', { text: logo.name })]);
+                  button.disabled = !currentMember || (!isSelected && selection.length >= maxClubs);
+                  button.addEventListener('click', () => {
+                    selection = isSelected ? selection.filter((id) => id !== logo.id) : [...selection, logo.id];
+                    saveStatus.textContent = '';
+                    renderAssign();
+                  });
+                  picker.append(button);
+                });
+              }
+
+              function renderSelection(focusLogoId) {
+                selectionList.replaceChildren();
+                selectionCount.textContent = `${selection.length}/${maxClubs}`;
+                if (!currentMember || selection.length === 0) {
+                  selectionList.append(el('li', {
+                    className: 'developer-club-selection-empty',
+                    text: currentMember ? '위 목록에서 클럽을 눌러 추가하세요. 비워두고 등록하면 모두 해제됩니다.' : '회원을 먼저 선택하세요.'
+                  }));
+                }
+                const logoById = logoMap();
+                selection.forEach((logoId, index) => {
+                  const logo = logoById.get(logoId);
+                  if (!logo) return;
+                  const handle = el('button', {
+                    type: 'button',
+                    className: 'developer-club-drag-handle',
+                    'data-drag-handle': '',
+                    'aria-label': `${logo.name} 순서 이동, 방향키 위 아래`,
+                    title: '드래그해서 순서 변경'
+                  }, [el('i', { className: 'fa-solid fa-grip-vertical', 'aria-hidden': 'true' })]);
+                  const removeButton = el('button', {
+                    className: 'developer-badge-remove',
+                    type: 'button',
+                    'aria-label': `${logo.name} 빼기`,
+                    title: '목록에서 빼기'
+                  }, [el('i', { className: 'fa-solid fa-xmark', 'aria-hidden': 'true' })]);
+                  removeButton.addEventListener('click', () => {
+                    selection = selection.filter((id) => id !== logoId);
+                    saveStatus.textContent = '';
+                    renderAssign();
+                  });
+                  selectionList.append(el('li', { className: 'developer-club-selection-item', dataset: { clubLogoId: logoId } }, [
+                    handle,
+                    el('span', { className: 'developer-club-selection-order', text: String(index + 1) }),
+                    logoImage(logo),
+                    el('span', { className: 'developer-club-selection-name', text: logo.name }),
+                    removeButton
+                  ]));
+                  if (focusLogoId === logoId) handle.focus();
+                });
+                saveButton.disabled = !isDirty();
+              }
+
+              function renderAssign(focusLogoId) {
+                renderPicker();
+                renderSelection(focusLogoId);
+              }
+
+              function renderOverview() {
+                overview.replaceChildren();
+                const logoById = logoMap();
+                const entries = [...favorites.entries()]
+                  .map(([userID, ids]) => ({
+                    userID,
+                    name: memberNames.get(userID) || userID,
+                    logos: ids.map((id) => logoById.get(id)).filter(Boolean)
+                  }))
+                  .filter((entry) => entry.logos.length > 0)
+                  .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+                overviewCount.textContent = `${entries.length}명`;
+                if (entries.length === 0) {
+                  overview.append(el('p', { className: 'developer-badge-empty', text: '클럽 엠블럼이 등록된 회원이 없습니다.' }));
+                  return;
+                }
+                entries.forEach((entry) => {
+                  const editButton = el('button', { type: 'button', className: 'btn btn-secondary developer-club-overview-edit', text: '편집' });
+                  editButton.disabled = !memberNames.has(entry.userID);
+                  editButton.addEventListener('click', () => {
+                    if (!changeMember(entry.userID)) return;
+                    document.getElementById('developer-club-assign').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  });
+                  overview.append(el('div', { className: 'developer-club-overview-row' }, [
+                    el('strong', { text: entry.name }),
+                    el('div', { className: 'developer-club-overview-logos' }, entry.logos.map((logo) => logoImage(logo, true))),
+                    editButton
+                  ]));
+                });
+              }
+
+              function renderAll() {
+                renderLibrary();
+                renderAssign();
+                renderOverview();
+              }
+
+              function changeMember(userID) {
+                if (userID !== currentMember && isDirty() && !window.confirm('저장하지 않은 변경 사항이 있습니다. 다른 회원으로 바꿀까요?')) {
+                  memberSelect.value = currentMember;
+                  return false;
+                }
+                const knownLogoIds = new Set(logos.map((logo) => logo.id));
+                currentMember = userID;
+                memberSelect.value = userID;
+                savedSelection = (favorites.get(userID) || []).filter((id) => knownLogoIds.has(id));
+                selection = [...savedSelection];
+                saveStatus.textContent = '';
+                renderAssign();
+                return true;
+              }
+
+              memberSelect.addEventListener('change', () => changeMember(memberSelect.value));
+
+              selectionList.addEventListener('keydown', (event) => {
+                const handle = event.target.closest('[data-drag-handle]');
+                if (!handle || !['ArrowUp', 'ArrowDown'].includes(event.key)) return;
+                event.preventDefault();
+                const logoId = handle.closest('li').dataset.clubLogoId;
+                const index = selection.indexOf(logoId);
+                const nextIndex = event.key === 'ArrowUp' ? index - 1 : index + 1;
+                if (nextIndex < 0 || nextIndex >= selection.length) return;
+                [selection[index], selection[nextIndex]] = [selection[nextIndex], selection[index]];
+                saveStatus.textContent = '';
+                renderSelection(logoId);
+              });
+
+              selectionList.addEventListener('pointerdown', (event) => {
+                const handle = event.target.closest('[data-drag-handle]');
+                if (!handle || (event.pointerType === 'mouse' && event.button !== 0)) return;
+                event.preventDefault();
+                const item = handle.closest('li');
+                item.classList.add('is-dragging');
+                dragState = { item, pointerId: event.pointerId };
+              });
+
+              window.addEventListener('pointermove', (event) => {
+                if (!dragState || event.pointerId !== dragState.pointerId) return;
+                event.preventDefault();
+                const others = [...selectionList.querySelectorAll('li[data-club-logo-id]:not(.is-dragging)')];
+                const nextItem = others.find((item) => {
+                  const rect = item.getBoundingClientRect();
+                  return event.clientY < rect.top + rect.height / 2;
+                });
+                if (nextItem) {
+                  if (dragState.item.nextElementSibling !== nextItem) selectionList.insertBefore(dragState.item, nextItem);
+                } else if (selectionList.lastElementChild !== dragState.item) {
+                  selectionList.append(dragState.item);
+                }
+              }, { passive: false });
+
+              function finishDrag(event) {
+                if (!dragState || event.pointerId !== dragState.pointerId) return;
+                dragState.item.classList.remove('is-dragging');
+                dragState = null;
+                selection = [...selectionList.querySelectorAll('li[data-club-logo-id]')].map((item) => item.dataset.clubLogoId);
+                if (isDirty()) saveStatus.textContent = '';
+                renderSelection();
+              }
+
+              window.addEventListener('pointerup', finishDrag);
+              window.addEventListener('pointercancel', finishDrag);
+
+              saveButton.addEventListener('click', async () => {
+                const userID = currentMember;
+                if (!userID) return;
+                saveButton.disabled = true;
+                saveStatus.textContent = '저장하는 중...';
+                try {
+                  const response = await fetch(`/developer/club-favorites/${encodeURIComponent(userID)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clubLogoIds: selection })
+                  });
+                  const data = await readJson(response);
+                  if (!response.ok || !data.ok) throw new Error(data.message || '클럽 엠블럼을 저장하지 못했습니다.');
+                  if (data.clubLogoIds.length) favorites.set(userID, data.clubLogoIds);
+                  else favorites.delete(userID);
+                  if (currentMember === userID) savedSelection = [...data.clubLogoIds];
+                  saveStatus.textContent = data.message;
+                  renderOverview();
+                } catch (error) {
+                  saveStatus.textContent = error.message || '클럽 엠블럼을 저장하지 못했습니다.';
+                } finally {
+                  saveButton.disabled = !isDirty();
+                }
+              });
+
+              logoImageInput.addEventListener('change', () => {
+                logoImageName.textContent = logoImageInput.files[0]?.name || '선택된 이미지 없음';
+              });
+
+              logoForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                logoSubmit.disabled = true;
+                logoFormStatus.textContent = '로고를 추가하는 중...';
+                try {
+                  const response = await fetch('/developer/club-logos', { method: 'POST', body: new FormData(logoForm) });
+                  const data = await readJson(response);
+                  if (!response.ok || !data.ok) throw new Error(data.message || '클럽 로고를 추가하지 못했습니다.');
+                  logos.push({ id: String(data.logo._id), name: data.logo.name, imageUrl: data.logo.imageUrl });
+                  sortLogos();
+                  renderAll();
+                  logoForm.reset();
+                  logoImageName.textContent = '선택된 이미지 없음';
+                  logoFormStatus.textContent = data.message;
+                } catch (error) {
+                  logoFormStatus.textContent = error.message || '클럽 로고를 추가하지 못했습니다.';
+                } finally {
+                  logoSubmit.disabled = false;
+                }
+              });
+
+              window.addEventListener('beforeunload', (event) => {
+                if (!isDirty()) return;
+                event.preventDefault();
+                event.returnValue = '';
+              });
+
+              sortLogos();
+              renderAll();
+            })();
+          </script>
           <div class="management-container management-section management-tools-section developer-shooting-reset">
             <h3>승부차기 초기화</h3>
             <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>

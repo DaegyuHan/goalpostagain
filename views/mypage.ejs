@@ -35,7 +35,18 @@
 
       <header class="mypage-heading">
         <p class="mypage-eyebrow">MEMBER PROFILE</p>
-        <h1><%= 프로필유저.username %><span>님의 페이지</span></h1>
+        <div class="mypage-profile-line">
+          <h1><%= 프로필유저.username %></h1>
+          <% if (clubEmblems.length > 0) { %>
+            <ul class="mypage-club-emblems" aria-label="좋아하는 축구 클럽">
+              <% clubEmblems.forEach((clubEmblem) => { %>
+                <li>
+                  <img src="<%= clubEmblem.imageUrl %>" alt="<%= clubEmblem.clubName %> 엠블럼" title="<%= clubEmblem.clubName %>" loading="lazy">
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>
       </header>
 
       <section class="mypage-badges" aria-labelledby="mypage-badges-title">
