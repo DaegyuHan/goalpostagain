@@ -190,18 +190,14 @@ function reportDeveloperError(error, req) {
   if (!req || req._developerErrorReported) return;
   req._developerErrorReported = true;
 
-  const username = req.user?.username || '비로그인';
+  const username = req.user?.username || 'null';
   const method = req.method || 'UNKNOWN';
   const path = (req.originalUrl || req.url || '/').split('?')[0].slice(0, 160);
   const requestMetrics = req._requestMetrics;
-  const requestElapsedMs = requestMetrics
-    ? Math.round(performance.now() - requestMetrics.startedAt)
-    : null;
   const retryInfo = error?.mongoReadRetry;
-  const timingSummary = requestElapsedMs === null
-    ? ''
-    : `\n요청 ID: ${requestMetrics.requestId}`
-      + `\n오류 시점까지 요청 경과: ${(requestElapsedMs / 1000).toFixed(2)}초`;
+  const timingSummary = requestMetrics
+    ? `\n요청 ID: ${requestMetrics.requestId}`
+    : '';
   const retrySummary = retryInfo
     ? `\nMongoDB 읽기: ${retryInfo.operationName} (${retryInfo.attempts}/${retryInfo.maxAttempts}회 시도)`
       + `\nDB 작업 경과: ${(retryInfo.operationElapsedMs / 1000).toFixed(2)}초`
@@ -242,7 +238,7 @@ function reportClientError(req) {
   scheduleBackgroundTask(
     sendDeveloperDiscordMessage([
       '[클라이언트 오류]',
-      `사용자: ${req.user?.username || '비로그인'}`,
+      `사용자: ${req.user?.username || 'null'}`,
       `페이지: ${page}`,
       `유형: ${type}`,
       `오류: ${message}`,
@@ -343,20 +339,34 @@ const MongoStore = require('connect-mongo')
 const connectDB = require('./database.js')
 
 app.use(passport.initialize())
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-      secure: 'auto'
-  },
-  // 1 주일
-  store: MongoStore.create({
-    clientPromise: connectDB,
-    dbName: process.env.DB_NAME || 'goalpostagain'
-  })
-}))
+// 세션 저장소는 MongoDB 연결에 성공한 뒤에 만든다.
+// connect-mongo는 처음 받은 clientPromise를 계속 재사용하므로, 실패한 Promise를 넘기면
+// 해당 인스턴스의 모든 요청이 DB 복구 후에도 계속 실패한다.
+let sessionMiddleware = null;
+function getSessionMiddleware(client) {
+  if (!sessionMiddleware) {
+    sessionMiddleware = session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+          secure: 'auto'
+      },
+      // 1 주일
+      store: MongoStore.create({
+        clientPromise: Promise.resolve(client),
+        dbName: process.env.DB_NAME || 'goalpostagain'
+      })
+    })
+  }
+  return sessionMiddleware
+}
+app.use((req, res, next) => {
+  connectDB()
+    .then((client) => getSessionMiddleware(client)(req, res, next))
+    .catch(next)
+})
 app.use(passport.session())
 
 app.use((error, req, res, next) => {
@@ -429,13 +439,18 @@ function getBadgeImageKey(badge) {
 }
 
 let db
-const dbReady = connectDB.then((client) => {
-  console.log('DB연결성공')
-  db = createRetryingDatabase(client.db(process.env.DB_NAME || 'goalpostagain'))
-  return db
-}).catch((err) => {
-  console.error('DB 연결 실패:', err)
-  throw err
+// 연결에 실패하면 다음 요청에서 다시 연결을 시도한다. (실패 상태를 캐시하지 않음)
+function ensureDb() {
+  return connectDB().then((client) => {
+    if (!db) {
+      console.log('DB연결성공')
+      db = createRetryingDatabase(client.db(process.env.DB_NAME || 'goalpostagain'))
+    }
+    return db
+  })
+}
+ensureDb().catch((err) => {
+  console.error('DB 연결 실패(다음 요청에서 재시도):', err)
 })
 // mongoDB library 연결 코드
 
@@ -639,7 +654,7 @@ app.use(async (req, res, next) => {
   if (req.path === '/dev/client-error') return next();
 
   try {
-    await dbReady
+    await ensureDb()
     next()
   } catch (error) {
     next(error)
@@ -1153,10 +1168,7 @@ app.delete('/developer/badges/:id', async (req, res) => {
     const badge = await badgeCollection.findOne({ _id: new ObjectId(req.params.id) });
     if (!badge) return res.status(404).json({ ok: false, message: '뱃지를 찾을 수 없습니다.' });
 
-    const imageKey = getBadgeImageKey(badge);
-    if (imageKey) {
-      await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: imageKey }));
-    }
+    // 뱃지 기록만 지워 화면에서 뺀다. S3 이미지 파일은 삭제하지 않고 남겨둔다.
     await badgeCollection.deleteOne({ _id: badge._id });
     logActivity(req.user.username, '회원 뱃지 제거', `- 대상: ${badge.username || badge.userID}`);
     res.json({ ok: true });

@@ -236,16 +236,18 @@
     transition: opacity 140ms ease, transform 140ms ease;
 }
 
-.mypage-badge:hover .mypage-badge-caption,
-.mypage-badge:focus-visible .mypage-badge-caption,
+/* 설명은 클릭(탭)으로만 열고 닫는다. hover/focus로도 열면 다시 눌러도 닫히지 않음 */
 .mypage-badge.is-revealed .mypage-badge-caption {
     opacity: 1;
     transform: translateY(0);
 }
 
-.mypage-badge:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 22px rgba(21, 61, 55, 0.15);
+/* 마우스가 있는 기기에서만 떠오르는 효과 적용 (모바일에서 탭 후 hover가 남는 현상 방지) */
+@media (hover: hover) and (pointer: fine) {
+    .mypage-badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 22px rgba(21, 61, 55, 0.15);
+    }
 }
 
 .mypage-badge:focus-visible {
