@@ -990,7 +990,8 @@
             <br>
             원정팀 : <input id="prediction-away-team" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.awayTeam : '' %>">
             <br>
-            경기 시작 시간 : <input id="prediction-start-time" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.matchTime : '' %>" placeholder="예: 2026-09-20 19:00">
+            경기 시작 시간 : <input id="prediction-start-time" class="management-input3" type="text" value="<%= predictionSetting ? predictionSetting.matchTime : '' %>" placeholder="예: 2026년 10월 6일 20시 00분">
+            <span class="prediction-auto-close-hint">이 시간이 되면 예측이 자동으로 마감됩니다.</span>
             <div class="prediction-logo-fields">
               <label>홈팀 로고 <input id="prediction-home-logo" type="file" accept="image/*"></label>
               <label>원정팀 로고 <input id="prediction-away-logo" type="file" accept="image/*"></label>

@@ -1320,3 +1320,10 @@
         columns: 1;
     }
 }
+
+.prediction-auto-close-hint {
+    display: block;
+    margin: 2px 0 6px;
+    color: var(--management-muted);
+    font-size: 12px;
+}

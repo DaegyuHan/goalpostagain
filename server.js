@@ -255,11 +255,11 @@ function reportClientError(req) {
 // Discord webhook (환경변수 우선)
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 
-async function sendDiscordNotification(message) {
+async function sendDiscordNotification(message, { url: pushUrl = '/' } = {}) {
   schedulePushNotification({
     title: '오늘도골대FC',
     body: message || '새로운 소식이 있습니다.',
-    url: '/'
+    url: pushUrl
   });
 
   if (!DISCORD_WEBHOOK) return;
@@ -438,6 +438,187 @@ const dbReady = connectDB.then((client) => {
   throw err
 })
 // mongoDB library 연결 코드
+
+// cron-job.org 예약 작업: 승부예측마다 "마감 30분 전"과 "경기 시간 직후" 두 시각에만 실행되도록 예약
+const CRONJOB_API_KEY = process.env.CRONJOB_API_KEY;
+const CRONJOB_PREDICTION_JOB_ID = process.env.CRONJOB_PREDICTION_JOB_ID;
+
+function getSeoulDateParts(date) {
+  const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  return {
+    year: kst.getUTCFullYear(),
+    month: kst.getUTCMonth() + 1,
+    day: kst.getUTCDate(),
+    hour: kst.getUTCHours(),
+    minute: kst.getUTCMinutes()
+  };
+}
+
+function buildPredictionCronSchedule(deadline, now = new Date()) {
+  const runTimes = [];
+  const reminderAt = new Date(deadline.getTime() - PREDICTION_REMINDER_MINUTES * 60 * 1000);
+  if (reminderAt > now) runTimes.push(reminderAt);
+  // 경기 시간 1분 뒤에 실행해서 마감 시각을 확실히 지난 뒤 확인
+  const closeCheckAt = new Date(deadline.getTime() + 60 * 1000);
+  runTimes.push(closeCheckAt);
+
+  const parts = runTimes.map(getSeoulDateParts);
+  const unique = (values) => [...new Set(values)].sort((x, y) => x - y);
+  const expires = getSeoulDateParts(new Date(closeCheckAt.getTime() + 10 * 60 * 1000));
+  const pad = (value) => String(value).padStart(2, '0');
+  return {
+    timezone: 'Asia/Seoul',
+    // 시·분·일·월 조합으로 몇 번 더 실행될 수 있지만, 확인 결과가 같아서 중복 알림은 나가지 않음
+    expiresAt: Number(`${expires.year}${pad(expires.month)}${pad(expires.day)}${pad(expires.hour)}${pad(expires.minute)}00`),
+    months: unique(parts.map((part) => part.month)),
+    mdays: unique(parts.map((part) => part.day)),
+    hours: unique(parts.map((part) => part.hour)),
+    minutes: unique(parts.map((part) => part.minute)),
+    wdays: [-1]
+  };
+}
+
+function updatePredictionCronJob(job, label) {
+  if (!CRONJOB_API_KEY || !CRONJOB_PREDICTION_JOB_ID) return Promise.resolve(false);
+  const postData = JSON.stringify({ job });
+
+  const request = new Promise((resolve, reject) => {
+    const apiRequest = https.request({
+      hostname: 'api.cron-job.org',
+      path: `/jobs/${encodeURIComponent(CRONJOB_PREDICTION_JOB_ID)}`,
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${CRONJOB_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, (response) => {
+      response.resume();
+      response.on('end', () => {
+        if (response.statusCode >= 200 && response.statusCode < 300) return resolve(true);
+        reject(new Error(`cron-job.org 응답 ${response.statusCode}`));
+      });
+    });
+    apiRequest.on('error', reject);
+    apiRequest.setTimeout(5000, () => apiRequest.destroy(new Error('cron-job.org 요청 시간 초과')));
+    apiRequest.write(postData);
+    apiRequest.end();
+  }).catch((error) => {
+    console.error(`승부예측 예약 ${label} 실패:`, error.message);
+    scheduleBackgroundTask(
+      sendDeveloperDiscordMessage(`[개발자 알림] 승부예측 예약 ${label} 실패\n${error.message}`),
+      'Prediction cron update failure notification'
+    );
+    return false;
+  });
+
+  scheduleBackgroundTask(request, `Prediction cron ${label}`);
+  return request;
+}
+
+function schedulePredictionCron(prediction) {
+  const deadline = getPredictionDeadline(prediction);
+  if (!deadline || deadline <= new Date()) return Promise.resolve(false);
+  return updatePredictionCronJob({ enabled: true, schedule: buildPredictionCronSchedule(deadline) }, '등록');
+}
+
+function disablePredictionCron() {
+  return updatePredictionCronJob({ enabled: false }, '해제');
+}
+
+// 승부예측 경기 시간(한국 시간) 문자열을 Date로 변환. 예: "2026년 10월 6일 20시 00분", "2026-10-06 20:00"
+function parsePredictionMatchTime(text) {
+  const value = String(text || '');
+  const numbers = (value.match(/\d+/g) || []).map(Number);
+  if (numbers.length < 4) return null;
+  let [year, month, day, hour, minute = 0] = numbers;
+  if (year < 100) year += 2000;
+  if (/오후|PM/i.test(value) && hour < 12) hour += 12;
+  if (/오전|AM/i.test(value) && hour === 12) hour = 0;
+  if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59) return null;
+  const date = new Date(Date.UTC(year, month - 1, day, hour - 9, minute));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getPredictionDeadline(prediction) {
+  if (!prediction) return null;
+  if (prediction.matchTimeAt) return new Date(prediction.matchTimeAt);
+  return parsePredictionMatchTime(prediction.matchTime);
+}
+
+function isPredictionPastDeadline(prediction, now = new Date()) {
+  if (!prediction || prediction.autoCloseSkipped) return false;
+  const deadline = getPredictionDeadline(prediction);
+  return Boolean(deadline) && now >= deadline;
+}
+
+async function notifyPredictionClosed(prediction, { auto = false } = {}) {
+  const voteCount = await db.collection('prediction_votes').countDocuments({ settingId: String(prediction._id) });
+  sendDiscordNotification(
+    [
+      `[${prediction.homeTeam} vs ${prediction.awayTeam}] ${auto ? '경기 시작 시간이 되어 승부예측이 마감되었습니다.' : '승부예측이 마감되었습니다.'}`,
+      `경기 시간: ${prediction.matchTime}`,
+      `참여 인원: ${voteCount}명`
+    ].join('\n'),
+    { url: '/prediction' }
+  );
+}
+
+// 경기 시간이 지났는데 아직 열려 있으면 마감 처리 (요청 시점에 확인하는 방식)
+async function closePredictionIfExpired(prediction) {
+  if (!prediction || prediction.isOpen === false || !isPredictionPastDeadline(prediction)) return prediction;
+  const closedAt = new Date();
+  const result = await db.collection('prediction_setting').updateOne(
+    { _id: prediction._id, isOpen: { $ne: false } },
+    { $set: { isOpen: false, autoClosedAt: closedAt, updatedAt: closedAt } }
+  );
+  if (result.modifiedCount === 1) {
+    disablePredictionCron();
+    logActivity('시스템', '승부예측 자동 마감', `- ${prediction.homeTeam} vs ${prediction.awayTeam} (${prediction.matchTime})`);
+    try {
+      await notifyPredictionClosed(prediction, { auto: true });
+    } catch (error) {
+      console.error('승부예측 자동 마감 알림 실패:', error.message);
+    }
+  }
+  return { ...prediction, isOpen: false, autoClosedAt: prediction.autoClosedAt || closedAt };
+}
+
+const PREDICTION_REMINDER_MINUTES = 30;
+
+// 마감 30분 이내로 들어오면 "마감 임박" 알림을 한 번만 발송
+async function sendPredictionReminderIfDue(prediction, now = new Date()) {
+  if (!prediction || prediction.isOpen === false || prediction.reminderSentAt) return prediction;
+  const deadline = getPredictionDeadline(prediction);
+  if (!deadline) return prediction;
+  const msLeft = deadline.getTime() - now.getTime();
+  if (msLeft <= 0 || msLeft > (PREDICTION_REMINDER_MINUTES + 1) * 60 * 1000) return prediction;
+
+  const result = await db.collection('prediction_setting').updateOne(
+    { _id: prediction._id, isOpen: { $ne: false }, reminderSentAt: null },
+    { $set: { reminderSentAt: now } }
+  );
+  if (result.modifiedCount === 1) {
+    const minutesLeft = Math.max(1, Math.round(msLeft / 60000));
+    const voteCount = await db.collection('prediction_votes').countDocuments({ settingId: String(prediction._id) });
+    sendDiscordNotification(
+      [
+        `[${prediction.homeTeam} vs ${prediction.awayTeam}] 승부예측 마감 ${minutesLeft >= PREDICTION_REMINDER_MINUTES - 2 ? PREDICTION_REMINDER_MINUTES : minutesLeft}분 전입니다.`,
+        `경기 시간: ${prediction.matchTime}`,
+        `현재 참여 인원: ${voteCount}명 · 아직 예측하지 않았다면 지금 참여해주세요!`
+      ].join('\n'),
+      { url: '/prediction' }
+    );
+    logActivity('시스템', '승부예측 마감 임박 알림', `- ${prediction.homeTeam} vs ${prediction.awayTeam} (${minutesLeft}분 전)`);
+  }
+  return { ...prediction, reminderSentAt: prediction.reminderSentAt || now };
+}
+
+async function getCurrentPrediction() {
+  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  const checkedPrediction = await closePredictionIfExpired(prediction);
+  return sendPredictionReminderIfDue(checkedPrediction);
+}
 
 async function getUserClubEmblems(userID) {
   const favorites = await db.collection('user_club_favorites').findOne({ userID }, { projection: { clubLogoIds: 1 } });
@@ -627,6 +808,30 @@ app.use((req, res, next) => {
   next();
 })
 
+app.get('/api/cron/prediction-reminders', async (req, res) => {
+  if (!CRON_SECRET || req.get('authorization') !== `Bearer ${CRON_SECRET}`) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized' });
+  }
+
+  try {
+    const prediction = await getCurrentPrediction();
+    const deadline = getPredictionDeadline(prediction);
+    // 확인할 승부예측이 없으면 예약 작업을 꺼서 불필요한 호출을 멈춤 (끄기 실패 대비 안전장치)
+    if (!prediction || prediction.isOpen === false) await disablePredictionCron();
+    res.json({
+      ok: true,
+      hasPrediction: Boolean(prediction),
+      isOpen: prediction ? prediction.isOpen !== false : null,
+      deadline: deadline ? deadline.toISOString() : null,
+      reminderSent: Boolean(prediction?.reminderSentAt)
+    });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('승부예측 예약 확인 실패:', error);
+    res.status(500).json({ ok: false, message: '승부예측 예약 확인에 실패했습니다.' });
+  }
+});
+
 app.get('/api/cron/daily-active-users', async (req, res) => {
   if (!CRON_SECRET || req.get('authorization') !== `Bearer ${CRON_SECRET}`) {
     return res.status(401).json({ ok: false, message: 'Unauthorized' });
@@ -731,7 +936,7 @@ app.get('/management', async (req, res) => {
   let mvpboard = mvpboardDic[0].member_score;
   let lastSavedTime = mvpboardDic[0].savedTime || '저장된 시간 없음';
   let lastSavedUsername = mvpboardDic[0].savedUsername || '저장한 사람 없음';
-  let predictionSetting = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  let predictionSetting = await getCurrentPrediction();
   const predictionLeaderboard = await getPredictionLeaderboard();
   const predictionHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).toArray();
 
@@ -1336,6 +1541,11 @@ app.post('/prediction/setting', (req, res) => {
         return res.status(400).json({ ok: false, message: '홈팀, 원정팀, 경기 시작 시간을 모두 입력해주세요.' });
       }
 
+      const matchTimeAt = parsePredictionMatchTime(matchTime);
+      if (!matchTimeAt) {
+        return res.status(400).json({ ok: false, message: '경기 시작 시간을 "2026년 10월 6일 20시 00분" 또는 "2026-10-06 20:00" 형식으로 입력해주세요.' });
+      }
+
       const previousSetting = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
       const homeLogo = req.files?.homeLogo?.[0]?.location || previousSetting?.homeLogo || '';
       const awayLogo = req.files?.awayLogo?.[0]?.location || previousSetting?.awayLogo || '';
@@ -1344,9 +1554,11 @@ app.post('/prediction/setting', (req, res) => {
         homeTeam: homeTeam.trim(),
         awayTeam: awayTeam.trim(),
         matchTime: matchTime.trim(),
+        matchTimeAt,
         homeLogo,
         awayLogo,
-        isOpen: true,
+        isOpen: matchTimeAt > new Date(),
+        reminderSentAt: matchTimeAt.getTime() - Date.now() <= PREDICTION_REMINDER_MINUTES * 60 * 1000 ? new Date() : null,
         finalHomeScore: null,
         finalAwayScore: null,
         finalizedAt: null,
@@ -1354,6 +1566,7 @@ app.post('/prediction/setting', (req, res) => {
       });
 
       await db.collection('prediction_votes').deleteMany({});
+      schedulePredictionCron({ matchTimeAt });
       logActivity(req.user.username, '승부예측 경기 설정 저장', `- ${homeTeam} vs ${awayTeam} (${matchTime})`);
       sendDiscordNotification(`새로운 승부예측이 등록되었습니다.\n${homeTeam.trim()} vs ${awayTeam.trim()}\n경기 시간: ${matchTime.trim()}`);
       res.json({ ok: true });
@@ -1373,7 +1586,7 @@ app.get('/prediction', (req, res, next) => {
   req.session.returnTo = req.originalUrl;
   res.render('login', { Needlogin_Message: '로그인이 필요합니다.', send_url: req.session.returnTo });
 }, async (req, res) => {
-  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  const prediction = await getCurrentPrediction();
   const votes = await db.collection('prediction_votes').find({}).sort({ createdAt: -1 }).toArray();
   const storedHistory = await db.collection('prediction_history').find({}).sort({ archivedAt: -1 }).limit(20).toArray();
   const predictionHistory = storedHistory.map((history) => {
@@ -1399,11 +1612,18 @@ app.post('/prediction/toggle', async (req, res) => {
   }
 
   const isOpen = req.body.isOpen === true || req.body.isOpen === 'true';
+  // 경기 시간이 지난 뒤 직접 다시 열면 자동 마감을 건너뛰고, 다시 닫으면 원래대로 돌아감
+  const autoCloseSkipped = isOpen && isPredictionPastDeadline({ ...prediction, autoCloseSkipped: false });
   await db.collection('prediction_setting').updateOne(
     { _id: prediction._id },
-    { $set: { isOpen, updatedAt: new Date() } }
+    { $set: { isOpen, autoCloseSkipped, updatedAt: new Date() } }
   );
   logActivity(req.user.username, isOpen ? '승부예측 재개' : '승부예측 마감');
+  if (!isOpen && prediction.isOpen !== false) {
+    disablePredictionCron();
+    await notifyPredictionClosed(prediction);
+  }
+  if (isOpen && !autoCloseSkipped) schedulePredictionCron(prediction);
   res.json({ ok: true, isOpen });
 });
 
@@ -1449,6 +1669,21 @@ app.post('/prediction/result', async (req, res) => {
     { $set: { finalHomeScore, finalAwayScore, isOpen: false, finalizedAt: archivedAt, updatedAt: archivedAt } }
   );
   logActivity(req.user.username, '승부예측 최종 결과 저장', `- ${prediction.homeTeam} ${finalHomeScore}:${finalAwayScore} ${prediction.awayTeam}`);
+
+  disablePredictionCron();
+  const finalPick = finalHomeScore > finalAwayScore ? 'home' : finalHomeScore < finalAwayScore ? 'away' : 'draw';
+  const exactWinners = evaluatedVotes.filter((vote) => vote.isCorrect).map((vote) => vote.username).filter(Boolean);
+  const outcomeHitCount = evaluatedVotes.filter((vote) => vote.pick === finalPick).length;
+  const resultTitle = `[${prediction.homeTeam} vs ${prediction.awayTeam}] ${prediction.finalizedAt ? '승부예측 최종 결과가 수정되었습니다.' : '승부예측 최종 결과가 발표되었습니다.'}`;
+  sendDiscordNotification(
+    [
+      resultTitle,
+      `${prediction.homeTeam} ${finalHomeScore} : ${finalAwayScore} ${prediction.awayTeam}`,
+      `스코어 적중: ${exactWinners.length ? exactWinners.join(', ') : '없음'}`,
+      `승무패 적중: ${outcomeHitCount}명 / 참여 ${evaluatedVotes.length}명`
+    ].join('\n'),
+    { url: '/prediction' }
+  );
   res.json({ ok: true, message: '최종 결과가 저장되고 예측이 마감되었습니다.' });
 });
 
@@ -1478,12 +1713,15 @@ app.post('/prediction/submit', async (req, res) => {
     return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
   }
 
-  const prediction = await db.collection('prediction_setting').findOne({}, { sort: { _id: -1 } });
+  const prediction = await getCurrentPrediction();
   if (!prediction) {
     return res.status(404).json({ ok: false, message: '현재 진행 중인 승부예측이 없습니다.' });
   }
   if (prediction.isOpen === false) {
-    return res.status(403).json({ ok: false, message: '현재 승부예측은 마감되었습니다.' });
+    return res.status(403).json({
+      ok: false,
+      message: prediction.autoClosedAt ? '경기 시작 시간이 지나 승부예측이 마감되었습니다.' : '현재 승부예측은 마감되었습니다.'
+    });
   }
 
   const homeScore = Number(req.body.homeScore);
