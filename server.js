@@ -363,7 +363,9 @@ function getSessionMiddleware(client) {
   return sessionMiddleware
 }
 app.use((req, res, next) => {
-  connectDB()
+  // passport.session()의 deserializeUser가 db를 쓰므로, 세션 처리 전에 db 준비를 먼저 끝낸다.
+  ensureDb()
+    .then(() => connectDB())
     .then((client) => getSessionMiddleware(client)(req, res, next))
     .catch(next)
 })
