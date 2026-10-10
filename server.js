@@ -818,10 +818,34 @@ function logActivity(username, action, details = '') {
 }
 
 
-app.use((req, res, next) => {
+// footer 버전: app_settings(_id: 'site-version')에 저장, 인스턴스별로 1분간 캐시해 매 요청 DB 조회를 피한다.
+const DEFAULT_SITE_VERSION = 'v2.1.11';
+const SITE_VERSION_CACHE_MS = 60_000;
+const siteVersionCache = { value: DEFAULT_SITE_VERSION, loadedAt: 0 };
+
+async function getSiteVersion() {
+  if (Date.now() - siteVersionCache.loadedAt < SITE_VERSION_CACHE_MS) return siteVersionCache.value;
+  try {
+    const settings = await db.collection('app_settings').findOne({ _id: 'site-version' });
+    siteVersionCache.value = settings?.version || DEFAULT_SITE_VERSION;
+  } catch (error) {
+    console.error('footer 버전 조회 실패(기존 값 사용):', error.message);
+  }
+  siteVersionCache.loadedAt = Date.now();
+  return siteVersionCache.value;
+}
+
+function normalizeSiteVersion(value) {
+  const text = String(value ?? '').trim();
+  if (!text || text.length > 20 || !/^[0-9A-Za-z._-]+$/.test(text)) return null;
+  return /^\d/.test(text) ? `v${text}` : text;
+}
+
+app.use(async (req, res, next) => {
   if (req.user) {
     res.locals.유저 = req.user || {};
   }
+  res.locals.siteVersion = req.path === '/dev/client-error' ? siteVersionCache.value : await getSiteVersion();
   next();
 })
 
@@ -1479,6 +1503,33 @@ app.post('/developer/users/:userID/restore', async (req, res) => {
   }
 });
 
+app.post('/developer/site-version', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+
+  const version = normalizeSiteVersion(req.body?.version);
+  if (!version) {
+    return res.status(400).json({ ok: false, message: '버전은 영문·숫자·점(.)·-·_ 로 20자 이내로 입력해주세요. (예: v2.1.14)' });
+  }
+
+  try {
+    await db.collection('app_settings').updateOne(
+      { _id: 'site-version' },
+      { $set: { version, updatedAt: new Date(), updatedBy: req.user.username } },
+      { upsert: true }
+    );
+    siteVersionCache.value = version;
+    siteVersionCache.loadedAt = Date.now();
+    logActivity(req.user.username, 'footer 버전 변경', `- ${version}`);
+    res.json({ ok: true, version });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('footer 버전 저장 실패:', error);
+    res.status(500).json({ ok: false, message: '버전을 저장하지 못했습니다.' });
+  }
+});
+
 app.post('/developer/general-discord-notifications', async (req, res) => {
   if (req.user?.userID !== DEVELOPER_USER_ID) {
     return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
@@ -1767,6 +1818,18 @@ app.post('/prediction/submit', async (req, res) => {
 });
 
 
+function getDateValueVariants(value) {
+  const text = String(value ?? '').trim();
+  const variants = new Set([text]);
+  const number = Number(text);
+  if (Number.isInteger(number) && number > 0) {
+    variants.add(String(number));
+    variants.add(String(number).padStart(2, '0'));
+    variants.add(number);
+  }
+  return [...variants];
+}
+
 app.get('/mvp', async (req, res) => {
   // MVP 추가
   let result = await db.collection('mvp').insertOne({
@@ -1776,16 +1839,21 @@ app.get('/mvp', async (req, res) => {
     mvp_name: req.query.MVP_Name
   });
 
-  let query = { month: req.query.month, day: req.query.day };
-
-  let updateResult = await db.collection('result').updateOne(query, { $set: { mvp_name: req.query.MVP_Name } });
+  // "9"/"09"/9 처럼 형식이 달라도 같은 날짜로 찾고, 같은 월·일이 여러 해에 있으면 가장 최근 경기에 기록한다.
+  const updateResult = await db.collection('result').findOneAndUpdate(
+    { month: { $in: getDateValueVariants(req.query.month) }, day: { $in: getDateValueVariants(req.query.day) } },
+    { $set: { mvp_name: req.query.MVP_Name } },
+    { sort: { _id: -1 }, returnDocument: 'after' }
+  );
+  const updatedResult = updateResult?.value ?? null;
 
   logActivity(req.user.username, 'MVP 선정', `- MVP: ${req.query.MVP_Name} (${req.query.month}.${req.query.day})`);
 
-  if (updateResult.modifiedCount === 1) {
-    console.log("Result collection 업데이트 성공");
+  if (updatedResult) {
+    console.log(`Result collection 업데이트 성공: ${updatedResult.year}.${updatedResult.month}.${updatedResult.day}`);
   } else {
-    console.log("업데이트된 문서가 없습니다.");
+    console.warn(`MVP 날짜(${req.query.month}.${req.query.day})와 일치하는 경기 결과가 없습니다.`);
+    reportDeveloperError(new Error(`MVP 날짜(${req.query.month}.${req.query.day})와 일치하는 경기 결과가 없어 result.mvp_name을 기록하지 못했습니다.`), req);
   }
 
   res.redirect('/');

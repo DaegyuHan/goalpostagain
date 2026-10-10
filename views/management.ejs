@@ -1035,8 +1035,8 @@
         </div>
         <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-star"></i></span><h3>주간 MVP</h3></div>
         <div style="height: 150px;">
-          <input class="mvp-date" type="text" id="mvp-date-month" value="<%=매치일정[0].month %>">월
-          <input class="mvp-date" type="text" id="mvp-date-day" value="<%=매치일정[0].date %>">일
+          <input class="mvp-date" type="text" id="mvp-date-month" value="<%= latestResult ? latestResult.month : 매치일정[0].month %>">월
+          <input class="mvp-date" type="text" id="mvp-date-day" value="<%= latestResult ? latestResult.day : 매치일정[0].date %>">일
           <div>
             <!-- TODO1 -->
             <select class="form-select" id="WeeklyMVPSelect">
@@ -2068,6 +2068,44 @@
           </script>
           </div>
           <div id="developer-category-tools" class="developer-category-panel developer-category-is-hidden" role="tabpanel" aria-labelledby="developer-category-tab-tools" data-developer-category-panel="tools">
+          <form id="site-version-form" class="management-container management-section developer-notification-control">
+            <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-code-branch"></i></span><h3>footer 버전</h3></div>
+            <p>모든 페이지 하단(footer)에 표시되는 버전입니다. 숫자로 시작하면 앞에 v가 자동으로 붙습니다.</p>
+            <input id="site-version-input" class="form-control" type="text" maxlength="20" value="<%= typeof siteVersion !== 'undefined' ? siteVersion : '' %>" placeholder="예) v2.1.14" autocomplete="off" required>
+            <div class="developer-notification-actions">
+              <button id="site-version-save" class="btn btn-primary" type="submit">버전 저장</button>
+              <span id="site-version-status" role="status" aria-live="polite"></span>
+            </div>
+          </form>
+          <script>
+            (() => {
+              const form = document.getElementById('site-version-form');
+              const input = document.getElementById('site-version-input');
+              const saveButton = document.getElementById('site-version-save');
+              const status = document.getElementById('site-version-status');
+              form?.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                saveButton.disabled = true;
+                status.textContent = '저장 중...';
+                try {
+                  const response = await fetch('/developer/site-version', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ version: input.value })
+                  });
+                  const data = await response.json().catch(() => ({}));
+                  if (!response.ok || !data.ok) throw new Error(data.message || '버전을 저장하지 못했습니다.');
+                  input.value = data.version;
+                  document.querySelectorAll('.site-footer').forEach((footer) => { footer.textContent = data.version; });
+                  status.textContent = `${data.version}(으)로 저장했습니다.`;
+                } catch (error) {
+                  status.textContent = error.message;
+                } finally {
+                  saveButton.disabled = false;
+                }
+              });
+            })();
+          </script>
           <div class="management-container management-section management-tools-section developer-shooting-reset">
             <h3>승부차기 초기화</h3>
             <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
