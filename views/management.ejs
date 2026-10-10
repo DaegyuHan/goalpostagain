@@ -933,7 +933,6 @@
         <a class="active" href="#management-schedule" data-management-tab="schedule">일정 · 결과</a>
         <a href="#management-prediction" data-management-tab="prediction">승부예측</a>
         <a href="#management-mvp" data-management-tab="mvp">MVP</a>
-        <a href="#management-score" data-management-tab="score">점수 보드</a>
         <a href="#management-tools-player" data-management-tab="tools">관리 도구</a>
         <% if (canSeeStats) { %>
           <a href="#management-stats" data-management-tab="stats">통계</a>
@@ -1093,7 +1092,7 @@
       </div>
 
 
-      <section id="management-score" class="management-section management-score-section" data-management-panel="score">
+      <section id="management-score" class="management-section management-score-section" data-management-panel="mvp">
       <div class="management-section-heading">
         <div><span class="management-section-kicker">03 / SCOREBOARD</span><h2>MVP 점수 보드</h2></div>
         <span class="management-section-note">직접 수정하거나 선택한 선수에게 점수를 일괄 반영합니다.</span>
@@ -1446,6 +1445,14 @@
             <div><span class="management-section-kicker">05 / DEVELOPER</span><h2>개발자 관리</h2></div>
             <span class="management-section-note">개발자 전용 관리 기능</span>
           </div>
+          <div class="developer-category-tabs" role="tablist" aria-label="개발자 관리 분류">
+            <button id="developer-category-tab-notice" class="developer-category-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="developer-category-notice" data-developer-category="notice"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i><span>공지·알림</span></button>
+            <button id="developer-category-tab-members" class="developer-category-tab" type="button" role="tab" aria-selected="false" aria-controls="developer-category-members" data-developer-category="members"><i class="fa-solid fa-users" aria-hidden="true"></i><span>회원</span></button>
+            <button id="developer-category-tab-badges" class="developer-category-tab" type="button" role="tab" aria-selected="false" aria-controls="developer-category-badges" data-developer-category="badges"><i class="fa-solid fa-award" aria-hidden="true"></i><span>뱃지</span></button>
+            <button id="developer-category-tab-clubs" class="developer-category-tab" type="button" role="tab" aria-selected="false" aria-controls="developer-category-clubs" data-developer-category="clubs"><i class="fa-solid fa-futbol" aria-hidden="true"></i><span>클럽 엠블럼</span></button>
+            <button id="developer-category-tab-tools" class="developer-category-tab" type="button" role="tab" aria-selected="false" aria-controls="developer-category-tools" data-developer-category="tools"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>기타 도구</span></button>
+          </div>
+          <div id="developer-category-notice" class="developer-category-panel" role="tabpanel" aria-labelledby="developer-category-tab-notice" data-developer-category-panel="notice">
           <div class="developer-priority-actions">
             <div class="management-container management-section management-tools-section developer-update-post">
               <h3>업데이트 공지 작성</h3>
@@ -1464,6 +1471,8 @@
               </div>
             </form>
           </div>
+          </div>
+          <div id="developer-category-members" class="developer-category-panel developer-category-is-hidden" role="tabpanel" aria-labelledby="developer-category-tab-members" data-developer-category-panel="members">
           <form id="developer-profile-access-form" class="management-container management-section developer-profile-access-form">
             <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-address-card"></i></span><h3>회원 마이페이지 보기</h3></div>
             <p class="developer-profile-access-note">개발자 권한으로 회원의 공개 프로필과 활동 기록을 확인합니다. 개인 푸시 설정은 본인에게만 표시됩니다.</p>
@@ -1478,6 +1487,44 @@
               <button class="btn btn-primary" type="submit">마이페이지 보기</button>
             </div>
           </form>
+          <div class="developer-account-actions">
+            <form id="developer-withdraw-form" class="management-container management-section developer-badge-form developer-withdraw-form">
+              <div class="management-card-title"><span class="management-icon developer-withdraw-icon"><i class="fa-solid fa-user-minus"></i></span><h3>회원 탈퇴 처리</h3></div>
+              <p class="developer-withdraw-desc">계정은 삭제하지 않고 탈퇴 상태로 전환합니다. 로그인은 차단되고 푸시 구독은 제거되며, 게시글·경기 기록·MVP·스탯·뱃지는 보존됩니다.</p>
+              <label class="developer-badge-field-label" for="developer-withdraw-user">회원</label>
+              <select id="developer-withdraw-user" class="form-select developer-badge-select" name="userID" required>
+                <option value="">회원을 선택하세요</option>
+                <% developerBadgeUsers.filter((member) => member.userID !== 유저.userID).forEach((member) => { %>
+                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
+                <% }); %>
+              </select>
+              <label class="developer-badge-field-label" for="developer-withdraw-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
+              <input id="developer-withdraw-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
+              <div class="developer-notification-actions">
+                <button id="developer-withdraw-submit" class="btn developer-withdraw-button" type="submit" disabled>탈퇴 처리</button>
+                <span id="developer-withdraw-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
+            <form id="developer-restore-form" class="management-container management-section developer-badge-form developer-restore-form">
+              <div class="management-card-title"><span class="management-icon developer-restore-icon"><i class="fa-solid fa-user-check"></i></span><h3>회원 복원</h3></div>
+              <p class="developer-withdraw-desc">탈퇴 처리된 회원을 다시 활성화합니다. 기존 게시글·기록·뱃지는 유지되며 푸시 알림은 다시 구독해야 합니다.</p>
+              <label class="developer-badge-field-label" for="developer-restore-user">탈퇴 회원</label>
+              <select id="developer-restore-user" class="form-select developer-badge-select" name="userID" required>
+                <option value="">회원을 선택하세요</option>
+                <% withdrawnUsers.forEach((member) => { %>
+                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
+                <% }); %>
+              </select>
+              <label class="developer-badge-field-label" for="developer-restore-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
+              <input id="developer-restore-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
+              <div class="developer-notification-actions">
+                <button id="developer-restore-submit" class="btn developer-restore-button" type="submit" disabled>회원 복원</button>
+                <span id="developer-restore-status" role="status" aria-live="polite"></span>
+              </div>
+            </form>
+          </div>
+          </div>
+          <div id="developer-category-badges" class="developer-category-panel developer-category-is-hidden" role="tabpanel" aria-labelledby="developer-category-tab-badges" data-developer-category-panel="badges">
           <form id="developer-badge-grant-form" class="management-container management-section developer-badge-form" enctype="multipart/form-data">
               <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-award"></i></span><h3>회원 뱃지 부여</h3></div>
               <label class="developer-badge-field-label" for="developer-badge-user">회원</label>
@@ -1546,6 +1593,8 @@
               </div>
             </details>
           </div>
+          </div>
+          <div id="developer-category-clubs" class="developer-category-panel developer-category-is-hidden" role="tabpanel" aria-labelledby="developer-category-tab-clubs" data-developer-category-panel="clubs">
           <section class="management-container management-section developer-badge-form developer-club-library" aria-labelledby="developer-club-library-title">
             <div class="developer-badge-records-heading">
               <div class="management-card-title"><span class="management-icon developer-club-emblem-icon"><i class="fa-solid fa-futbol"></i></span><h3 id="developer-club-library-title">클럽 로고 목록</h3></div>
@@ -2016,46 +2065,54 @@
               renderAll();
             })();
           </script>
+          </div>
+          <div id="developer-category-tools" class="developer-category-panel developer-category-is-hidden" role="tabpanel" aria-labelledby="developer-category-tab-tools" data-developer-category-panel="tools">
           <div class="management-container management-section management-tools-section developer-shooting-reset">
             <h3>승부차기 초기화</h3>
             <button class="btn btn-primary" onclick="reset_ShootingGame()">초기화</button>
           </div>
-          <div class="developer-account-actions">
-            <form id="developer-withdraw-form" class="management-container management-section developer-badge-form developer-withdraw-form">
-              <div class="management-card-title"><span class="management-icon developer-withdraw-icon"><i class="fa-solid fa-user-minus"></i></span><h3>회원 탈퇴 처리</h3></div>
-              <p class="developer-withdraw-desc">계정은 삭제하지 않고 탈퇴 상태로 전환합니다. 로그인은 차단되고 푸시 구독은 제거되며, 게시글·경기 기록·MVP·스탯·뱃지는 보존됩니다.</p>
-              <label class="developer-badge-field-label" for="developer-withdraw-user">회원</label>
-              <select id="developer-withdraw-user" class="form-select developer-badge-select" name="userID" required>
-                <option value="">회원을 선택하세요</option>
-                <% developerBadgeUsers.filter((member) => member.userID !== 유저.userID).forEach((member) => { %>
-                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
-                <% }); %>
-              </select>
-              <label class="developer-badge-field-label" for="developer-withdraw-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
-              <input id="developer-withdraw-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
-              <div class="developer-notification-actions">
-                <button id="developer-withdraw-submit" class="btn developer-withdraw-button" type="submit" disabled>탈퇴 처리</button>
-                <span id="developer-withdraw-status" role="status" aria-live="polite"></span>
-              </div>
-            </form>
-            <form id="developer-restore-form" class="management-container management-section developer-badge-form developer-restore-form">
-              <div class="management-card-title"><span class="management-icon developer-restore-icon"><i class="fa-solid fa-user-check"></i></span><h3>회원 복원</h3></div>
-              <p class="developer-withdraw-desc">탈퇴 처리된 회원을 다시 활성화합니다. 기존 게시글·기록·뱃지는 유지되며 푸시 알림은 다시 구독해야 합니다.</p>
-              <label class="developer-badge-field-label" for="developer-restore-user">탈퇴 회원</label>
-              <select id="developer-restore-user" class="form-select developer-badge-select" name="userID" required>
-                <option value="">회원을 선택하세요</option>
-                <% withdrawnUsers.forEach((member) => { %>
-                  <option value="<%= member.userID %>" data-username="<%= member.username %>"><%= member.username %> (<%= member.userID %>)</option>
-                <% }); %>
-              </select>
-              <label class="developer-badge-field-label" for="developer-restore-confirm">확인을 위해 회원 이름을 그대로 입력하세요</label>
-              <input id="developer-restore-confirm" class="form-control developer-badge-description" name="confirmUsername" type="text" autocomplete="off" placeholder="회원을 먼저 선택하세요" disabled required>
-              <div class="developer-notification-actions">
-                <button id="developer-restore-submit" class="btn developer-restore-button" type="submit" disabled>회원 복원</button>
-                <span id="developer-restore-status" role="status" aria-live="polite"></span>
-              </div>
-            </form>
           </div>
+          <script>
+            (() => {
+              const tabs = [...document.querySelectorAll('[data-developer-category]')];
+              const panels = [...document.querySelectorAll('[data-developer-category-panel]')];
+              if (!tabs.length) return;
+              const storageKey = 'management-developer-category';
+
+              function selectCategory(key, focus = false) {
+                if (!tabs.some((tab) => tab.dataset.developerCategory === key)) key = tabs[0].dataset.developerCategory;
+                tabs.forEach((tab) => {
+                  const isActive = tab.dataset.developerCategory === key;
+                  tab.classList.toggle('is-active', isActive);
+                  tab.setAttribute('aria-selected', String(isActive));
+                  tab.tabIndex = isActive ? 0 : -1;
+                  if (isActive && focus) tab.focus();
+                });
+                panels.forEach((panel) => {
+                  panel.classList.toggle('developer-category-is-hidden', panel.dataset.developerCategoryPanel !== key);
+                });
+                try { localStorage.setItem(storageKey, key); } catch (_error) { /* 저장 불가 환경은 무시 */ }
+              }
+
+              tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => selectCategory(tab.dataset.developerCategory));
+                tab.addEventListener('keydown', (event) => {
+                  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                  event.preventDefault();
+                  let next = index;
+                  if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+                  if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+                  if (event.key === 'Home') next = 0;
+                  if (event.key === 'End') next = tabs.length - 1;
+                  selectCategory(tabs[next].dataset.developerCategory, true);
+                });
+              });
+
+              let savedKey = null;
+              try { savedKey = localStorage.getItem(storageKey); } catch (_error) { savedKey = null; }
+              selectCategory(savedKey || tabs[0].dataset.developerCategory);
+            })();
+          </script>
         </section>
       <% } %>
     </div>
