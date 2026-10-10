@@ -3021,18 +3021,123 @@ app.get('/user', async (req, res) => {
   res.json(userData);
 });
 
+// 팀소개 탭 포메이션 기준 포지션. 회원이 직접 입력(user.position)하기 전까지 임시로 사용한다.
+const MEMBER_POSITIONS = ['GOLEIRO', 'FIXO', 'ALA', 'PIVO'];
+const TEAM_POSITION_BY_USER_ID = {
+  tjrqjatn97: 'FIXO', saaq45: 'FIXO', bigstarhan33: 'FIXO',
+  oyt001: 'ALA', cjfwls34: 'ALA', qkrwjd24568: 'ALA', rere4581: 'ALA', als123eotlr: 'ALA',
+  sst266: 'ALA', chw7244: 'ALA', hsn972: 'ALA',
+  taehoon9908: 'PIVO', yusjin96: 'PIVO',
+  ks9071: 'GOLEIRO'
+};
+
+function getMemberPosition(user) {
+  const position = String(user?.position || TEAM_POSITION_BY_USER_ID[user?.userID] || '').toUpperCase();
+  return MEMBER_POSITIONS.includes(position) ? position : null;
+}
+
+// 회원 입력 정보(생일·키·몸무게)
+const MEMBER_BODY_LIMIT = 300; // 키(cm)·몸무게(kg) 입력 상한
+
+function getKoreanAge(birthDateKey, todayKey = getSeoulDateKey()) {
+  const [birthYear, birthMonth, birthDay] = birthDateKey.split('-').map(Number);
+  const [year, month, day] = todayKey.split('-').map(Number);
+  let age = year - birthYear;
+  if (month < birthMonth || (month === birthMonth && day < birthDay)) age -= 1;
+  return age;
+}
+
+function isValidBirthDateKey(value, todayKey = getSeoulDateKey()) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const isRealDate = date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+  return isRealDate && value >= '1900-01-01' && value <= todayKey;
+}
+
+// 자연수(1 이상 정수)만 허용. 문자열 "181", 숫자 181 모두 받되 "181.5", "-1", "1e2"는 거절
+function parseNaturalNumber(value) {
+  const text = String(value ?? '').trim();
+  if (!/^[1-9]\d*$/.test(text)) return null;
+  const number = Number(text);
+  return number <= MEMBER_BODY_LIMIT ? number : null;
+}
+
+function getMemberProfileInfo(user) {
+  const birthDateKey = user?.birthDate instanceof Date ? getSeoulDateKey(user.birthDate) : String(user?.birthDate || '');
+  const hasBirthDate = isValidBirthDateKey(birthDateKey);
+  const heightCm = parseNaturalNumber(user?.heightCm);
+  const weightKg = parseNaturalNumber(user?.weightKg);
+
+  return {
+    // 생년월일·키·몸무게가 모두 입력돼야 프로필 정보(포지션·특성 포함)를 보여준다
+    isComplete: Boolean(hasBirthDate && heightCm && weightKg),
+    position: getMemberPosition(user),
+    birth: hasBirthDate ? { label: birthDateKey.replaceAll('-', '.'), age: getKoreanAge(birthDateKey) } : null,
+    body: heightCm && weightKg ? `${heightCm}cm, ${weightKg}kg` : null,
+    form: {
+      birthDate: hasBirthDate ? birthDateKey : '',
+      heightCm: heightCm || '',
+      weightKg: weightKg || ''
+    }
+  };
+}
+
+// 선수 스탯창(stats_result.chr)에 등록된 특성 이미지. 빈 칸(none.png)은 제외한다.
+function getMemberTraits(statsResult) {
+  const urls = Array.isArray(statsResult?.chr) ? statsResult.chr : [];
+  return urls
+    .filter((url) => typeof url === 'string' && url.trim() && !/\/none\.png(\?|$)/i.test(url))
+    .map((url) => {
+      let name = '특성';
+      try {
+        name = decodeURIComponent(new URL(url).pathname.split('/').pop()).replace(/\.[a-z]+$/i, '');
+      } catch (_error) { /* 이름을 못 읽으면 기본값 사용 */ }
+      return { imageUrl: url, name };
+    });
+}
+
+app.post('/mypage/profile-info', async (req, res) => {
+  if (!req.user) return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+
+  const todayKey = getSeoulDateKey();
+  const birthDate = String(req.body?.birthDate || '').trim();
+  const heightCm = parseNaturalNumber(req.body?.heightCm);
+  const weightKg = parseNaturalNumber(req.body?.weightKg);
+
+  if (!isValidBirthDateKey(birthDate, todayKey)) {
+    return res.status(400).json({ ok: false, message: '생년월일을 올바르게 입력해주세요.' });
+  }
+  if (!heightCm || !weightKg) {
+    return res.status(400).json({ ok: false, message: `키와 몸무게는 1~${MEMBER_BODY_LIMIT} 사이의 자연수로 입력해주세요.` });
+  }
+
+  try {
+    await db.collection('user').updateOne(
+      { _id: new ObjectId(req.user._id), isWithdrawn: { $ne: true } },
+      { $set: { birthDate, heightCm, weightKg, profileInfoUpdatedAt: new Date() } }
+    );
+    logActivity(req.user.username, '회원정보 수정');
+    res.json({ ok: true });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('회원정보 저장 실패:', error);
+    res.status(500).json({ ok: false, message: '회원정보를 저장하지 못했습니다.' });
+  }
+});
+
 app.get('/mypage/:userId', async (req, res) => {
   if (!req.user) return res.redirect('/login');
 
   const profileOwner = await db.collection('user').findOne(
     { userID: req.params.userId, isWithdrawn: { $ne: true } },
-    { projection: { _id: 1, userID: 1, username: 1 } }
+    { projection: { _id: 1, userID: 1, username: 1, position: 1, birthDate: 1, heightCm: 1, weightKg: 1 } }
   );
   if (!profileOwner) return res.status(404).render('error.ejs');
   if (!canViewMemberProfile(req.user, profileOwner)) return res.status(403).render('error.ejs');
 
   const isOwnProfile = req.user.userID === profileOwner.userID;
-  const [mvpAwardCount, badges, clubEmblems, photoPostCount, commentCount, likedPhotoCount] = await Promise.all([
+  const [mvpAwardCount, badges, clubEmblems, photoPostCount, commentCount, likedPhotoCount, statsResult] = await Promise.all([
     db.collection('mvp').countDocuments({ mvp_name: profileOwner.username }),
     db.collection('user_badges').find({ userID: profileOwner.userID }).sort({ createdAt: -1 }).toArray(),
     getUserClubEmblems(profileOwner.userID),
@@ -3040,7 +3145,8 @@ app.get('/mypage/:userId', async (req, res) => {
     db.collection('photo-comment').countDocuments({
       $or: [{ writerId: profileOwner._id }, { writer: profileOwner.username }]
     }),
-    db.collection('photo').countDocuments({ likes: profileOwner.username })
+    db.collection('photo').countDocuments({ likes: profileOwner.username }),
+    db.collection('stats_result').findOne({ to_userID: profileOwner.userID }, { projection: { chr: 1 } })
   ]);
   const activityStats = {
     photoPostCount,
@@ -3056,6 +3162,9 @@ app.get('/mypage/:userId', async (req, res) => {
   res.render('mypage.ejs', {
     유저: req.user,
     프로필유저: profileOwner,
+    memberInfo: getMemberProfileInfo(profileOwner),
+    memberTraits: getMemberTraits(statsResult),
+    todayKey: getSeoulDateKey(),
     isOwnProfile,
     pushEnabled,
     mvpAwardCount,

@@ -47,6 +47,48 @@
             </ul>
           <% } %>
         </div>
+        <% if (memberInfo.isComplete) { %>
+          <dl class="mypage-member-info">
+            <% if (memberInfo.position) { %>
+              <div class="mypage-member-info-row">
+                <dt>포지션</dt>
+                <dd><span class="mypage-position mypage-position--<%= memberInfo.position.toLowerCase() %>"><%= memberInfo.position %></span></dd>
+              </div>
+            <% } %>
+            <% if (memberInfo.birth) { %>
+              <div class="mypage-member-info-row">
+                <dt>생년월일</dt>
+                <dd><%= memberInfo.birth.label %> <span class="mypage-member-info-sub">(만 <%= memberInfo.birth.age %>세)</span></dd>
+              </div>
+            <% } %>
+            <% if (memberInfo.body) { %>
+              <div class="mypage-member-info-row">
+                <dt>신체</dt>
+                <dd><%= memberInfo.body %></dd>
+              </div>
+            <% } %>
+            <% if (memberTraits.length > 0) { %>
+              <div class="mypage-member-info-row mypage-member-info-row--traits">
+                <dt>특성</dt>
+                <dd>
+                  <ul class="mypage-traits">
+                    <% memberTraits.forEach((trait) => { %>
+                      <li><img src="<%= trait.imageUrl %>" alt="<%= trait.name %>" title="<%= trait.name %>" loading="lazy"></li>
+                    <% }); %>
+                  </ul>
+                </dd>
+              </div>
+            <% } %>
+          </dl>
+        <% } else if (isOwnProfile) { %>
+          <div class="mypage-info-empty">
+            <p>회원정보를 입력하면 포지션, 생년월일, 신체, 특성이 프로필에 표시돼요.</p>
+            <button class="mypage-info-button" type="button" data-open-profile-info>
+              <i class="fa-solid fa-user-pen" aria-hidden="true"></i>
+              회원정보 입력하기
+            </button>
+          </div>
+        <% } %>
       </header>
 
       <section class="mypage-badges" aria-labelledby="mypage-badges-title">
@@ -120,9 +162,58 @@
           </label>
         </div>
       </section>
-      <% } %>
 
- 
+      <section class="mypage-profile-settings" aria-labelledby="mypage-profile-settings-title">
+        <div>
+          <h2 id="mypage-profile-settings-title">회원정보</h2>
+          <p><%= memberInfo.isComplete ? '생년월일, 키, 몸무게를 수정할 수 있습니다.' : '아직 입력한 회원정보가 없습니다.' %></p>
+        </div>
+        <button class="mypage-info-button mypage-info-button--outline" type="button" data-open-profile-info>
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          <%= memberInfo.isComplete ? '회원정보 수정' : '회원정보 입력' %>
+        </button>
+      </section>
+
+      <dialog id="mypage-profile-dialog" class="mypage-profile-dialog" aria-labelledby="mypage-profile-dialog-title">
+        <form id="mypage-profile-form" class="mypage-profile-form" novalidate>
+          <div class="mypage-profile-dialog-head">
+            <h2 id="mypage-profile-dialog-title"><%= memberInfo.isComplete ? '회원정보 수정' : '회원정보 입력' %></h2>
+            <button class="mypage-profile-dialog-close" type="button" data-close-profile-info aria-label="닫기">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <label class="mypage-profile-field">
+            <span>생년월일</span>
+            <input id="mypage-birth-date" name="birthDate" type="date" min="1900-01-01" max="<%= todayKey %>" value="<%= memberInfo.form.birthDate %>" required>
+          </label>
+
+          <div class="mypage-profile-field-row">
+            <label class="mypage-profile-field">
+              <span>키</span>
+              <span class="mypage-profile-input-unit">
+                <input id="mypage-height" name="heightCm" type="text" inputmode="numeric" pattern="[1-9][0-9]*" maxlength="3" placeholder="예) 175" value="<%= memberInfo.form.heightCm %>" required>
+                <em>cm</em>
+              </span>
+            </label>
+            <label class="mypage-profile-field">
+              <span>몸무게</span>
+              <span class="mypage-profile-input-unit">
+                <input id="mypage-weight" name="weightKg" type="text" inputmode="numeric" pattern="[1-9][0-9]*" maxlength="3" placeholder="예) 70" value="<%= memberInfo.form.weightKg %>" required>
+                <em>kg</em>
+              </span>
+            </label>
+          </div>
+          <p class="mypage-profile-hint">키와 몸무게는 자연수(소수점 없이)로 입력해주세요.</p>
+          <p id="mypage-profile-error" class="mypage-profile-error" role="alert"></p>
+
+          <div class="mypage-profile-actions">
+            <button class="mypage-info-button mypage-info-button--ghost" type="button" data-close-profile-info>취소</button>
+            <button id="mypage-profile-submit" class="mypage-info-button" type="submit">저장</button>
+          </div>
+        </form>
+      </dialog>
+      <% } %>
 
     </div>
 
@@ -195,6 +286,71 @@
         } catch (error) {
           console.error('Current device push status refresh failed:', error);
         }
+      }
+    });
+
+    // 회원정보 입력/수정 팝업
+    const profileDialog = document.getElementById('mypage-profile-dialog');
+    const profileForm = document.getElementById('mypage-profile-form');
+    const profileError = document.getElementById('mypage-profile-error');
+    const profileSubmit = document.getElementById('mypage-profile-submit');
+    const MAX_BODY_VALUE = 300;
+
+    document.querySelectorAll('[data-open-profile-info]').forEach((button) => {
+      button.addEventListener('click', () => {
+        profileError.textContent = '';
+        profileDialog?.showModal();
+      });
+    });
+    document.querySelectorAll('[data-close-profile-info]').forEach((button) => {
+      button.addEventListener('click', () => profileDialog?.close());
+    });
+    // 팝업 바깥(어두운 배경) 클릭 시 닫기
+    profileDialog?.addEventListener('click', (event) => {
+      if (event.target === profileDialog) profileDialog.close();
+    });
+
+    // 키·몸무게: 숫자 외 입력은 즉시 제거하고, 맨 앞의 0도 지움
+    ['mypage-height', 'mypage-weight'].forEach((id) => {
+      const input = document.getElementById(id);
+      input?.addEventListener('input', () => {
+        input.value = input.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 3);
+      });
+    });
+
+    function isNaturalNumber(value) {
+      return /^[1-9]\d*$/.test(value) && Number(value) <= MAX_BODY_VALUE;
+    }
+
+    profileForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const birthDate = profileForm.birthDate.value;
+      const heightCm = profileForm.heightCm.value.trim();
+      const weightKg = profileForm.weightKg.value.trim();
+
+      if (!birthDate || birthDate < profileForm.birthDate.min || birthDate > profileForm.birthDate.max) {
+        profileError.textContent = '생년월일을 올바르게 입력해주세요.';
+        return;
+      }
+      if (!isNaturalNumber(heightCm) || !isNaturalNumber(weightKg)) {
+        profileError.textContent = `키와 몸무게는 1~${MAX_BODY_VALUE} 사이의 자연수로 입력해주세요.`;
+        return;
+      }
+
+      profileSubmit.disabled = true;
+      profileError.textContent = '';
+      try {
+        const response = await fetch('/mypage/profile-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ birthDate, heightCm, weightKg })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.message || '회원정보를 저장하지 못했습니다.');
+        location.reload();
+      } catch (error) {
+        profileError.textContent = error.message;
+        profileSubmit.disabled = false;
       }
     });
 
