@@ -31,14 +31,24 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const targetUrl = new URL(event.notification.data?.url || '/', self.location.origin).href;
 
-  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-    const existingClient = clientList.find((client) => 'focus' in client);
+  event.waitUntil((async () => {
+    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    // 이미 그 글이 열려 있으면 그 창만 앞으로
+    const sameClient = clientList.find((client) => client.url === targetUrl && 'focus' in client);
+    if (sameClient) return sameClient.focus();
+
+    // 열린 창이 있으면 그 창을 알림 주소로 이동 (서비스워커가 제어하지 않는 창은 navigate가 실패하므로 새 창으로 대체)
+    const existingClient = clientList.find((client) => 'focus' in client && 'navigate' in client);
     if (existingClient) {
-      existingClient.navigate(targetUrl);
-      return existingClient.focus();
+      try {
+        const navigated = await existingClient.navigate(targetUrl);
+        if (navigated) return navigated.focus();
+      } catch (error) {
+        // 아래에서 새 창으로 연다
+      }
     }
     return clients.openWindow(targetUrl);
-  }));
+  })());
 });
 
 self.addEventListener('fetch', (event) => {

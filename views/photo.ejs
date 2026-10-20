@@ -145,6 +145,9 @@
                 icon.classList.toggle('fa-solid', data.liked);
                 icon.classList.toggle('fa-regular', !data.liked);
                 countElement.textContent = data.likeCount;
+                countElement.dataset.likers = JSON.stringify(data.likes || []);
+                // 팝업이 열려 있으면 바로 갱신
+                if (countElement.getAttribute('aria-expanded') === 'true') renderPhotoLikers(countElement);
             } catch (error) {
                 console.error(error);
                 alert('좋아요 처리 중 문제가 발생했습니다.');
@@ -152,6 +155,60 @@
                 button.disabled = false;
             }
         }
+
+        // 좋아요 누른 사람 작은 팝업
+        function closePhotoLikers() {
+            document.querySelectorAll('.story-photo-likers-pop').forEach((pop) => pop.remove());
+            document.querySelectorAll('.story-photo-like-count[aria-expanded="true"]').forEach((btn) => btn.setAttribute('aria-expanded', 'false'));
+        }
+
+        function renderPhotoLikers(button) {
+            let likers = [];
+            try { likers = JSON.parse(button.dataset.likers || '[]'); } catch (e) { likers = []; }
+            let pop = button.parentNode.querySelector('.story-photo-likers-pop');
+            if (!pop) {
+                pop = document.createElement('div');
+                pop.className = 'story-photo-likers-pop';
+                pop.setAttribute('role', 'dialog');
+                pop.setAttribute('aria-label', '좋아요 누른 사람');
+                button.parentNode.appendChild(pop);
+            }
+            const title = document.createElement('div');
+            title.className = 'story-photo-likers-title';
+            title.textContent = `좋아요 ${likers.length}명`;
+            const list = document.createElement('ul');
+            if (likers.length === 0) {
+                const empty = document.createElement('li');
+                empty.className = 'is-empty';
+                empty.textContent = '아직 좋아요가 없어요';
+                list.appendChild(empty);
+            } else {
+                likers.forEach((name) => {
+                    const item = document.createElement('li');
+                    item.textContent = name;
+                    list.appendChild(item);
+                });
+            }
+            pop.replaceChildren(title, list);
+        }
+
+        function togglePhotoLikers(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const button = event.currentTarget;
+            const isOpen = button.getAttribute('aria-expanded') === 'true';
+            closePhotoLikers();
+            if (isOpen) return;
+            button.setAttribute('aria-expanded', 'true');
+            renderPhotoLikers(button);
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.story-photo-likers-wrap')) closePhotoLikers();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closePhotoLikers();
+        });
 
         function EditPhoto(event) {
 
@@ -427,8 +484,14 @@
                                 data-count-target="photo-like-count-<%=i%>"
                                 aria-label="좋아요" aria-pressed="<%= photoIsLiked %>">
                                 <i class="fa-<%= photoIsLiked ? 'solid' : 'regular' %> fa-heart"></i>
-                                <span id="photo-like-count-<%=i%>"><%=photoLikes.length%></span>
                             </button>
+                            <span class="story-photo-likers-wrap">
+                                <button type="button" class="story-photo-like-count" id="photo-like-count-<%=i%>"
+                                    data-likers="<%= JSON.stringify(photoLikes) %>"
+                                    onclick="togglePhotoLikers(event)"
+                                    aria-haspopup="dialog" aria-expanded="false"
+                                    aria-label="좋아요 누른 사람 보기"><%=photoLikes.length%></button>
+                            </span>
                             <span class="story-photo-comment-count">댓글 <%=포토[i].comments.length%>개</span>
                         </div>
 

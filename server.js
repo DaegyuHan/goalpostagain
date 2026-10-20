@@ -56,13 +56,14 @@ function getSeoulDateKey(date = new Date()) {
   return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
-async function sendPushNotification(payload) {
+async function sendPushNotification(payload, { targetUsernames = null } = {}) {
   if (!isPushConfigured()) {
     return { sentUsernames: [], unidentifiedSentCount: 0, attemptedCount: 0, failedCount: 0, configured: false };
   }
 
   const [subscriptions, disabledUsers] = await Promise.all([
-    db.collection('push_subscription').find({}).toArray(),
+    // targetUsernames가 있으면 해당 회원의 기기에만 발송 (개인 알림)
+    db.collection('push_subscription').find(Array.isArray(targetUsernames) ? { username: { $in: targetUsernames } } : {}).toArray(),
     db.collection('user').find({ pushNotificationsEnabled: false }, { projection: { username: 1 } }).toArray()
   ]);
   const disabledUsernames = new Set(disabledUsers.map((user) => user.username));
@@ -162,9 +163,9 @@ function chunkDiscordNames(title, usernames) {
   return messages;
 }
 
-function schedulePushNotification(payload) {
+function schedulePushNotification(payload, options = {}) {
   scheduleBackgroundTask(
-    sendPushNotification(payload).then(async (result) => {
+    sendPushNotification(payload, options).then(async (result) => {
       const summary = [
         '[웹푸시 발송 결과]',
         `알림: ${(payload.body || '새로운 소식이 있습니다.').slice(0, 300)}`,
@@ -956,8 +957,8 @@ app.get('/management', async (req, res) => {
     : [];
   const developerBadges = isDeveloper
     ? await db.collection('user_badges').find({}, {
-      projection: { userID: 1, username: 1, imageUrl: 1, description: 1, createdAt: 1 }
-    }).sort({ createdAt: -1 }).toArray()
+      projection: { userID: 1, username: 1, imageUrl: 1, description: 1, createdAt: 1, order: 1 }
+    }).toArray().then(sortBadgesForDisplay)
     : [];
   const [developerClubLogos, developerClubFavorites] = isDeveloper
     ? await Promise.all([
@@ -1019,8 +1020,10 @@ app.get('/management', async (req, res) => {
     : null;
   const mvpAwardLeaderboard = canSeeStats
     ? await db.collection('mvp').aggregate([
-      { $match: { mvp_name: { $type: 'string', $ne: '' } } },
-      { $group: { _id: '$mvp_name', awardCount: { $sum: 1 } } },
+      { $project: { names: MVP_NAMES_EXPR } },
+      { $unwind: '$names' },
+      { $match: { names: { $type: 'string', $ne: '' } } },
+      { $group: { _id: '$names', awardCount: { $sum: 1 } } },
       { $sort: { awardCount: -1, _id: 1 } },
       { $limit: 10 },
       { $project: { _id: 0, username: '$_id', awardCount: 1 } }
@@ -1074,7 +1077,13 @@ app.post('/developer/badges', (req, res) => {
         return res.status(404).json({ ok: false, message: '선택한 회원을 찾을 수 없습니다.' });
       }
 
+      // 순서를 직접 정한 회원이면 새 뱃지는 맨 앞에 배치 (기존 최신순 동작과 동일)
+      const firstOrdered = await db.collection('user_badges').findOne(
+        { userID, order: { $type: 'number' } },
+        { sort: { order: 1 }, projection: { order: 1 } }
+      );
       await db.collection('user_badges').insertOne({
+        ...(firstOrdered ? { order: firstOrdered.order - 1 } : {}),
         userID,
         username: targetUser.username,
         imageUrl: uploadedFile.location,
@@ -1084,6 +1093,14 @@ app.post('/developer/badges', (req, res) => {
         createdBy: req.user.userID
       });
       logActivity(req.user.username, '회원 뱃지 부여', `- 대상: ${targetUser.username}`);
+
+      // 뱃지 받은 회원에게만 개인 푸시 알림 → 누르면 내 마이페이지(뱃지 목록)로 이동
+      schedulePushNotification({
+        title: '오늘도골대FC',
+        body: `새로운 뱃지를 받았습니다! [${normalizedDescription.slice(0, 60)}]`,
+        url: `/mypage/${encodeURIComponent(userID)}`
+      }, { targetUsernames: [targetUser.username] });
+
       res.json({ ok: true, message: `${targetUser.username}님에게 뱃지를 부여했습니다.` });
     } catch (error) {
       await removeUploadedFile();
@@ -1179,6 +1196,46 @@ app.put('/developer/badges/:id', (req, res) => {
       res.status(500).json({ ok: false, message: '뱃지를 수정하지 못했습니다.' });
     }
   });
+});
+
+// 뱃지 표시 순서: 회원별로 order(직접 정한 순서) 오름차순, 순서가 없으면 최신순
+function sortBadgesForDisplay(badges) {
+  return badges.sort((a, b) => {
+    const userCompare = String(a.username || '').localeCompare(String(b.username || ''), 'ko');
+    if (userCompare !== 0) return userCompare;
+    const aHasOrder = typeof a.order === 'number';
+    const bHasOrder = typeof b.order === 'number';
+    if (aHasOrder && bHasOrder && a.order !== b.order) return a.order - b.order;
+    if (aHasOrder !== bHasOrder) return aHasOrder ? -1 : 1;
+    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+  });
+}
+
+// 개발자 관리: 회원별 뱃지 배치 순서 저장
+app.put('/developer/badge-order', async (req, res) => {
+  if (req.user?.userID !== DEVELOPER_USER_ID) {
+    return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
+  }
+  const { userID, badgeIds } = req.body || {};
+  if (!userID || !Array.isArray(badgeIds) || badgeIds.length === 0 || !badgeIds.every((id) => ObjectId.isValid(id))) {
+    return res.status(400).json({ ok: false, message: '순서 정보가 올바르지 않습니다.' });
+  }
+
+  try {
+    const badgeCollection = db.collection('user_badges');
+    const ownedCount = await badgeCollection.countDocuments({ userID, _id: { $in: badgeIds.map((id) => new ObjectId(id)) } });
+    if (ownedCount !== badgeIds.length) {
+      return res.status(400).json({ ok: false, message: '다른 회원의 뱃지가 섞여 있거나 삭제된 뱃지가 있습니다. 새로고침 후 다시 시도해주세요.' });
+    }
+    await badgeCollection.bulkWrite(badgeIds.map((id, index) => ({
+      updateOne: { filter: { _id: new ObjectId(id), userID }, update: { $set: { order: index } } }
+    })));
+    res.json({ ok: true });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    console.error('뱃지 순서 저장 실패:', error);
+    res.status(500).json({ ok: false, message: '뱃지 순서를 저장하지 못했습니다.' });
+  }
 });
 
 app.delete('/developer/badges/:id', async (req, res) => {
@@ -1830,34 +1887,147 @@ function getDateValueVariants(value) {
   return [...variants];
 }
 
-app.get('/mvp', async (req, res) => {
-  // MVP 추가
-  let result = await db.collection('mvp').insertOne({
-    mvp: req.query.val,
-    month: req.query.month,
-    day: req.query.day,
-    mvp_name: req.query.MVP_Name
-  });
+// MVP 이름 목록 정규화: 공동 MVP(동일 득표)를 위해 배열(MVP_Names)과 기존 단일 값(MVP_Name)을 모두 지원
+function parseMvpNames(source) {
+  let names = [];
+  if (source.MVP_Names) {
+    try {
+      const parsed = typeof source.MVP_Names === 'string' ? JSON.parse(source.MVP_Names) : source.MVP_Names;
+      if (Array.isArray(parsed)) names = parsed;
+    } catch (e) {
+      names = String(source.MVP_Names).split(',');
+    }
+  } else if (source.MVP_Name) {
+    names = [source.MVP_Name];
+  }
+  return [...new Set(names.map((name) => String(name).trim()).filter((name) => name && name !== 'undefined'))];
+}
 
-  // "9"/"09"/9 처럼 형식이 달라도 같은 날짜로 찾고, 같은 월·일이 여러 해에 있으면 가장 최근 경기에 기록한다.
+// 기존 문서(mvp_name 단일)와 신규 문서(mvp_names 배열)를 모두 수상자 배열로 펼치는 표현식
+const MVP_NAMES_EXPR = {
+  $cond: [
+    { $isArray: '$mvp_names' },
+    '$mvp_names',
+    { $cond: [{ $and: [{ $eq: [{ $type: '$mvp_name' }, 'string'] }, { $ne: ['$mvp_name', ''] }] }, ['$mvp_name'], []] }
+  ]
+};
+
+// 연도는 "26" / "2026" 두 형식이 섞여 있을 수 있어 둘 다 매칭
+function getYearValueVariants(value) {
+  const variants = new Set(getDateValueVariants(value));
+  const number = Number(String(value ?? '').trim());
+  if (Number.isInteger(number) && number > 0) {
+    const full = number < 100 ? 2000 + number : number;
+    const short = String(full % 100).padStart(2, '0');
+    [String(full), full, short, String(Number(short)), Number(short)].forEach((v) => variants.add(v));
+  }
+  return [...variants];
+}
+
+function getMvpNamesFromDoc(doc) {
+  if (!doc) return [];
+  if (Array.isArray(doc.mvp_names) && doc.mvp_names.length) return doc.mvp_names;
+  return typeof doc.mvp_name === 'string' && doc.mvp_name && doc.mvp_name !== '미정' ? [doc.mvp_name] : [];
+}
+
+// 해당 연·월·일에 이미 등록된 MVP 문서 찾기
+// 1) 연도가 기록된 신규 문서 → 2) 연도 없는 예전 문서는 같은 날짜 경기결과의 MVP 이름과 일치할 때만 인정
+async function findExistingMvpDoc(year, month, day) {
+  const monthVariants = getDateValueVariants(month);
+  const dayVariants = getDateValueVariants(day);
+  const withYear = await db.collection('mvp').findOne(
+    { year: { $in: getYearValueVariants(year) }, month: { $in: monthVariants }, day: { $in: dayVariants } },
+    { sort: { _id: -1 } }
+  );
+  if (withYear) return withYear;
+
+  const result = await db.collection('result').findOne(
+    { year: { $in: getYearValueVariants(year) }, month: { $in: monthVariants }, day: { $in: dayVariants } },
+    { sort: { _id: -1 } }
+  );
+  const resultNames = getMvpNamesFromDoc(result);
+  if (resultNames.length === 0) return null;
+
+  return db.collection('mvp').findOne(
+    { year: { $exists: false }, month: { $in: monthVariants }, day: { $in: dayVariants }, $or: [{ mvp_names: resultNames[0] }, { mvp_name: resultNames[0] }] },
+    { sort: { _id: -1 } }
+  );
+}
+
+// 관리자 화면: 날짜별 기존 MVP 조회
+app.get('/mvp/lookup', async (req, res) => {
+  const { year, month, day } = req.query;
+  if (!year || !month || !day) return res.json({ ok: true, names: [] });
+  const existing = await findExistingMvpDoc(year, month, day);
+  res.json({ ok: true, names: getMvpNamesFromDoc(existing) });
+});
+
+async function handleMvpSelect(req, res) {
+  const source = req.method === 'POST' ? req.body : req.query;
+  const mvpNames = parseMvpNames(source);
+  if (mvpNames.length === 0) return res.status(400).send('MVP를 1명 이상 선택해주세요.');
+  if (!source.month || !source.day) return res.status(400).send('날짜를 입력해주세요.');
+
+  const year = source.year ? String(source.year).trim() : '';
+  const mvpNameText = mvpNames.join(', ');
+  const isCoMvp = mvpNames.length > 1;
+  const mvpFields = {
+    mvp: source.val,
+    month: source.month,
+    day: source.day,
+    mvp_name: mvpNameText,
+    mvp_names: mvpNames,
+    is_co_mvp: isCoMvp
+  };
+  if (year) mvpFields.year = year;
+
+  // 같은 날짜에 이미 등록된 MVP가 있으면 새로 만들지 않고 갱신 → 수상 횟수 중복 방지
+  const existing = year ? await findExistingMvpDoc(year, source.month, source.day) : null;
+  if (existing) {
+    await db.collection('mvp').updateOne({ _id: existing._id }, { $set: mvpFields });
+  } else {
+    await db.collection('mvp').insertOne(mvpFields);
+  }
+
+  // 연도까지 일치하는 경기에 기록 (연도 미입력 시 기존처럼 월·일 기준 가장 최근 경기)
+  const resultFilter = { month: { $in: getDateValueVariants(source.month) }, day: { $in: getDateValueVariants(source.day) } };
+  if (year) resultFilter.year = { $in: getYearValueVariants(year) };
   const updateResult = await db.collection('result').findOneAndUpdate(
-    { month: { $in: getDateValueVariants(req.query.month) }, day: { $in: getDateValueVariants(req.query.day) } },
-    { $set: { mvp_name: req.query.MVP_Name } },
+    resultFilter,
+    { $set: { mvp_name: isCoMvp ? `${mvpNameText} (공동 MVP)` : mvpNameText, mvp_names: mvpNames } },
     { sort: { _id: -1 }, returnDocument: 'after' }
   );
   const updatedResult = updateResult?.value ?? null;
 
-  logActivity(req.user.username, 'MVP 선정', `- MVP: ${req.query.MVP_Name} (${req.query.month}.${req.query.day})`);
+  const dateText = `${year ? `${year}.` : ''}${source.month}.${source.day}`;
+  logActivity(req.user.username, existing ? 'MVP 수정' : 'MVP 선정', `- ${isCoMvp ? `공동 MVP(${mvpNames.length}명)` : 'MVP'}: ${mvpNameText} (${dateText})`);
 
   if (updatedResult) {
     console.log(`Result collection 업데이트 성공: ${updatedResult.year}.${updatedResult.month}.${updatedResult.day}`);
   } else {
-    console.warn(`MVP 날짜(${req.query.month}.${req.query.day})와 일치하는 경기 결과가 없습니다.`);
-    reportDeveloperError(new Error(`MVP 날짜(${req.query.month}.${req.query.day})와 일치하는 경기 결과가 없어 result.mvp_name을 기록하지 못했습니다.`), req);
+    console.warn(`MVP 날짜(${dateText})와 일치하는 경기 결과가 없습니다.`);
+    reportDeveloperError(new Error(`MVP 날짜(${dateText})와 일치하는 경기 결과가 없어 result.mvp_name을 기록하지 못했습니다.`), req);
   }
 
+  // MVP 등록 알림 (푸시 + Discord, 기존 알림 설정을 그대로 따름)
+  const matchText = `${source.month}월 ${source.day}일 경기`;
+  const previousNames = getMvpNamesFromDoc(existing);
+  const addedNames = mvpNames.filter((name) => !previousNames.includes(name));
+  let mvpMessage = '';
+  if (existing && previousNames.length) {
+    if (addedNames.length) mvpMessage = `${matchText} MVP에 ${addedNames.join(', ')}님이 추가되었습니다.\n공동 MVP: ${mvpNameText} 축하합니다!`;
+  } else if (isCoMvp) {
+    mvpMessage = `${matchText} 공동 MVP는 ${mvpNameText}님입니다. 축하합니다!`;
+  } else {
+    mvpMessage = `${matchText} MVP는 ${mvpNameText}님입니다. 축하합니다!`;
+  }
+  if (mvpMessage) sendDiscordNotification(mvpMessage, { url: '/' });
+
   res.redirect('/');
-});
+}
+
+app.get('/mvp', handleMvpSelect);
+app.post('/mvp', handleMvpSelect);
 
 // TODO1
 app.post('/mvpboard', async (req, res) => {
@@ -1960,7 +2130,7 @@ app.post('/result', async (req, res) => {
   });
 
   logActivity(req.user.username, '경기 결과 등록', `- ${data.year}.${data.month}.${data.day} (오골 ${homescore} : ${awayscore} ${data.awayname})`);
-  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${homescore} : ${awayscore} ${data.awayname}`);
+  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${homescore} : ${awayscore} ${data.awayname}`, { url: '/' });
   res.json({ ok: true });
 });
 
@@ -1980,7 +2150,7 @@ app.get('/result', async (req, res) => {
     mvp_name: '미정'
   })
   logActivity(req.user.username, '경기 결과 등록', `- ${req.query.year}.${req.query.month}.${req.query.day} (오골 ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname})`);
-  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname}`);
+  sendDiscordNotification(`지난 매치 결과가 등록되었습니다. \n오늘도골대FC ${req.query.homescore} : ${req.query.awayscore} ${req.query.awayname}`, { url: '/' });
   res.redirect('/match-result')
 })
 
@@ -2289,7 +2459,7 @@ app.post('/comment', async (req, res) => {
     writer: req.user.username,
     parentId: new ObjectId(req.body.parentId)
   })
-  sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 공지 글 댓글을 달았습니다.`);
+  // 공지 댓글 알림은 발송하지 않음
   res.redirect('back')
 }
 
@@ -2345,7 +2515,7 @@ app.post('/update-note-post', async (req, res) => {
       } else {
         const imageArray = req.files.length > 0 ? req.files.map(file => ({ filename: file.filename, location: file.location })) : [];
 
-        await db.collection('update-note').insertOne(
+        const insertedNote = await db.collection('update-note').insertOne(
           {
             today: Today,
             time: Time,
@@ -2357,6 +2527,13 @@ app.post('/update-note-post', async (req, res) => {
           }
         )
         logActivity(req.user.username, '업데이트 공지 작성', `- 제목: ${req.body.title} (이미지: ${imageArray.length}개)`);
+
+        // 업데이트 공지 알림: 제목에 버전(v1.2.3 / 1.2.3)이 있으면 "클라이언트 v1.2.3 업데이트 안내"
+        const noteTitle = String(req.body.title || '').trim();
+        const versionMatch = noteTitle.match(/v?(\d+\.\d+(?:\.\d+)?)/i);
+        const noteHeadline = versionMatch ? `클라이언트 v${versionMatch[1]} 업데이트 안내` : '클라이언트 업데이트 안내';
+        sendDiscordNotification(noteHeadline, { url: `/update-note-detail/${insertedNote.insertedId}?via=push` });
+
         res.redirect('/update-note')
       }
     } catch (e) {
@@ -2369,6 +2546,33 @@ app.post('/update-note-post', async (req, res) => {
 })
 
 app.get('/update-note-detail/:id', async (req, res, next) => {
+  if (!ObjectId.isValid(req.params.id)) return res.status(404).render('error.ejs');
+
+  // 푸시 알림을 눌러 들어온 경우: 회원별 첫 확인만 DEV Discord로 알리고, 새로고침 중복 방지를 위해 깨끗한 주소로 이동
+  if (req.query.via === 'push') {
+    const viewer = req.user?.username || null;
+    if (viewer) {
+      const marked = await db.collection('update-note').findOneAndUpdate(
+        { _id: new ObjectId(req.params.id), pushOpenedBy: { $ne: viewer } },
+        { $addToSet: { pushOpenedBy: viewer } },
+        { projection: { title: 1, pushOpenedBy: 1 }, returnDocument: 'after' }
+      );
+      const note = marked?.value ?? null;
+      if (note) {
+        scheduleBackgroundTask(
+          sendDeveloperDiscordMessage(`[업데이트 공지 확인] ${viewer}님이 알림을 눌러 확인했습니다.\n공지: ${note.title || '(제목 없음)'}\n누적 확인: ${(note.pushOpenedBy || []).length}명`),
+          'Update note push open notification'
+        );
+      }
+    } else {
+      scheduleBackgroundTask(
+        sendDeveloperDiscordMessage('[업데이트 공지 확인] 로그인하지 않은 사용자가 알림을 눌러 확인했습니다.'),
+        'Update note push open notification'
+      );
+    }
+    return res.redirect(`/update-note-detail/${req.params.id}`);
+  }
+
   let postID = await db.collection('update-note').findOne({ _id: new ObjectId(req.params.id) })
 
   res.render('update-note-detail.ejs', { 글: postID })
@@ -2968,7 +3172,7 @@ app.post('/photo-post', async (req, res) => {
             username: req.user.username
           }
         )
-        sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 사진을 등록하였습니다.`);
+        sendDiscordNotification(`[${req.user?.username || '익명'}] 님이 사진을 등록하였습니다.`, { url: '/photo' });
         res.redirect('/photo')
       }
     } catch (e) {
@@ -3022,7 +3226,9 @@ app.post('/photo-like/:id', async (req, res) => {
     : { $addToSet: { likes: username } };
 
   await db.collection('photo').updateOne({ _id: photoId }, update);
-  res.json({ ok: true, liked: !isLiked, likeCount: isLiked ? likes.length - 1 : likes.length + 1 });
+  // 누가 눌렀는지 팝업 갱신용으로 최신 목록도 함께 반환
+  const nextLikes = isLiked ? likes.filter((name) => name !== username) : [...likes, username];
+  res.json({ ok: true, liked: !isLiked, likeCount: nextLikes.length, likes: nextLikes });
 });
 
 app.post('/photo-comment', async (req, res) => {
@@ -3034,7 +3240,19 @@ app.post('/photo-comment', async (req, res) => {
     writer: req.user.username,
     parentId: new ObjectId(req.body.parentId)
   })
-  sendDiscordNotification(`${req.user?.username || '익명'} 님이 사진에 댓글을 달았습니다. [${req.body.content}]`);
+  // 사진 댓글 알림: 사진 게시자 본인에게만 푸시 (Discord 단체방에는 보내지 않음, 본인 댓글은 제외)
+  const commentedPhoto = ObjectId.isValid(req.body.parentId)
+    ? await db.collection('photo').findOne({ _id: new ObjectId(req.body.parentId) }, { projection: { username: 1 } })
+    : null;
+  const photoOwner = commentedPhoto?.username;
+  if (photoOwner && photoOwner !== req.user?.username) {
+    const commentPreview = String(req.body.content || '').slice(0, 60);
+    schedulePushNotification({
+      title: '오늘도골대FC',
+      body: `${req.user?.username || '익명'} 님이 내 사진에 댓글을 달았습니다. [${commentPreview}]`,
+      url: '/photo'
+    }, { targetUsernames: [photoOwner] });
+  }
   res.redirect('back')
 }
 )
@@ -3208,8 +3426,8 @@ app.get('/mypage/:userId', async (req, res) => {
 
   const isOwnProfile = req.user.userID === profileOwner.userID;
   const [mvpAwardCount, badges, clubEmblems, photoPostCount, commentCount, likedPhotoCount, statsResult] = await Promise.all([
-    db.collection('mvp').countDocuments({ mvp_name: profileOwner.username }),
-    db.collection('user_badges').find({ userID: profileOwner.userID }).sort({ createdAt: -1 }).toArray(),
+    db.collection('mvp').countDocuments({ $or: [{ mvp_names: profileOwner.username }, { mvp_name: profileOwner.username }] }),
+    db.collection('user_badges').find({ userID: profileOwner.userID }).toArray().then(sortBadgesForDisplay),
     getUserClubEmblems(profileOwner.userID),
     db.collection('photo').countDocuments({ user: profileOwner._id }),
     db.collection('photo-comment').countDocuments({

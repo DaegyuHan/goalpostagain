@@ -173,7 +173,16 @@
             });
             const data = await response.json();
             if (!response.ok || !data.ok) throw new Error(data.message || '뱃지를 제거하지 못했습니다.');
+            const group = row.closest('[data-badge-group]');
             row.remove();
+            if (group) {
+              const groupCount = group.querySelectorAll('[data-developer-badge-row]').length;
+              if (groupCount === 0) group.remove();
+              else {
+                group.querySelector('[data-badge-group-count]').textContent = `${groupCount}개`;
+                updateBadgeMoveButtons(group);
+              }
+            }
             const count = document.querySelectorAll('[data-developer-badge-row]').length;
             document.getElementById('developer-badge-count').textContent = `${count}개`;
             status.textContent = '뱃지를 제거했습니다.';
@@ -184,6 +193,57 @@
             status.textContent = error.message || '뱃지를 제거하지 못했습니다.';
             button.disabled = false;
           }
+        });
+      });
+
+      // 회원별 뱃지 배치 순서 변경 (▲▼ 누르면 바로 저장, 마이페이지 뱃지함 순서에 반영)
+      function updateBadgeMoveButtons(group) {
+        const rows = [...group.querySelectorAll('[data-developer-badge-row]')];
+        rows.forEach((row, index) => {
+          row.querySelector('[data-badge-move="up"]').disabled = index === 0;
+          row.querySelector('[data-badge-move="down"]').disabled = index === rows.length - 1;
+        });
+      }
+      window.updateBadgeMoveButtons = updateBadgeMoveButtons;
+
+      const badgeOrderTimers = new Map();
+      async function saveBadgeOrder(group) {
+        const status = group.querySelector('[data-badge-order-status]');
+        const badgeIds = [...group.querySelectorAll('[data-developer-badge-row]')].map((row) => row.dataset.badgeId);
+        status.textContent = '순서 저장 중...';
+        try {
+          const response = await fetch('/developer/badge-order', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userID: group.dataset.badgeGroup, badgeIds })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '순서를 저장하지 못했습니다.');
+          status.textContent = '순서 저장됨';
+        } catch (error) {
+          status.textContent = error.message || '순서를 저장하지 못했습니다.';
+        }
+      }
+
+      document.querySelectorAll('[data-badge-group]').forEach((group) => {
+        updateBadgeMoveButtons(group);
+        group.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-badge-move]');
+          if (!button || button.disabled) return;
+          const row = button.closest('[data-developer-badge-row]');
+          if (button.dataset.badgeMove === 'up' && row.previousElementSibling?.matches('[data-developer-badge-row]')) {
+            row.parentNode.insertBefore(row, row.previousElementSibling);
+          } else if (button.dataset.badgeMove === 'down' && row.nextElementSibling?.matches('[data-developer-badge-row]')) {
+            row.parentNode.insertBefore(row.nextElementSibling, row);
+          } else {
+            return;
+          }
+          updateBadgeMoveButtons(group);
+          button.focus();
+          // 연속으로 누를 때는 마지막 순서만 저장
+          clearTimeout(badgeOrderTimers.get(group));
+          group.querySelector('[data-badge-order-status]').textContent = '변경됨';
+          badgeOrderTimers.set(group, setTimeout(() => saveBadgeOrder(group), 600));
         });
       });
 
@@ -312,133 +372,158 @@
       });
 
       selectManagementTab('schedule');
+      loadExistingMvp();
     });
 
+    // TODO1 : 멤버 추가 시 MVP 이미지도 여기에 추가
+    const MVP_IMAGES = {
+      '박승룡': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_02.png?updatedAt=1715401360961',
+      '오연택': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862.png?updatedAt=1718033243805',
+      '양철진': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%96%91%EC%B2%A0%EC%A7%84MVP.png?updatedAt=1705229241080',
+      '석범수': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%84%9D%EB%B2%94%EC%88%98MVP.png?updatedAt=1705229367311',
+      '장희승': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9E%A5%ED%9D%AC%EC%8A%B9MVP.png?updatedAt=1705229367278',
+      '노용준': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%85%B8%EC%9A%A9%EC%A4%80MVP.png?updatedAt=1705229241093',
+      '손윤기': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20251110_205138453.png?updatedAt=1762781455199',
+      '안태훈': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%95%88%ED%83%9C%ED%9B%88MVP.png?updatedAt=1705229241071',
+      '김정훈': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EA%B9%80%EC%A0%95%ED%9B%88MVP.png?updatedAt=1705229241209',
+      '민대식': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_03.png?updatedAt=1715401360873',
+      '송시창': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/13.png?updatedAt=1751289835052',
+      '이찬웅': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276',
+      '이기남': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_03.png',
+      '나현수': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%82%98%ED%98%84%EC%88%98MVP.png?updatedAt=1705229241083',
+      '한대규': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%ED%95%9C%EB%8C%80%EA%B7%9CMVP.png?updatedAt=1705229240781',
+      '이원근': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_02.png',
+      '유성진': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_02.png?updatedAt=1718033243449',
+      '황덕현': 'https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_01.png?updatedAt=1718033243911'
+    };
+
+    function escapeMvpText(value) {
+      return String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
+    // 해당 날짜에 이미 등록된 MVP(기존) + 이번에 추가할 후보 (순서대로, 첫 번째 사람이 메인 화면에 표시됨)
+    let mvpExisting = [];
+    let mvpCandidates = [];
+    let mvpLookupSeq = 0;
+
+    function getMvpDate() {
+      return {
+        year: document.getElementById('mvp-date-year').value.trim(),
+        month: document.getElementById('mvp-date-month').value.trim(),
+        day: document.getElementById('mvp-date-day').value.trim()
+      };
+    }
+
+    function renderMvpCandidates() {
+      const list = document.getElementById('mvp-pick-list');
+      if (!list) return;
+      const items = [
+        ...mvpExisting.map((name) => ({ name, existing: true })),
+        ...mvpCandidates.map((name, index) => ({ name, existing: false, index }))
+      ];
+      list.hidden = items.length === 0;
+      list.innerHTML = items.map((item, order) => `
+        <span class="mvp-pick-item${order === 0 ? ' is-main' : ''}${item.existing ? ' is-existing' : ''}">
+          ${order === 0 ? '<em>메인</em>' : ''}${item.existing ? '<em class="tag-existing">기존</em>' : ''}${escapeMvpText(item.name)}
+          ${item.existing ? '' : `<button type="button" aria-label="${escapeMvpText(item.name)} 빼기" title="빼기" onclick="removeMvpCandidate(${item.index})"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>`}
+        </span>`).join('');
+    }
+
+    async function loadExistingMvp() {
+      const { year, month, day } = getMvpDate();
+      const status = document.getElementById('mvp-pick-status');
+      const seq = ++mvpLookupSeq;
+      mvpExisting = [];
+      if (!year || !month || !day) {
+        status.textContent = '';
+        renderMvpCandidates();
+        return;
+      }
+      status.textContent = '기존 등록 확인 중...';
+      try {
+        const res = await fetch(`/mvp/lookup?year=${encodeURIComponent(year)}&month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}`);
+        const data = await res.json();
+        if (seq !== mvpLookupSeq) return; // 날짜를 연달아 바꾼 경우 마지막 조회만 반영
+        mvpExisting = Array.isArray(data.names) ? data.names : [];
+        mvpCandidates = mvpCandidates.filter((name) => !mvpExisting.includes(name));
+        status.textContent = mvpExisting.length
+          ? `${year}.${month}.${day} 기존 MVP: ${mvpExisting.join(', ')} · 추가하면 공동 MVP로 등록됩니다.`
+          : `${year}.${month}.${day} 등록된 MVP 없음`;
+      } catch (e) {
+        if (seq !== mvpLookupSeq) return;
+        status.textContent = '기존 MVP를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.';
+      }
+      renderMvpCandidates();
+    }
+
+    function addMvpCandidate() {
+      const select = document.getElementById('WeeklyMVPSelect');
+      const name = select.value;
+      if (!name) {
+        alert('추가할 MVP를 선택해주세요.');
+        return;
+      }
+      if (mvpExisting.includes(name) || mvpCandidates.includes(name)) {
+        alert(`${name}님은 이미 ${mvpExisting.includes(name) ? '등록되어' : '추가되어'} 있습니다.`);
+        return;
+      }
+      mvpCandidates.push(name);
+      select.value = '';
+      renderMvpCandidates();
+    }
+
+    function removeMvpCandidate(index) {
+      mvpCandidates.splice(index, 1);
+      renderMvpCandidates();
+    }
+
     function showMVP() {
-      var WeeklyMVPSelect = document.getElementById("WeeklyMVPSelect");
-      var selectedMVP = WeeklyMVPSelect.options[WeeklyMVPSelect.selectedIndex].text
-      var month = document.getElementById("mvp-date-month").value;
-      var day = document.getElementById("mvp-date-day").value;
-      var MVP_Name;
+      const { year, month, day } = getMvpDate();
+      if (!year || !month || !day) {
+        alert('년·월·일을 모두 입력해주세요.');
+        return;
+      }
+      // 기존 등록자 + 추가 목록 + 드롭다운에 선택만 해두고 추가 안 한 사람
+      const currentName = document.getElementById('WeeklyMVPSelect').value;
+      const added = [...mvpCandidates];
+      if (currentName && !added.includes(currentName) && !mvpExisting.includes(currentName)) added.push(currentName);
+      const names = [...mvpExisting, ...added].filter((name) => MVP_IMAGES[name]);
 
-
-      // TODO1 : 추가해야됨
-      switch (selectedMVP) {
-        case '박승룡':
-          var MVP_Name = '박승룡'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_02.png?updatedAt=1715401360961">
-          </div>`
-          break
-        case '오연택':
-          var MVP_Name = '오연택'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862.png?updatedAt=1718033243805">
-          </div>`
-          break
-        case '양철진':
-          var MVP_Name = '양철진'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div>
-            <div class="mvp-area"><img
-                src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%96%91%EC%B2%A0%EC%A7%84MVP.png?updatedAt=1705229241080">
-            </div>`
-          break
-        case '석범수':
-          var MVP_Name = '석범수'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%84%9D%EB%B2%94%EC%88%98MVP.png?updatedAt=1705229367311">
-          </div>`
-          break
-        case '장희승':
-          var MVP_Name = '장희승'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9E%A5%ED%9D%AC%EC%8A%B9MVP.png?updatedAt=1705229367278">
-          </div>`
-          break
-        case '노용준':
-          var MVP_Name = '노용준'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%85%B8%EC%9A%A9%EC%A4%80MVP.png?updatedAt=1705229241093">
-          </div>`
-          break
-        case '손윤기':
-          var MVP_Name = '손윤기'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20251110_205138453.png?updatedAt=1762781455199">
-          </div>`
-          break
-        case '안태훈':
-          var MVP_Name = '안태훈'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%95%88%ED%83%9C%ED%9B%88MVP.png?updatedAt=1705229241071">
-          </div>`
-          break
-        case '김정훈':
-          var MVP_Name = '김정훈'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EA%B9%80%EC%A0%95%ED%9B%88MVP.png?updatedAt=1705229241209">
-          </div>`
-          break
-        case '민대식':
-          var MVP_Name = '민대식'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240507_175656083_03.png?updatedAt=1715401360873">
-          </div>`
-          break
-          case '송시창':
-          var MVP_Name = '송시창'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/13.png?updatedAt=1751289835052">
-          </div>`
-          break
-        case '이찬웅':
-          var MVP_Name = '이찬웅'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EC%9D%B4%EC%B0%AC%EC%9B%85MVP.png?updatedAt=1705229244276">
-          </div>`
-          break
-        case '이기남':
-          var MVP_Name = '이기남'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_03.png">
-          </div>`
-          break  
-        case '나현수':
-          var MVP_Name = '나현수'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%EB%82%98%ED%98%84%EC%88%98MVP.png?updatedAt=1705229241083">
-          </div>`
-          break
-        case '한대규':
-          var MVP_Name = '한대규'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/%ED%95%9C%EB%8C%80%EA%B7%9CMVP.png?updatedAt=1705229240781">
-          </div>`
-          break
-        case '이원근':
-          var MVP_Name = '이원근'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20260919_144203599_02.png">
-          </div>`
-          break  
-        case '유성진':
-          var MVP_Name = '유성진'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_02.png?updatedAt=1718033243449">
-          </div>`
-          break
-        case '황덕현':
-          var MVP_Name = '황덕현'
-          var selectedMVP = `<div class="overlay-text">${month}.${day}</div><div class="mvp-area"><img
-              src="https://ik.imagekit.io/wlalafg7g/GoalPostAgain/mvp/KakaoTalk_20240611_002314862_01.png?updatedAt=1718033243911">
-          </div>`
-          break
-        default:
-          break
+      if (names.length === 0) {
+        alert('MVP를 선택해주세요.');
+        return;
+      }
+      if (mvpExisting.length && added.length === 0) {
+        alert(`이미 ${mvpExisting.join(', ')}님이 등록된 날짜입니다. 추가할 MVP를 선택해주세요.`);
+        return;
       }
 
+      let confirmText = '';
+      if (mvpExisting.length) {
+        confirmText = `기존 ${mvpExisting.join(', ')}님에 ${added.join(', ')}님을 추가해\n공동 MVP ${names.length}명으로 수정할까요?`;
+      } else if (names.length > 1) {
+        confirmText = `${names.join(', ')} ${names.length}명을 공동 MVP로 선정할까요?`;
+      }
+      if (confirmText && !confirm(`${confirmText}\n(메인 화면에는 첫 번째인 ${names[0]}님만 표시됩니다)`)) return;
 
-      location.href = `/mvp?val=${encodeURIComponent(selectedMVP)}&month=${encodeURIComponent(month)}&day=${encodeURIComponent(day)}&MVP_Name=${encodeURIComponent(MVP_Name)}`;
+      const date = `${escapeMvpText(month)}.${escapeMvpText(day)}`;
+      // 메인 화면에는 첫 번째 선택자만 표시 (집계는 선택된 전원에게 1회씩 반영)
+      const selectedMVP = `<div class="overlay-text">${date}</div><div class="mvp-area"><img src="${MVP_IMAGES[names[0]]}"></div>`;
+
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/mvp';
+      const fields = { val: selectedMVP, year, month, day, MVP_Names: JSON.stringify(names) };
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
     }
 
     function navi_input() {
@@ -1034,11 +1119,12 @@
           <span class="management-section-note">이번 경기의 주인공을 선택합니다.</span>
         </div>
         <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-star"></i></span><h3>주간 MVP</h3></div>
-        <div style="height: 150px;">
-          <input class="mvp-date" type="text" id="mvp-date-month" value="<%= latestResult ? latestResult.month : 매치일정[0].month %>">월
-          <input class="mvp-date" type="text" id="mvp-date-day" value="<%= latestResult ? latestResult.day : 매치일정[0].date %>">일
+        <div class="mvp-pick-wrap">
+          <input class="mvp-date mvp-date-year" type="text" inputmode="numeric" id="mvp-date-year" value="<%= latestResult ? latestResult.year : (매치일정[0].year || '') %>" onchange="loadExistingMvp()">년
+          <input class="mvp-date" type="text" inputmode="numeric" id="mvp-date-month" onchange="loadExistingMvp()" value="<%= latestResult ? latestResult.month : 매치일정[0].month %>">월
+          <input class="mvp-date" type="text" inputmode="numeric" id="mvp-date-day" onchange="loadExistingMvp()" value="<%= latestResult ? latestResult.day : 매치일정[0].date %>">일
           <div>
-            <!-- TODO1 -->
+            <!-- TODO1 : 멤버 추가 시 아래 option과 MVP_IMAGES 둘 다 추가 -->
             <select class="form-select" id="WeeklyMVPSelect">
               <option value="">선택</option>
               <option value="박승룡">박승룡</option>
@@ -1060,7 +1146,13 @@
               <option value="유성진">유성진</option>
               <option value="황덕현">황덕현</option>
             </select>
-            <button class="btn btn-primary" onclick="showMVP()">MVP 선정</button>
+            <p class="mvp-pick-help">공동 MVP는 [추가]로 여러 명을 담은 뒤 [MVP 선정]을 누르세요. 이미 등록된 날짜면 기존 MVP에 이어서 추가됩니다. 메인 화면에는 첫 번째 사람만 표시됩니다.</p>
+            <div class="mvp-pick-status" id="mvp-pick-status" aria-live="polite"></div>
+            <div class="mvp-pick-list" id="mvp-pick-list" hidden></div>
+            <div class="mvp-pick-actions">
+              <button type="button" class="btn btn-outline-secondary" onclick="addMvpCandidate()">추가</button>
+              <button type="button" class="btn btn-primary" onclick="showMVP()">MVP 선정</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1561,8 +1653,20 @@
               <% if (developerBadges.length === 0) { %>
                 <p class="developer-badge-empty">부여된 뱃지가 없습니다.</p>
               <% } else { %>
-                <% developerBadges.forEach((badge) => { %>
-                  <div class="developer-badge-row" data-developer-badge-row>
+                <% const badgeGroups = []; developerBadges.forEach((badge) => {
+                  const lastGroup = badgeGroups[badgeGroups.length - 1];
+                  if (lastGroup && lastGroup.userID === badge.userID) lastGroup.badges.push(badge);
+                  else badgeGroups.push({ userID: badge.userID, username: badge.username, badges: [badge] });
+                }); %>
+                <% badgeGroups.forEach((group) => { %>
+                <div class="developer-badge-group" data-badge-group="<%= group.userID %>">
+                  <div class="developer-badge-group-title">
+                    <strong><%= group.username %></strong>
+                    <span data-badge-group-count><%= group.badges.length %>개</span>
+                    <span class="developer-badge-order-status" role="status" aria-live="polite" data-badge-order-status></span>
+                  </div>
+                <% group.badges.forEach((badge) => { %>
+                  <div class="developer-badge-row" data-developer-badge-row data-badge-id="<%= badge._id %>">
                     <img src="<%= badge.imageUrl %>" alt="" loading="lazy">
                     <div class="developer-badge-row-info">
                       <strong><%= badge.username %></strong>
@@ -1584,10 +1688,16 @@
                         </form>
                       </details>
                     </div>
-                    <button class="developer-badge-remove" type="button" data-remove-developer-badge="<%= badge._id %>" aria-label="<%= badge.username %> 회원의 뱃지 제거" title="뱃지 제거">
-                      <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                    </button>
+                    <div class="developer-badge-actions">
+                      <div class="developer-badge-move" role="group" aria-label="뱃지 순서 변경">
+                        <button type="button" class="action-btn" data-badge-move="up" aria-label="앞으로 이동" title="앞으로"><i class="fa-solid fa-chevron-up" aria-hidden="true"></i></button>
+                        <button type="button" class="action-btn" data-badge-move="down" aria-label="뒤로 이동" title="뒤로"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+                      </div>
+                      <button class="developer-badge-remove" type="button" data-remove-developer-badge="<%= badge._id %>" aria-label="<%= badge.username %> 회원의 뱃지 제거" title="뱃지 제거"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+                    </div>
                   </div>
+                <% }); %>
+                </div>
                 <% }); %>
               <% } %>
             </div>

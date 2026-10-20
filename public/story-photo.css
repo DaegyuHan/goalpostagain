@@ -257,3 +257,88 @@ p {
         padding-left: 12px;
     }
 }
+
+/* ===== 좋아요 누른 사람 팝업 ===== */
+.story-photo-likers-wrap {
+    position: relative;
+    display: inline-flex;
+    margin-left: -9px; /* 하트 바로 옆에 붙도록 */
+}
+
+.story-photo-like-count {
+    min-width: 22px;
+    padding: 2px 6px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #555;
+    font-size: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 0, 0, 0.25);
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.story-photo-like-count:hover,
+.story-photo-like-count[aria-expanded="true"] {
+    background: #fff0f7;
+    color: #ff3ca0;
+    text-decoration-color: currentColor;
+}
+
+.story-photo-like-count:focus-visible {
+    outline: 2px solid #ff3ca0;
+    outline-offset: 1px;
+}
+
+.story-photo-likers-pop {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: -12px;
+    z-index: 50;
+    min-width: 140px;
+    max-width: min(220px, 70vw);
+    padding: 10px 12px;
+    border: 1px solid #f3c6dd;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 40, 50, 0.18);
+    color: #1f2d31;
+    font-size: 13px;
+    text-align: left;
+}
+
+.story-photo-likers-pop::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 18px;
+    border: 7px solid transparent;
+    border-top-color: #ffffff;
+    filter: drop-shadow(0 1px 0 #f3c6dd);
+}
+
+.story-photo-likers-title {
+    margin-bottom: 6px;
+    color: #ff3ca0;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.story-photo-likers-pop ul {
+    max-height: 168px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.story-photo-likers-pop li {
+    padding: 4px 0;
+    border-bottom: 1px solid #f2f4f5;
+    word-break: keep-all;
+}
+
+.story-photo-likers-pop li:last-child { border-bottom: 0; }
+.story-photo-likers-pop li.is-empty { color: #8a9799; }

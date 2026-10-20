@@ -494,7 +494,7 @@
 
 .developer-badge-row {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr) 38px;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
     align-items: center;
     gap: 12px;
     padding: 12px 2px;
@@ -547,7 +547,7 @@
 
 .developer-club-emblem-row {
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 38px;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     align-items: center;
     gap: 12px;
     padding: 12px 2px;
@@ -736,7 +736,7 @@
 
 .developer-club-selection-item {
     display: grid;
-    grid-template-columns: 36px 18px 36px minmax(0, 1fr) 36px;
+    grid-template-columns: 36px 18px 36px minmax(0, 1fr) auto;
     align-items: center;
     gap: 8px;
     padding: 6px 8px 6px 4px;
@@ -846,7 +846,7 @@
     }
 
     .developer-club-selection-item {
-        grid-template-columns: 36px 14px 32px minmax(0, 1fr) 36px;
+        grid-template-columns: 36px 14px 32px minmax(0, 1fr) auto;
         gap: 6px;
     }
 
@@ -902,11 +902,11 @@
     display: grid;
     place-items: center;
     width: 36px;
-    aspect-ratio: 1;
-    border: 1px solid #d9796c;
-    border-radius: 5px;
-    background: #fde8e4;
-    color: #b3261e;
+    height: 36px;
+    border: 1.5px solid #c62828;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #c62828;
     font-size: 15px;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
@@ -914,9 +914,10 @@
 
 .developer-badge-remove:hover,
 .developer-badge-remove:focus-visible {
-    border-color: #b3261e;
-    background: #b3261e;
+    background: #c62828;
     color: #ffffff;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.2);
 }
 
 .developer-badge-remove:disabled {
@@ -1326,4 +1327,184 @@
     margin: 2px 0 6px;
     color: var(--management-muted);
     font-size: 12px;
+}
+
+/* ===== MVP 다수 등록 (공동 MVP) ===== */
+.mvp-pick-wrap { height: auto !important; }
+
+.mvp-pick-help {
+  margin: 6px auto;
+  max-width: 360px;
+  font-size: 0.82rem;
+  color: var(--management-muted);
+  word-break: keep-all;
+}
+
+.mvp-pick-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 360px;
+  margin: 8px auto;
+}
+
+.mvp-pick-list[hidden] { display: none; }
+
+.mvp-pick-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px 5px 12px;
+  border: 1px solid #cbd8da;
+  border-radius: 999px;
+  background: #fbfdfd;
+  font-size: 0.9rem;
+}
+
+.mvp-pick-item.is-main {
+  border-color: var(--management-pink);
+  background: var(--management-pink-soft);
+  font-weight: 700;
+}
+
+.mvp-pick-item em {
+  font-style: normal;
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--management-pink);
+  color: #fff;
+}
+
+.mvp-pick-item button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 2px;
+  padding: 0;
+  border: 1.5px solid #c62828;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #c62828;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mvp-pick-item button:hover,
+.mvp-pick-item button:focus-visible { background: #c62828; color: #ffffff; outline: 0; }
+
+.mvp-pick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mvp-date.mvp-date-year { width: 72px; }
+
+.mvp-pick-status {
+  min-height: 1.2em;
+  margin: 4px auto;
+  max-width: 360px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--management-ink);
+  word-break: keep-all;
+}
+
+.mvp-pick-item.is-existing { background: #eef3f4; }
+
+.mvp-pick-item em.tag-existing {
+  background: var(--management-muted);
+}
+
+/* ===== 회원별 뱃지 그룹 + 순서 변경 ===== */
+.developer-badge-group {
+    padding: 4px 0 6px;
+    border-bottom: 2px solid var(--management-line);
+}
+
+.developer-badge-group:last-child { border-bottom: 0; }
+
+.developer-badge-group-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    padding: 10px 2px 2px;
+    text-align: left;
+}
+
+.developer-badge-group-title strong {
+    color: var(--management-ink);
+    font-size: 14px;
+}
+
+.developer-badge-group-title span {
+    color: var(--management-muted);
+    font-size: 12px;
+}
+
+.developer-badge-group-title .developer-badge-order-status {
+    margin-left: auto;
+    color: var(--management-pink);
+    font-weight: 700;
+}
+
+.developer-badge-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.developer-badge-move {
+    display: flex;
+    gap: 6px;
+}
+
+.developer-badge-move .action-btn {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1.5px solid var(--management-ink);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--management-ink);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.developer-badge-move .action-btn:hover:not(:disabled),
+.developer-badge-move .action-btn:focus-visible {
+    background: var(--management-ink);
+    color: #ffffff;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(9, 47, 56, 0.18);
+}
+
+.developer-badge-move .action-btn:disabled {
+    border-color: var(--management-line);
+    color: #b5c2c5;
+    cursor: default;
+}
+
+@media only screen and (max-width: 400px) {
+    .developer-badge-actions,
+    .developer-badge-move { gap: 4px; }
+    .developer-badge-move .action-btn,
+    .developer-badge-remove { width: 32px; height: 32px; }
+}
+
+/* main.css의 전역 규칙(i { color: white })이 흰 배경 버튼의 아이콘을 안 보이게 만들던 문제 수정:
+   관리자 화면의 버튼 안 아이콘은 버튼 글자색을 그대로 따른다 */
+.white-main button i,
+.white-main .btn i,
+.white-main [role="button"] i,
+.white-main .developer-club-drag-handle i {
+    color: inherit;
 }
