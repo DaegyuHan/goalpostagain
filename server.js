@@ -45,6 +45,14 @@ function isPushConfigured() {
   return Boolean(PUSH_PUBLIC_KEY && PUSH_PRIVATE_KEY);
 }
 
+// 야간 알림 끄기: 한국 시간 00:00 ~ 07:59 에는 발송하지 않음 (회원 설정 기본값: 켜짐)
+const QUIET_HOURS_START = 0;
+const QUIET_HOURS_END = 8;
+function isSeoulQuietHours(date = new Date()) {
+  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: SEOUL_TIME_ZONE, hour: '2-digit', hourCycle: 'h23' }).format(date));
+  return hour >= QUIET_HOURS_START && hour < QUIET_HOURS_END;
+}
+
 function getSeoulDateKey(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en', {
     timeZone: SEOUL_TIME_ZONE,
@@ -58,16 +66,30 @@ function getSeoulDateKey(date = new Date()) {
 
 async function sendPushNotification(payload, { targetUsernames = null } = {}) {
   if (!isPushConfigured()) {
-    return { sentUsernames: [], unidentifiedSentCount: 0, attemptedCount: 0, failedCount: 0, configured: false };
+    return { sentUsernames: [], unidentifiedSentCount: 0, attemptedCount: 0, failedCount: 0, quietSkippedCount: 0, configured: false };
   }
 
-  const [subscriptions, disabledUsers] = await Promise.all([
+  const quietHours = isSeoulQuietHours();
+  const [subscriptions, settingUsers] = await Promise.all([
     // targetUsernames가 있으면 해당 회원의 기기에만 발송 (개인 알림)
     db.collection('push_subscription').find(Array.isArray(targetUsernames) ? { username: { $in: targetUsernames } } : {}).toArray(),
-    db.collection('user').find({ pushNotificationsEnabled: false }, { projection: { username: 1 } }).toArray()
+    // 야간 시간대에만 "야간 알림 끄기"를 해제한 회원 목록을 함께 조회
+    db.collection('user').find(
+      quietHours ? { $or: [{ pushNotificationsEnabled: false }, { quietHoursEnabled: false }] } : { pushNotificationsEnabled: false },
+      { projection: { username: 1, pushNotificationsEnabled: 1, quietHoursEnabled: 1 } }
+    ).toArray()
   ]);
-  const disabledUsernames = new Set(disabledUsers.map((user) => user.username));
-  const enabledSubscriptions = subscriptions.filter((record) => !disabledUsernames.has(record.username));
+  const disabledUsernames = new Set(settingUsers.filter((user) => user.pushNotificationsEnabled === false).map((user) => user.username));
+  const nightAllowedUsernames = new Set(settingUsers.filter((user) => user.quietHoursEnabled === false).map((user) => user.username));
+  let quietSkippedCount = 0;
+  const enabledSubscriptions = subscriptions.filter((record) => {
+    if (disabledUsernames.has(record.username)) return false;
+    if (quietHours && !nightAllowedUsernames.has(record.username)) {
+      quietSkippedCount += 1;
+      return false;
+    }
+    return true;
+  });
   const deliveryResults = await Promise.all(enabledSubscriptions.map(async (subscriptionRecord) => {
     try {
       await webpush.sendNotification(subscriptionRecord.subscription, JSON.stringify(payload));
@@ -87,6 +109,7 @@ async function sendPushNotification(payload, { targetUsernames = null } = {}) {
     unidentifiedSentCount: deliveryResults.filter((result) => result.sent && !result.username).length,
     attemptedCount: enabledSubscriptions.length,
     failedCount: deliveryResults.filter((result) => !result.sent).length,
+    quietSkippedCount,
     configured: true
   };
 }
@@ -171,6 +194,7 @@ function schedulePushNotification(payload, options = {}) {
         `알림: ${(payload.body || '새로운 소식이 있습니다.').slice(0, 300)}`,
         `푸시 서비스 접수 사용자 수: ${result.sentUsernames.length + result.unidentifiedSentCount}명`,
         `전송 요청: ${result.attemptedCount}건 · 실패: ${result.failedCount}건`,
+        ...(result.quietSkippedCount ? [`야간 알림 끄기로 제외: ${result.quietSkippedCount}건`] : []),
         '※ 기기에서 실제 표시/확인한 여부가 아닌 푸시 서비스 접수 기준입니다.'
       ].join('\n');
       const recipientMessages = result.configured
@@ -712,8 +736,24 @@ app.get('/push/preferences', async (req, res) => {
   const subscriptionCount = await db.collection('push_subscription').countDocuments({ username: req.user.username });
   res.json({
     ok: true,
-    enabled: req.user.pushNotificationsEnabled !== false && subscriptionCount > 0
+    enabled: req.user.pushNotificationsEnabled !== false && subscriptionCount > 0,
+    quietHoursEnabled: req.user.quietHoursEnabled !== false
   });
+});
+
+app.put('/push/quiet-hours', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ ok: false, message: '로그인이 필요합니다.' });
+  }
+  if (typeof req.body?.enabled !== 'boolean') {
+    return res.status(400).json({ ok: false, message: '야간 알림 설정값이 올바르지 않습니다.' });
+  }
+
+  await db.collection('user').updateOne(
+    { _id: req.user._id },
+    { $set: { quietHoursEnabled: req.body.enabled } }
+  );
+  res.json({ ok: true, quietHoursEnabled: req.body.enabled });
 });
 
 app.put('/push/preferences', async (req, res) => {
@@ -1690,7 +1730,7 @@ app.post('/prediction/setting', (req, res) => {
       await db.collection('prediction_votes').deleteMany({});
       schedulePredictionCron({ matchTimeAt });
       logActivity(req.user.username, '승부예측 경기 설정 저장', `- ${homeTeam} vs ${awayTeam} (${matchTime})`);
-      sendDiscordNotification(`새로운 승부예측이 등록되었습니다.\n${homeTeam.trim()} vs ${awayTeam.trim()}\n경기 시간: ${matchTime.trim()}`);
+      sendDiscordNotification(`새로운 승부예측이 등록되었습니다.\n${homeTeam.trim()} vs ${awayTeam.trim()}\n경기 시간: ${matchTime.trim()}`, { url: '/prediction' });
       res.json({ ok: true });
     } catch (error) {
       reportDeveloperError(error, req);
@@ -2992,11 +3032,12 @@ app.get('/gamezone-shooting', this.isLoggedIn, async (req, res, next) => {
   // 쿼리로 이전 달 보기 옵션 지원 (예: ?prev=1)
   const isPrev = req.query.prev === '1';
   if (isPrev) {
-    const prevDate = new Date();
-    prevDate.setMonth(prevDate.getMonth() - 1);
-    const prevMonth = prevDate.toLocaleString('ko-KR', { timeZone, month: '2-digit' });
-    const prevYear = prevDate.toLocaleString('ko-KR', { timeZone, year: 'numeric' });
-    yearMonth = `${prevYear}-${prevMonth}`;
+    // 한국 시간 기준 이번 달에서 1을 빼서 계산 (31일·서버 UTC 시간대 영향 없음)
+    const year = parseInt(currentYear, 10);
+    const month = parseInt(currentMonth, 10);
+    const prevYear = month === 1 ? year - 1 : year;
+    const prevMonth = month === 1 ? 12 : month - 1;
+    yearMonth = `${prevYear}년-${String(prevMonth).padStart(2, '0')}월`; // 저장 형식과 동일: "2026년-09월"
   }
 
   let mvpboardDic = await db.collection('mvpboard').find().sort({ _id: -1 }).limit(1).toArray();
@@ -3065,7 +3106,7 @@ app.get('/gamezone-shooting-scoreboard', async (req, res) => {
   if (topList && topList.length > 0) {
     const topEntry = topList[0];
     if (score >= 10 && topEntry.name === username && topEntry.top_score === score) {
-      sendDiscordNotification(`[${username}] 님이 승부차기에서 ${score}점으로 1위를 기록했습니다.`);
+      sendDiscordNotification(`[${username}] 님이 승부차기에서 ${score}점으로 1위를 기록했습니다.`, { url: '/gamezone-shooting' });
     }
   }
 
@@ -3101,13 +3142,25 @@ app.post('/reset-shootinggame', async (req, res) => {
 
 app.get('/photo', this.isLoggedIn, async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
+    let page = parseInt(req.query.page) || 1;
     const perPage = 10;
-    const skip = (page - 1) * perPage;
-    
+
     // 전체 사진 개수 조회
     const totalPhotos = await db.collection('photo').countDocuments();
     const totalPages = Math.ceil(totalPhotos / perPage);
+
+    // 알림 등으로 photoId가 넘어오면 그 사진이 있는 페이지를 계산 (최신순 정렬 기준)
+    let targetPhotoId = null;
+    if (typeof req.query.photoId === 'string' && ObjectId.isValid(req.query.photoId)) {
+      const photoObjectId = new ObjectId(req.query.photoId);
+      const exists = await db.collection('photo').countDocuments({ _id: photoObjectId }, { limit: 1 });
+      if (exists) {
+        const newerCount = await db.collection('photo').countDocuments({ _id: { $gt: photoObjectId } });
+        page = Math.floor(newerCount / perPage) + 1;
+        targetPhotoId = photoObjectId.toString();
+      }
+    }
+    const skip = (page - 1) * perPage;
     
     // 현재 페이지의 사진 10개 로드
     let result = await db.collection('photo').aggregate([
@@ -3132,7 +3185,7 @@ app.get('/photo', this.isLoggedIn, async (req, res, next) => {
       }
     ]).toArray();
     
-    res.render('photo.ejs', { 포토: result, currentPage: page, totalPages: totalPages });
+    res.render('photo.ejs', { 포토: result, currentPage: page, totalPages: totalPages, targetPhotoId });
   } catch (error) {
     console.error(error);
     next(error);
@@ -3250,7 +3303,7 @@ app.post('/photo-comment', async (req, res) => {
     schedulePushNotification({
       title: '오늘도골대FC',
       body: `${req.user?.username || '익명'} 님이 내 사진에 댓글을 달았습니다. [${commentPreview}]`,
-      url: '/photo'
+      url: `/photo?photoId=${commentedPhoto._id}`
     }, { targetUsernames: [photoOwner] });
   }
   res.redirect('back')
@@ -3455,6 +3508,7 @@ app.get('/mypage/:userId', async (req, res) => {
     todayKey: getSeoulDateKey(),
     isOwnProfile,
     pushEnabled,
+    quietHoursEnabled: isOwnProfile ? req.user.quietHoursEnabled !== false : true,
     mvpAwardCount,
     badges,
     clubEmblems,

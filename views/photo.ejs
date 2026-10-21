@@ -94,6 +94,13 @@
             cursor: not-allowed;
         }
     
+
+        /* 알림으로 들어온 사진 강조 */
+        .story-photo-card.photo-target-highlight {
+            border-radius: 12px;
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.9);
+            transition: box-shadow 0.6s ease;
+        }
     </style>
     <script>
 
@@ -283,7 +290,7 @@
                 <% const photoLikes = Array.isArray(포토[i].likes) ? 포토[i].likes : []; %>
                 <% const photoIsLiked = photoLikes.includes(유저.username); %>
 
-                <div class="story-photo-area story-photo-card">
+                <div class="story-photo-area story-photo-card" id="photo-<%= 포토[i]._id %>">
 
                     <div class="story-photo-info-area">
 <!-- TODO1 -->
@@ -621,6 +628,26 @@
         </div>
 
 
+    <script>
+        // 알림을 눌러 들어온 경우 해당 사진으로 스크롤 (상단 고정 메뉴 높이만큼 띄움)
+        (function () {
+            const targetPhotoId = <%- JSON.stringify(typeof targetPhotoId === 'undefined' ? null : targetPhotoId) %>;
+            if (!targetPhotoId) return;
+            const scrollToTarget = function () {
+                const card = document.getElementById('photo-' + targetPhotoId);
+                if (!card) return;
+                const header = document.querySelector('.top-area-fixed');
+                const offset = (header ? header.offsetHeight : 0) + 12;
+                const top = card.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+                card.classList.add('photo-target-highlight');
+                setTimeout(function () { card.classList.remove('photo-target-highlight'); }, 2500);
+            };
+            // 이미지가 로드되며 위치가 바뀌므로 전체 로드 후 이동
+            if (document.readyState === 'complete') scrollToTarget();
+            else window.addEventListener('load', scrollToTarget);
+        })();
+    </script>
     <%- include('footer.ejs') %>
 </body>
 

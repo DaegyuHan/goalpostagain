@@ -163,6 +163,21 @@
         </div>
       </section>
 
+      <section id="mypage-quiet-hours" class="mypage-notification-settings mypage-quiet-hours" aria-labelledby="mypage-quiet-hours-title" <%= pushEnabled ? '' : 'hidden' %>>
+        <div>
+          <h2 id="mypage-quiet-hours-title">야간 알림 끄기</h2>
+          <p id="mypage-quiet-hours-status" aria-live="polite"><%= quietHoursEnabled ? '밤 12시 ~ 오전 8시(한국 시간)에는 알림을 보내지 않습니다.' : '밤 시간에도 알림을 받습니다.' %></p>
+        </div>
+        <div class="mypage-push-actions">
+          <label class="mypage-push-switch">
+            <span class="mypage-push-switch-text" aria-hidden="true">00:00 ~ 08:00</span>
+            <span class="visually-hidden">밤 12시부터 오전 8시까지 알림 끄기</span>
+            <input id="mypage-quiet-hours-enabled" type="checkbox" role="switch" <%= quietHoursEnabled ? 'checked' : '' %>>
+            <span class="mypage-push-slider" aria-hidden="true"></span>
+          </label>
+        </div>
+      </section>
+
       <section class="mypage-profile-settings" aria-labelledby="mypage-profile-settings-title">
         <div>
           <h2 id="mypage-profile-settings-title">회원정보</h2>
@@ -276,6 +291,7 @@
         } else {
           await enablePushNotifications();
           accountPushToggle.checked = true;
+          syncQuietHoursVisibility();
           status.textContent = '이 기기를 알림 수신 기기로 등록했습니다.';
         }
       } catch (error) {
@@ -286,6 +302,39 @@
         } catch (error) {
           console.error('Current device push status refresh failed:', error);
         }
+      }
+    });
+
+    // 야간 알림 끄기: 알림을 켠 회원에게만 보이고, 기본값은 켜짐
+    const quietHoursSection = document.getElementById('mypage-quiet-hours');
+    const quietHoursToggle = document.getElementById('mypage-quiet-hours-enabled');
+    const quietHoursStatus = document.getElementById('mypage-quiet-hours-status');
+
+    function syncQuietHoursVisibility() {
+      if (!quietHoursSection || !accountPushToggle) return;
+      quietHoursSection.hidden = !accountPushToggle.checked;
+    }
+    document.addEventListener('push-preference-updated', syncQuietHoursVisibility);
+
+    quietHoursToggle?.addEventListener('change', async () => {
+      const nextValue = quietHoursToggle.checked;
+      quietHoursToggle.disabled = true;
+      try {
+        const response = await fetch('/push/quiet-hours', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: nextValue })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.message || '야간 알림 설정을 변경하지 못했습니다.');
+        quietHoursStatus.textContent = nextValue
+          ? '밤 12시 ~ 오전 8시(한국 시간)에는 알림을 보내지 않습니다.'
+          : '밤 시간에도 알림을 받습니다.';
+      } catch (error) {
+        quietHoursToggle.checked = !nextValue;
+        quietHoursStatus.textContent = error.message || '야간 알림 설정을 변경하지 못했습니다.';
+      } finally {
+        quietHoursToggle.disabled = false;
       }
     });
 

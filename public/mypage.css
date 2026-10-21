@@ -726,6 +726,16 @@
     opacity: 0.6;
 }
 
+/* 야간 알림 끄기 (웹 푸시 알림 바로 아래) */
+.mypage-quiet-hours {
+    margin-top: 16px;
+    padding-top: 16px;
+}
+
+.mypage-quiet-hours[hidden] {
+    display: none;
+}
+
 
 
 

@@ -175,6 +175,8 @@ async function togglePushNotifications(toggle) {
     if (status) status.textContent = error.message || '알림 설정을 변경하지 못했습니다.';
   } finally {
     toggle.disabled = false;
+    // 마이페이지의 "야간 알림 끄기" 영역 표시 여부 갱신
+    document.dispatchEvent(new CustomEvent('push-preference-updated'));
   }
 }
 
