@@ -736,6 +736,14 @@
     display: none;
 }
 
+.mypage-quiet-hours .mypage-push-actions {
+    justify-content: flex-end;
+}
+
+.mypage-quiet-hours p {
+    word-break: keep-all;
+}
+
 
 
 
@@ -784,8 +792,26 @@
 
     .mypage-push-actions {
         flex-wrap: wrap;
-        justify-content: flex-start;
+        justify-content: space-between;
         gap: 12px 16px;
+        width: 100%;
+    }
+
+    /* 야간 알림 끄기: 모바일에서도 한 줄 유지, 스위치는 위 "전체 알림" 스위치와 같은 오른쪽 끝에 맞춤 */
+    .mypage-quiet-hours.mypage-notification-settings {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .mypage-quiet-hours > div:first-child {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .mypage-quiet-hours .mypage-push-actions {
+        width: auto;
+        flex: 0 0 auto;
+        justify-content: flex-end;
     }
 
     .mypage-heading h1 {

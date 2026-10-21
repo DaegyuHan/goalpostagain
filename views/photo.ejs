@@ -96,10 +96,17 @@
     
 
         /* 알림으로 들어온 사진 강조 */
+        .story-photo-card {
+            transition: transform 0.6s ease, box-shadow 0.6s ease, background-color 0.6s ease;
+        }
         .story-photo-card.photo-target-highlight {
-            border-radius: 12px;
-            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.9);
-            transition: box-shadow 0.6s ease;
+            /* 아주 살짝 떠오르는 입체감 (그림자만 사용해 다른 사진은 밀리지 않음) */
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.025);
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.35),
+                0 2px 4px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px) scale(1.005);
         }
     </style>
     <script>
