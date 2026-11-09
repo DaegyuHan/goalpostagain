@@ -965,6 +965,7 @@ app.get('/', async (req, res) => {
     }).sort({ _id: -1 }).limit(3).toArray(),
     db.collection('matchplan').find({}, {
       projection: {
+        year: 1,
         month: 1,
         date: 1,
         day: 1,
@@ -2516,10 +2517,23 @@ app.post('/notice-post', async (req, res) => {
 })
 
 app.get('/notice/notice-detail/:id', this.isLoggedIn, async (req, res, next) => {
-  let postID = await db.collection('notice').findOne({ _id: new ObjectId(req.params.id) })
-  let comment = await db.collection('comment').find({ parentId: new ObjectId(req.params.id) }).toArray()
+  if (!ObjectId.isValid(req.params.id)) return res.status(404).render('error.ejs');
+  const noticeId = new ObjectId(req.params.id);
+  const viewerId = String(req.user._id);
 
-  res.render('notice-detail.ejs', { 글: postID, 댓글: comment })
+  // 조회수: 글을 연 회원을 1명씩만 기록 (작성자 본인 제외, 같은 회원이 여러 번 열어도 1명)
+  const viewUpdate = await db.collection('notice').findOneAndUpdate(
+    { _id: noticeId, user: { $ne: req.user._id } },
+    { $addToSet: { viewerIds: viewerId } },
+    { returnDocument: 'after' }
+  );
+  let postID = viewUpdate && Object.prototype.hasOwnProperty.call(viewUpdate, 'value') ? viewUpdate.value : viewUpdate;
+  if (!postID) postID = await db.collection('notice').findOne({ _id: noticeId });
+  if (!postID) return res.status(404).render('error.ejs');
+  let comment = await db.collection('comment').find({ parentId: noticeId }).toArray()
+  const viewCount = Array.isArray(postID.viewerIds) ? postID.viewerIds.length : 0;
+
+  res.render('notice-detail.ejs', { 글: postID, 댓글: comment, 조회수: viewCount })
 
 })
 

@@ -89,7 +89,7 @@
       <div class="match-plan-area">
 
         <div class="main-planmatch-datefont">
-          24. <%=매치일정[0].month %>. <%=매치일정[0].date %> (<%=매치일정[0].day%>)
+          <%= String(매치일정[0].year || new Date().getFullYear()).trim().slice(-2) %>. <%=매치일정[0].month %>. <%=매치일정[0].date %> (<%=매치일정[0].day%>)
         </div>
 
         <div class="planmatch-result-area">
@@ -173,7 +173,7 @@
               <%=result[0].awayname%>
             </div>
             <div class="home-lastmatch-date">
-              <%=result[1].year%>.<%=result[0].month%>.<%=result[0].day%>
+              <%=result[0].year%>.<%=result[0].month%>.<%=result[0].day%>
             </div>
           </div>
           <div class="home-lastmatch-score-area">
@@ -225,7 +225,7 @@
               <%=result[2].awayname%>
             </div>
             <div class="home-lastmatch-date">
-              <%=result[1].year%>.<%=result[2].month%>.<%=result[2].day%>
+              <%=result[2].year%>.<%=result[2].month%>.<%=result[2].day%>
             </div>
           </div>
           <div class="home-lastmatch-score-area">

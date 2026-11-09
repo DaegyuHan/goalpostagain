@@ -87,6 +87,9 @@
                     <span>
                         <%=글.time%>
                     </span>
+                    <span class="detail-view-count" title="조회수 (확인한 회원 수, 작성자 제외)" aria-label="조회수">
+                        <i class="fa-regular fa-eye" aria-hidden="true"></i> <%= typeof 조회수 !== 'undefined' ? 조회수 : 0 %>
+                    </span>
                 </div>
 
                 <hr>

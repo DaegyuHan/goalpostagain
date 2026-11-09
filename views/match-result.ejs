@@ -163,10 +163,16 @@
           </div>
 
 
-          <div class="match-result-resultlogo match-result-tooltip">
+          <% const mvpNames = Array.isArray(result[i].mvp_names) && result[i].mvp_names.length ? result[i].mvp_names : (result[i].mvp_name ? [String(result[i].mvp_name).replace(/\s*\(공동 MVP\)$/, '')] : []); %>
+          <div class="match-result-resultlogo match-result-tooltip" tabindex="0">
             <%-result[i].resultlogo%>
             <div class="match-result-tooltip-content">
-              <%=result[i].mvp_name%>
+              <% if (mvpNames.length > 1) { %>
+                <span class="match-result-tooltip-label">공동 MVP</span>
+              <% } %>
+              <% mvpNames.forEach((name) => { %>
+                <span class="match-result-tooltip-name"><%= name %></span>
+              <% }); %>
             </div>
           </div>
           

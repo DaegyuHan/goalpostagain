@@ -372,3 +372,62 @@
         }
     }
 }
+
+/* MVP 툴팁: 공동 MVP도 잘리지 않도록 내용 길이에 맞춰 늘어남 */
+.match-result-tooltip {
+    outline: none;
+}
+
+.match-result-tooltip .match-result-tooltip-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2px 8px;
+    top: calc(100% - 6px);
+    left: 50%;
+    right: auto;
+    width: max-content;
+    min-width: 70px;
+    max-width: min(280px, 90vw);
+    height: auto;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: keep-all;
+    transform: translateX(-50%);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.match-result-tooltip:hover .match-result-tooltip-content,
+.match-result-tooltip:focus .match-result-tooltip-content,
+.match-result-tooltip:focus-within .match-result-tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+.match-result-tooltip-label {
+    flex-basis: 100%;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.match-result-tooltip-name {
+    white-space: nowrap;
+}
+
+@media only screen and (max-width: 1000px) {
+    .match-result-tooltip .match-result-tooltip-content {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .match-result-tooltip-label {
+        font-size: 10px;
+    }
+}

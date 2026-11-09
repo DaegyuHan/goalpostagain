@@ -129,3 +129,12 @@ button:hover {
   }
 
 }
+
+/* 공지 조회수 */
+.detail-view-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  white-space: nowrap;
+}
