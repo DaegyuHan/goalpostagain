@@ -1508,3 +1508,105 @@
 .white-main .developer-club-drag-handle i {
     color: inherit;
 }
+
+/* 통계: 월별 접속일수 */
+.monthly-active-days-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.monthly-active-days-head .management-card-title {
+    margin-bottom: 0;
+}
+
+.monthly-active-days-picker select {
+    min-width: 128px;
+    padding: 7px 10px;
+    border: 1px solid var(--management-line);
+    border-radius: 5px;
+    background: var(--management-surface);
+    color: var(--management-ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.monthly-active-days-summary {
+    margin: 10px 0 8px;
+    text-align: left;
+}
+
+.monthly-active-days-row {
+    display: grid;
+    grid-template-columns: 48px minmax(72px, 140px) minmax(0, 1fr) 48px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid var(--management-line);
+    color: var(--management-ink);
+}
+
+.monthly-active-days-row.is-zero {
+    color: var(--management-muted);
+}
+
+.monthly-active-days-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.monthly-active-days-bar {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--management-pink-soft);
+}
+
+.monthly-active-days-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--management-pink);
+}
+
+.monthly-active-days-count {
+    font-size: 13px;
+    font-weight: 800;
+    text-align: right;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .monthly-active-days-row {
+        grid-template-columns: 36px minmax(0, 1fr) 40px;
+        gap: 6px 8px;
+        padding: 10px 4px;
+    }
+
+    .monthly-active-days-name {
+        font-size: 12px;
+    }
+
+    .monthly-active-days-bar {
+        grid-column: 2 / 4;
+        grid-row: 2;
+        height: 6px;
+    }
+
+    .monthly-active-days-count {
+        grid-column: 3;
+        grid-row: 1;
+        font-size: 12px;
+    }
+
+    .monthly-active-days-picker,
+    .monthly-active-days-picker select {
+        width: 100%;
+    }
+}

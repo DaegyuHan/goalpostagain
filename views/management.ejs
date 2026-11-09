@@ -49,6 +49,9 @@
         managementStats.forEach((stats) => {
           stats.classList.toggle('management-is-hidden', selectedTab !== 'stats');
         });
+        if (selectedTab === 'stats' && typeof window.loadMonthlyActiveDays === 'function') {
+          window.loadMonthlyActiveDays();
+        }
       }
 
       managementTabs.forEach((tab) => {
@@ -1530,6 +1533,18 @@
                   </ul>
                 <% } %>
               </div>
+              <div class="developer-push-subscribers monthly-active-days" id="monthly-active-days">
+                <div class="monthly-active-days-head">
+                  <div class="management-card-title"><span class="management-icon"><i class="fa-solid fa-calendar-check"></i></span><h3>월별 접속일수</h3></div>
+                  <label class="monthly-active-days-picker" for="monthly-active-days-month">
+                    <select id="monthly-active-days-month" aria-label="조회 월"></select>
+                  </label>
+                </div>
+                <div class="management-section-note monthly-active-days-summary" id="monthly-active-days-summary">그날 한 번이라도 접속(요청)하면 1일 · 한국 시간 기준</div>
+                <div class="monthly-active-days-list" id="monthly-active-days-list" aria-live="polite">
+                  <div class="prediction-empty">통계 탭을 열면 불러옵니다.</div>
+                </div>
+              </div>
               </div>
               <% } %>
       <% if (isDeveloper) { %>
@@ -2267,6 +2282,102 @@
     </div>
 
   <%- include('footer.ejs') %>
+
+  <script>
+    (() => {
+      const root = document.getElementById('monthly-active-days');
+      if (!root) return;
+      const monthSelect = document.getElementById('monthly-active-days-month');
+      const summary = document.getElementById('monthly-active-days-summary');
+      const list = document.getElementById('monthly-active-days-list');
+      let loadedMonth = null;
+      let loading = false;
+
+      function formatMonth(month) {
+        const [year, monthNumber] = month.split('-');
+        return `${year}년 ${Number(monthNumber)}월`;
+      }
+
+      function renderMessage(text) {
+        list.replaceChildren();
+        const empty = document.createElement('div');
+        empty.className = 'prediction-empty';
+        empty.textContent = text;
+        list.appendChild(empty);
+      }
+
+      function render(data) {
+        if (!monthSelect.options.length || monthSelect.dataset.months !== data.months.join(',')) {
+          monthSelect.replaceChildren(...data.months.map((month) => new Option(formatMonth(month), month)));
+          monthSelect.dataset.months = data.months.join(',');
+        }
+        monthSelect.value = data.month;
+        summary.textContent = `${formatMonth(data.month)} · 접속 ${data.activeUserCount}명 · 기준 ${data.totalDays}일 · 한국 시간 기준`;
+
+        if (!data.users.length) {
+          renderMessage('이 달의 접속 기록이 없습니다.');
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        let rank = 0;
+        let previousDays = null;
+        data.users.forEach((user, index) => {
+          if (index === 0 || user.days !== previousDays) rank = index + 1;
+          previousDays = user.days;
+
+          const row = document.createElement('div');
+          row.className = 'monthly-active-days-row' + (user.days === 0 ? ' is-zero' : '');
+
+          const rankEl = document.createElement('strong');
+          rankEl.textContent = user.days > 0 ? `${rank}위` : '-';
+
+          const name = document.createElement('span');
+          name.className = 'monthly-active-days-name';
+          name.textContent = user.username;
+
+          const bar = document.createElement('div');
+          bar.className = 'monthly-active-days-bar';
+          const fill = document.createElement('i');
+          fill.style.width = `${data.totalDays ? Math.min(100, Math.round(user.days / data.totalDays * 100)) : 0}%`;
+          bar.appendChild(fill);
+
+          const count = document.createElement('span');
+          count.className = 'monthly-active-days-count';
+          count.textContent = `${user.days}일`;
+          if (user.lastDate) count.title = `마지막 접속 ${user.lastDate}`;
+
+          row.append(rankEl, name, bar, count);
+          fragment.appendChild(row);
+        });
+        list.replaceChildren(fragment);
+      }
+
+      async function load(month) {
+        if (loading) return;
+        loading = true;
+        renderMessage('불러오는 중...');
+        try {
+          const query = month ? `?month=${encodeURIComponent(month)}` : '';
+          const response = await fetch(`/management/active-days${query}`, { headers: { Accept: 'application/json' } });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.message || '불러오기 실패');
+          loadedMonth = data.month;
+          render(data);
+        } catch (error) {
+          renderMessage(error.message || '월간 접속 통계를 불러오지 못했습니다.');
+        } finally {
+          loading = false;
+        }
+      }
+
+      window.loadMonthlyActiveDays = () => {
+        if (!loadedMonth) load();
+      };
+      monthSelect.addEventListener('change', () => load(monthSelect.value));
+
+    })();
+  </script>
 </body>
 
 </html>

@@ -1074,6 +1074,70 @@ app.get('/management', async (req, res) => {
   res.render('management.ejs', { 글목록: result, 매치일정: matchplan, latestResult: latestResult[0] || null, mvpboard: mvpboard, avgStatsResult: avgStatsResult, lastSavedTime: lastSavedTime, lastSavedUsername: lastSavedUsername, predictionSetting: predictionSetting || null, predictionLeaderboard, predictionHistory, pushEnabledUsernames, isDeveloper, canSeeStats, canManage, todayActiveUsernames: todayActiveRecord?.usernames || [], generalDiscordNotificationsEnabled, mvpAwardLeaderboard, developerBadgeUsers, developerBadges, withdrawnUsers, developerClubLogos, developerClubFavorites, clubFavoriteLimit: MAX_FAVORITE_CLUBS });
 });
 
+// 통계: 회원별 월간 접속일수 (그날 한 번이라도 요청을 보낸 날 = 접속 1일, 한국 시간 기준)
+app.get('/management/active-days', async (req, res) => {
+  const canSeeStats = req.user?.userID === DEVELOPER_USER_ID || req.user?.username === '한대규';
+  if (!canSeeStats) {
+    return res.status(403).json({ ok: false, message: '통계 조회 권한이 필요합니다.' });
+  }
+
+  try {
+    const currentMonth = getSeoulDateKey().slice(0, 7);
+    const requestedMonth = String(req.query.month || '');
+    const month = /^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth) ? requestedMonth : currentMonth;
+
+    const [dateDocs, monthlyDocs, members] = await Promise.all([
+      db.collection('daily_active_users').find({}, { projection: { _id: 1 } }).toArray(),
+      db.collection('daily_active_users').find(
+        { _id: { $gte: `${month}-01`, $lte: `${month}-31` } },
+        { projection: { usernames: 1 } }
+      ).toArray(),
+      db.collection('user').find({ isWithdrawn: { $ne: true } }, { projection: { username: 1 } }).toArray()
+    ]);
+
+    const months = [...new Set(dateDocs.map((doc) => String(doc._id).slice(0, 7)))];
+    if (!months.includes(currentMonth)) months.push(currentMonth);
+    months.sort().reverse();
+
+    const dayCounts = new Map();
+    const lastDates = new Map();
+    monthlyDocs.sort((a, b) => String(a._id).localeCompare(String(b._id)));
+    for (const doc of monthlyDocs) {
+      for (const username of new Set(doc.usernames || [])) {
+        if (typeof username !== 'string' || !username) continue;
+        dayCounts.set(username, (dayCounts.get(username) || 0) + 1);
+        lastDates.set(username, String(doc._id));
+      }
+    }
+    for (const member of members) {
+      if (typeof member.username === 'string' && member.username && !dayCounts.has(member.username)) {
+        dayCounts.set(member.username, 0);
+      }
+    }
+
+    const users = [...dayCounts.entries()]
+      .map(([username, days]) => ({ username, days, lastDate: lastDates.get(username) || null }))
+      .sort((a, b) => b.days - a.days || a.username.localeCompare(b.username, 'ko'));
+
+    const [year, monthNumber] = month.split('-').map(Number);
+    const daysInMonth = new Date(year, monthNumber, 0).getDate();
+    const totalDays = month === currentMonth ? Number(getSeoulDateKey().slice(8, 10)) : daysInMonth;
+
+    res.json({
+      ok: true,
+      month,
+      months,
+      totalDays,
+      trackedDays: monthlyDocs.length,
+      activeUserCount: users.filter((user) => user.days > 0).length,
+      users
+    });
+  } catch (error) {
+    reportDeveloperError(error, req);
+    res.status(500).json({ ok: false, message: '월간 접속 통계를 불러오지 못했습니다.' });
+  }
+});
+
 app.post('/developer/badges', (req, res) => {
   if (req.user?.userID !== DEVELOPER_USER_ID) {
     return res.status(403).json({ ok: false, message: '개발자 권한이 필요합니다.' });
