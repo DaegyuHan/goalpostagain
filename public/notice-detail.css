@@ -130,11 +130,21 @@ button:hover {
 
 }
 
-/* 공지 조회수 */
+/* 공지 조회수: 글쓴이·작성시간과 같은 글꼴/색/줄맞춤 */
 .detail-view-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
+  color: inherit;
+  font: inherit;
   white-space: nowrap;
+}
+
+.detail-view-icon {
+  width: 1em;
+  height: 1em;
+  margin-right: 3px;
+  vertical-align: -0.125em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
